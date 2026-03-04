@@ -261,7 +261,7 @@
 		};
     .topTabbar {
 			width: 100%;
-			padding: 16px;
+			padding: 0 0 0 16px;
 			box-sizing: border-box;
 			overflow: auto;
 			display: flex;
@@ -300,7 +300,7 @@
 					width: 98%;
 					word-break: break-all;
 					font-size: 12px;
-					margin-top: 10px;
+					margin-top: 4px;
 					line-height: 20px
 				}
 			}
@@ -311,7 +311,7 @@
 			height: 0;
 			display: flex;
 			flex-direction: column;
-			margin-top: 10px;
+			margin-top: 6px;
 			.task-board {
 				width: 100%;
 				padding: 0 16px 10px 16px;
