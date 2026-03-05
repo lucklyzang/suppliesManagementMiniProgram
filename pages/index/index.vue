@@ -216,14 +216,13 @@
 			
 			// 功能区点击事件
 			functionalZoneEvent (item, index) {
-				if (item.name == '设备巡检') {
-					this.$router.push({path: '/equipmentPatrolDetails'})
-				} else if (item.name == '设备点检') {
-					this.$router.push({path: '/equipmentSpotCheck'})
-				} else if (item.name == '设备管理') {
-					this.$router.push({path: '/equipmentList'})
-				} else if (item.name == '调度管理') {
-					this.$router.push({path: '/equipmentSpotList'}) 
+				if (item.text == '临时申领') {
+					uni.navigateTo({
+						url: '/materialApplicationPackage/pages/materialApplication/materialApplication'
+					})
+				} else if (item.text == '计划申领') {
+				} else if (item.text == '我的订单') {
+				} else if (item.text == '审核') {
 				}
 			}
 		}

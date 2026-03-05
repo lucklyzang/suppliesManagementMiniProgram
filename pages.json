@@ -39,54 +39,15 @@
 				"navigationBarTextStyle": "black",
 				"navigationStyle" : "custom"
 			}
-		},
-		{
-			"path": "pages/feedbackEvent/feedbackEvent",
-			"style": { 
-				"navigationBarTitleText": "",
-				"navigationBarBackgroundColor": "#75b0f0",
-				"navigationBarTextStyle": "black",
-				"navigationStyle" : "custom"
-			}
 		}
 	],
 	"subPackages": [
 		{
-			"root": "projectManagementPackage",
-			"name": "rootProjectManagementPackage",
+			"root": "materialApplicationPackage",
+			"name": "rootMaterialApplicationPackage",
 			"pages": [
 				{
-					"path": "pages/callTask/callTask",
-					"style": {
-						"navigationBarTitleText": "",
-						"navigationBarBackgroundColor": "#ffffff",
-						"backgroundColorTop": "#fff,",
-						"backgroundColorBottom": "#fff",
-						"navigationStyle" : "custom"
-					}
-				},
-				{
-					"path": "pages/realtimeTask/realtimeTask",
-					"style": {
-						"navigationBarTitleText": "",
-						"navigationBarBackgroundColor": "#ffffff",
-						"backgroundColorTop": "#fff,",
-						"backgroundColorBottom": "#fff",
-						"navigationStyle" : "custom"
-					}
-				},
-				{
-					"path": "pages/historicalTask/historicalTask",
-					"style": {
-						"navigationBarTitleText": "",
-						"navigationBarBackgroundColor": "#ffffff",
-						"backgroundColorTop": "#fff,",
-						"backgroundColorBottom": "#fff",
-						"navigationStyle" : "custom"
-					}
-				},
-				{
-					"path": "pages/projectWorkerOrderMessage/projectWorkerOrderMessage",
+					"path": "pages/materialApplication/materialApplication",
 					"style": {
 						"navigationBarTitleText": "",
 						"navigationBarBackgroundColor": "#ffffff",
@@ -99,9 +60,9 @@
 		}
 	],
 	"preloadRule": {
-		"projectManagementPackage/pages/callTask/callTask": {
+		"materialApplicationPackage/pages/materialApplication/materialApplication": {
 				"network": "all",
-				"packages": ["rootProjectManagementPackage"]
+				"packages": ["rootMaterialApplicationPackage"]
 		}
 	},
 	"globalStyle": {
