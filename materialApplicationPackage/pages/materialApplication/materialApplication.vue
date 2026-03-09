@@ -167,6 +167,7 @@ export default {
 			tierNum: 0,
 			searchValue: '',
 			allChooseProductPrice: 0,
+			temporaryMaterialList: [],
 			originalMaterialList: [],
 			materialList: [
 				{
@@ -203,6 +204,7 @@ export default {
 			this.tierNum = pages.length;
 		};
 		this.originalMaterialList = deepClone(this.materialList);
+		this.temporaryMaterialList = deepClone(this.materialList);
 	},
 	
   watch: {},
@@ -249,6 +251,7 @@ export default {
 			 this.allChooseProductPrice = targetMsg.reduce((accumulator, currentValue) => {
 				 return accumulator + currentValue.totalPrice
 			 }, 0);
+			 console.log('飒飒',targetMsg,this.chooseMaterialList,this.chooseMaterialList[0]['quantity']);
 		 },
 		 
 		 // 保留两位小数，返回数字类型，修复精度问题
@@ -265,6 +268,7 @@ export default {
 			 };
 			 item['showTotalPrice'] = this.formatPrice(item['unitPrice'] * val['value']);
 			 item['totalPrice'] = item['unitPrice'] * val['value'];
+			 item['quantity'] = val['value'];
 			 this.reduceTotal();
 		 },
 		 
@@ -272,8 +276,10 @@ export default {
 		 addProductEvent () {
 				this.productChooseShow = true;
 				this.searchValue = '';
+				// 打开产品弹框就显示全部产品信息
+				this.materialList = deepClone(this.originalMaterialList);
+				// 添加过的产品不允许再次添加
 				for (let item of this.materialList) {
-					 // 添加过的产品不允许再次添加
 					 let isExist = this.chooseMaterialList.filter((innerItem) => { return innerItem.productName == item.productName});
 					 if (isExist.length > 0) {
 						 item['checked'] = true;
@@ -295,9 +301,23 @@ export default {
 		 // 搜索框值改变事件
 		 searchChange () {
 			 if (this.searchValue === '') {
-				 this.materialList = this.originalMaterialList
+				 this.materialList = deepClone(this.originalMaterialList);
+			 } else {
+				  this.materialList = this.temporaryMaterialList.filter((item) => { return item['productName'].indexOf(this.searchValue) != -1 });
 			 };
-			 this.materialList = this.materialList.filter((item) => { return item['productName'].indexOf(this.searchValue) != -1 })
+			 // 添加过的产品不允许再次添加
+			 for (let item of this.materialList) {
+			 	 let isExist = this.chooseMaterialList.filter((innerItem) => { return innerItem.productName == item.productName});
+			 	 if (isExist.length > 0) {
+			 		 item['checked'] = true;
+			 		 item['disabled'] = true;
+			 		 item['quantity'] = isExist[0]['quantity'];
+			 	 } else {
+			 		 item['checked'] = false;
+			 		 item['disabled'] = false;
+			 		 item['quantity'] = 0;
+			 	 }
+			 }
 		 },
 		 
 		 // 添加确认事件
@@ -324,6 +344,11 @@ export default {
 					productImage: item['productImage']
 				}) 
 			 };
+			 // 计算选中产品的对应价格
+			 for (let item of this.chooseMaterialList) {
+				 item['showTotalPrice'] = this.formatPrice(item['unitPrice'] * item['quantity']);
+				 item['totalPrice'] = item['unitPrice'] * item['quantity'];
+			 }; 
 			 this.reduceTotal();
 		 },
 		 

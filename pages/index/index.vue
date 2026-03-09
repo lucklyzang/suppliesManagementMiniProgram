@@ -222,6 +222,9 @@
 					})
 				} else if (item.text == '计划申领') {
 				} else if (item.text == '我的订单') {
+					uni.navigateTo({
+						url: '/materialApplicationPackage/pages/myOrderForm/myOrderForm'
+					})
 				} else if (item.text == '审核') {
 				}
 			}

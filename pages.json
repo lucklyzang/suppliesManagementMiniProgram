@@ -65,6 +65,16 @@
 						"backgroundColorBottom": "#fff",
 						"navigationStyle" : "custom"
 					}
+				},
+				{
+					"path": "pages/myOrderForm/myOrderForm",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
 				}
 			]
 		}
