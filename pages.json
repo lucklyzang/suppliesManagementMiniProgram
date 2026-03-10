@@ -75,6 +75,26 @@
 						"backgroundColorBottom": "#fff",
 						"navigationStyle" : "custom"
 					}
+				},
+				{
+					"path": "pages/historyOrderForm/historyOrderForm",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/orderDetails/orderDetails",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
 				}
 			]
 		}

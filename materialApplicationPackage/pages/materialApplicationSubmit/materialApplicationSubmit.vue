@@ -9,8 +9,8 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
 		<!-- 医院 -->
-		<view class="transport-rice-box" v-if="showTaskType">
-			<ScrollSelection v-model="showHospital" :pickerValues="hospitalDefaultIndex" :isShowSearch="true" :columns="hospitalOption" title="任务类型" @sure="hospitalSureEvent" @cancel="hospitalCancelEvent" @close="hospitalCloseEvent" />
+		<view class="transport-rice-box" v-if="showHospital">
+			<ScrollSelection v-model="showHospital" :pickerValues="hospitalDefaultIndex" :isShowSearch="true" :columns="hospitalOption" title="医院" @sure="hospitalSureEvent" @cancel="hospitalCancelEvent" @close="hospitalCloseEvent" />
 		</view>
 		<view class="nav">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="产品申领" @backClick="backTo">
@@ -18,15 +18,15 @@
 		</view>
 		<view class="content-box-inner">
 			<view class="message-box">
-				<view class="select-box">
+				<view class="select-box" @click="showHospital = true">
 					<view class="select-box-left">
 						<text>*</text>
 						<text>医院</text>
 					</view>
 					<view class="select-box-center">
-							<text>{{ currentHospital }}</text>
+						<text>{{ currentHospital }}</text>
 					</view>
-					<view class="select-box-right" @click="showHospital = true">
+					<view class="select-box-right">
 						<u-icon name="arrow-right" color="#101010" size="20" /></u-icon>
 					</view>
 				</view>
@@ -38,7 +38,7 @@
 					<view class="select-box-right">
 						 <u--input
 								v-model="deliveryAddress"
-						    placeholder=""
+						    placeholder="请输入送货地址"
 						    border="none"
 						    clearable
 						  ></u--input>
@@ -117,10 +117,26 @@
 				deliveryDate: getDate(),
 				deliveryDatevalue: this.normalizeTimestamp(),
 				showDeliveryDate: false,
-				hospitalOption: [],
+				hospitalOption: [
+					{
+						text: '医院1',
+						value: 1,
+						id: 0
+					},
+					{
+						text: '医院2',
+						value: 2,
+						id: 1
+					},
+					{
+						text: '医院3',
+						value: 3,
+						id: 2
+					}
+				],
 				hospitalDefaultIndex: [0],
 				showHospital: false,
-				currentTaskType: '请选择'
+				currentHospital: '请选择'
 			}
 		},
 		computed: {
@@ -172,13 +188,13 @@
 			
 				// 医院下拉选择框确认事件
 				hospitalSureEvent (val,value,id) {
-				if (val) {
-					this.hospitalDefaultIndex = [id];
-					this.currentHospital =  val
-				} else {
-					this.currentHospital = '请选择'
-				};
-				this.showHospital = false
+					if (val) {
+						this.hospitalDefaultIndex = [id];
+						this.currentHospital = val
+					} else {
+						this.currentHospital = '请选择'
+					};
+					this.showHospital = false
 				},
 
 				// 医院下拉选择框取消事件
@@ -377,6 +393,8 @@
 						};
 						.select-box-center {
 								flex: 1;
+								display: flex;
+								align-items: center;
 								>text {
 									color: #101010;
 									text-align: left;

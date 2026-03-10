@@ -9,19 +9,12 @@
 		<light-hint ref="alertToast"></light-hint>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="订单" @backClick="backTo">
-				<view slot="right" @click="enterHistoryOrderEvent">
-					<text>历史订单</text>
-				</view>
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="历史订单" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
 			<view class="status-date-box">
 				<view class="status-box">
-					<view class="status-text" @click="orderStatusListShow = !orderStatusListShow">
-						<text>{{ currentStatusText }}</text>
-						<u-icon :name="orderStatusListShow ? 'arrow-down' : 'arrow-up'" color="#101010" size="16" /></u-icon>
-					</view>
 					<view class="status-list-box" v-if="orderStatusListShow">
 						<view class="status-list" v-for="(item,index) in orderStatusList" @click="statusListEvent(item,index)" :key="index">
 							<text :class="{'statusTextStyle': index == currentStatusIndex }">{{ item }}</text>
@@ -87,11 +80,8 @@
 					</view>
 					<view class="order-list-bottom">
 						<view class="order-list-btn">
-							<view class="delete-left" @click.stop="deleteEvent(item,index)">
-								<text>删除</text>
-							</view>
-							<view class="edit-right" @click.edit="deleteEvent(item,index)">
-								<text>编辑</text>
+							<view class="edit-right" @click.edit="evaluateEvent(item,index)">
+								<text>评价</text>
 							</view>
 						</view>
 					</view>
@@ -132,15 +122,6 @@
 				defaultDateArr: [],
 				startDate: '',
 				endDate: '',
-				currentStatusText: '全部状态',
-				currentStatusIndex: 0,
-				orderStatusListShow: false,
-				orderStatusList: [
-					'全部状态',
-					'待确认',
-					'待审核',
-					'已审核'
-				],
 				orderList: [
 					{
 						orderType: '计划订单',
@@ -255,11 +236,7 @@
 			},
 			
 			// 进入历史订单事件
-			enterHistoryOrderEvent () {
-				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/historyOrderForm/historyOrderForm'
-				})
-			},
+			enterHistoryOrderEvent () {},
 			
 			// 日历日期选择确认事件
 			calendarConfirm(e) {
@@ -295,13 +272,6 @@
 			  return `${y}-${m}-${d}`;
 			},
 			
-			// 订单列表点击事件
-			statusListEvent(item,index) {
-				this.currentStatusText = item;
-				this.currentStatusIndex = index;
-				this.orderStatusListShow = false;
-			},
-			
 			//进入订单详情事件
 			enterOrderDetailsEvent(item,index) {
 				uni.navigateTo({
@@ -309,17 +279,8 @@
 				})
 			},
 			
-			// 订单删除事件
-			deleteEvent(item,index) {},
-			
-			// 订单编辑事件
-			editEvent(item,index) {},
-			
-			// 订单退换货事件
-			changingOrRefundingEvent(item,index) {},
-			
-			// 订单确认收货事件
-			sureReceivingEvent(item,index) {},
+			// 订单评价事件
+			evaluateEvent(item,index) {},
 			
 			// 顶部导航返回事件
 			backTo () {
@@ -363,14 +324,6 @@
 		};
 		.nav {
 			width: 100%;
-			.header_fixed {
-				.header_content {
-					.header_right_info {
-						color: #fff;
-						font-size: 14px;
-					}
-				}
-			}
 		};
 		.content {
 			 flex: 1;
@@ -386,52 +339,12 @@
 				 height: 40px;
 				 display: flex;
 				 align-items: center;
-				 justify-content: space-between;
-				 .status-box {
-					 width: 70px;
-					 margin-right: 20px;
-					 position: relative;
-					 .status-text {
-						 display: flex;
-						 align-items: center;
-						 justify-content: space-between;
-							>text {
-								margin-right: 4px;
-								font-size: 12px;
-								color: #101010
-							}
-					 };
-					 .status-list-box {
-						 width: 70px;
-						 background: #fff;
-						 position: absolute;
-						 left: 0;
-						 top: 20px;
-						 max-height: 160px;
-						 overflow: auto;
-						 .status-list {
-							 heigth: 20px;
-							 width: 70px;
-							 display: flex;
-							 align-items: center;
-							 >text {
-								 display: inline-block;
-								 heigth: 20px;
-								 width: 70px;
-								 font-size: 12px;
-								 color: #101010
-							 };
-							 .statusTextStyle {
-								 color: #7BE9A0 !important;
-							 }
-						 }
-					 }
-				 };
+				 padding-left: 12px;
+				 box-sizing: border-box;
 				 .data-box {
-					 width: 0;
+					 width: 70%;
 					 display: flex;
 					 align-items: center;
-					 flex: 1;
 					 .date-text {
 						 font-size: 12px;
 						 color: #101010;
@@ -603,21 +516,6 @@
 						 .order-list-btn {
 							 display: flex;
 							 align-items: center;
-								.delete-left {
-									 width: 65px;
-									 height: 28px;
-									 display: flex;
-									 align-items: center;
-									 justify-content: center;
-									 border: 1px solid #E86F50;
-									 box-sizing: border-box;
-									 border-radius: 4px;
-									 margin-right: 10px;
-									 >text {
-										 font-size: 12px;
-										 color: #E86F50
-									 }
-								};
 								.edit-right {
 									 width: 65px;
 									 height: 28px;
