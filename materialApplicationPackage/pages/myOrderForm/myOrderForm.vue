@@ -87,10 +87,10 @@
 					</view>
 					<view class="order-list-bottom">
 						<view class="order-list-btn">
-							<view class="delete-left" @click.stop="deleteEvent(item,index)">
-								<text>删除</text>
+							<view class="delete-left" @click.stop="changingOrRefundingEvent(item,index)">
+								<text>退换货</text>
 							</view>
-							<view class="edit-right" @click.edit="deleteEvent(item,index)">
+							<view class="edit-right" @click.stop="editEvent(item,index)">
 								<text>编辑</text>
 							</view>
 						</view>
@@ -316,7 +316,11 @@
 			editEvent(item,index) {},
 			
 			// 订单退换货事件
-			changingOrRefundingEvent(item,index) {},
+			changingOrRefundingEvent(item,index) {
+				uni.navigateTo({
+					url: '/materialApplicationPackage/pages/changingOrRefunding/changingOrRefunding'
+				})
+			},
 			
 			// 订单确认收货事件
 			sureReceivingEvent(item,index) {},
