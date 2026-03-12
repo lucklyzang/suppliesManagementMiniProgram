@@ -9,7 +9,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="退换货" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="确认收货" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content">
@@ -45,6 +45,11 @@
 					</view>
 				</view>
 			</view>
+		</view>
+		<view class="bottom-btn">
+				<view class="back-box" @click="allConfirmReceiptEvent">
+					<text>全部确认收货</text>
+				</view>
 		</view>
 	</view>
 </template>
@@ -118,12 +123,15 @@
 				uni.navigateBack()
 			},
 			
-			// 进入退换货详情事件
+			// 进入确认货详情事件
 			enterChangingOrRefundingDetailsEvent () {
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/changingOrRefundingDetails/changingOrRefundingDetails'
+					url: '/materialApplicationPackage/pages/confirmReceiptDetails/confirmReceiptDetails'
 				})
-			}
+			},
+			
+			// 确认全部收货事件
+			allConfirmReceiptEvent () {}
 		}
 	}
 </script>
@@ -375,6 +383,27 @@
 						}
 					}
 				}	
+			}
+		};
+		.bottom-btn {
+			height: 100px;
+			width: 94%;
+			margin: 0 auto;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			.back-box {
+				 width: 55%;
+				 height: 32px;
+				 background: #11D183;
+				 display: flex;
+				 align-items: center;
+				 justify-content: center;
+				 border-radius: 4px;
+				 >text {
+					font-size: 12px;
+					color: #fff;
+				 }
 			}
 		}
 	}

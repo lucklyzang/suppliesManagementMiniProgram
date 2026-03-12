@@ -87,11 +87,17 @@
 					</view>
 					<view class="order-list-bottom">
 						<view class="order-list-btn">
+							<view class="delete-left" v-if="false">
+								<text>删除</text>
+							</view>
 							<view class="delete-left" @click.stop="changingOrRefundingEvent(item,index)">
 								<text>退换货</text>
 							</view>
-							<view class="edit-right" @click.stop="editEvent(item,index)">
+							<view class="edit-right" v-if="false" @click.stop="editEvent(item,index)">
 								<text>编辑</text>
+							</view>
+							<view class="edit-right" @click.stop="sureReceivingEvent(item,index)">
+								<text>确认收货</text>
 							</view>
 						</view>
 					</view>
@@ -323,7 +329,11 @@
 			},
 			
 			// 订单确认收货事件
-			sureReceivingEvent(item,index) {},
+			sureReceivingEvent(item,index) {
+				uni.navigateTo({
+					url: '/materialApplicationPackage/pages/confirmReceipt/confirmReceipt'
+				})
+			},
 			
 			// 顶部导航返回事件
 			backTo () {

@@ -50,7 +50,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx97541cda15e4009a",
+        "appid" : "wx243da7c1b1e812a8",
         "setting" : {
             "urlCheck" : true,
             "ignoreDevUnusedFiles" : false,
@@ -59,11 +59,13 @@
             "minified" : true
         },
         "usingComponents" : true,
-				"requiredBackgroundModes": ["record"],
+        "requiredBackgroundModes" : [ "record" ],
         "permission" : {
-					"scope.writePhotosAlbum": {"desc": "写入相册权限"}
-				},
-				"lazyCodeLoading": "requiredComponents"
+            "scope.writePhotosAlbum" : {
+                "desc" : "写入相册权限"
+            }
+        },
+        "lazyCodeLoading" : "requiredComponents"
     },
     "mp-alipay" : {
         "usingComponents" : true
@@ -78,5 +80,5 @@
         "enable" : false
     },
     "vueVersion" : "2",
-	"sassImplementationName": "node-sass"
+    "sassImplementationName" : "node-sass"
 }

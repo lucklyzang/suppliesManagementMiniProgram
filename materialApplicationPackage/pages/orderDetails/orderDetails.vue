@@ -130,8 +130,8 @@
 					<text>订单状态记录:</text>
 				</view>
 				<view class="order-status-record-list-wrapper">
-					<view class="order-status-record-list-line"></view>
 					<view class="order-status-record-list">
+						<view class="order-status-record-list-line"></view>
 						<view class="order-status-record-left">
 							<text></text>
 						</view>
@@ -170,6 +170,34 @@
 						</view>
 					</view>
 					<view class="order-status-record-list">
+						<view class="order-status-record-list-line"></view>
+						<view class="order-status-record-left">
+							<text></text>
+						</view>
+						<view class="order-status-record-right">
+							<view class="order-status-text">
+								<text>待审核</text>
+							</view>
+							<view class="commom-view operation-time">
+								<text>操作时间:</text>
+								<text>2025-05-12 12:10</text>
+							</view>
+							<view class="commom-view operation-people">
+								<text>操作人:</text>
+								<text>沙克老师</text>
+							</view>
+							<view class="commom-view score-box">
+								<text>评分:</text>
+								<text>5星</text>
+							</view>
+							<view class="commom-view evaluate-box">
+								<text>评价:</text>
+								<text>非常不错</text>
+							</view>
+						</view>
+					</view>
+					<view class="order-status-record-list">
+						<view class="order-status-record-list-line" v-if="false"></view>
 						<view class="order-status-record-left">
 							<text></text>
 						</view>
@@ -697,18 +725,19 @@
 					}
 				};
 				.order-status-record-list-wrapper {
-					position: relative;
-					.order-status-record-list-line {
-						position: absolute;
-						top: 6px;
-						left: 6px;
-						width: 1px;
-						height: 70%;
-						background: rgba(59,157,249,0.19);
-					};
 					.order-status-record-list {
 						display: flex;
-						margin-bottom: 10px;
+						padding-bottom: 10px;
+						box-sizing: border-box;
+						position: relative;
+						.order-status-record-list-line {
+							position: absolute;
+							top: 11px;
+							left: 6px;
+							width: 1px;
+							height: 100%;
+							background: rgba(59,157,249,0.19);
+						};
 						.order-status-record-left {
 							display: flex;
 							justify-content: center;
