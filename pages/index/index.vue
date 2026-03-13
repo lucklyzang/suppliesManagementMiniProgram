@@ -226,6 +226,9 @@
 						url: '/materialApplicationPackage/pages/myOrderForm/myOrderForm'
 					})
 				} else if (item.text == '审核') {
+					uni.navigateTo({
+						url: '/orderFormAuditPackage/pages/myAuditOrderForm/myAuditOrderForm'
+					})
 				}
 			}
 		}
@@ -409,7 +412,6 @@
 			};
 			.bottom-message {
 				display: flex;
-				justify-content: space-between;
 				width: 100%;
 				padding: 0 16px;
 				box-sizing: border-box;
@@ -417,6 +419,9 @@
 				bottom: 20px;
 				left: 0;
 				.project-name {
+					flex: 1;
+					@include no-wrap;
+					margin-right: 10px;
 					image {
 						vertical-align: middle;
 						width: 24px;

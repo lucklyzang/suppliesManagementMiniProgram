@@ -147,12 +147,42 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "orderFormAuditPackage",
+			"name": "rootOrderFormAuditPackage",
+			"pages": [
+				{
+					"path": "pages/myAuditOrderForm/myAuditOrderForm",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/historyAuditOrderForm/historyAuditOrderForm",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				}
+			]
 		}
 	],
 	"preloadRule": {
 		"materialApplicationPackage/pages/materialApplication/materialApplication": {
-				"network": "all",
-				"packages": ["rootMaterialApplicationPackage"]
+			"network": "all",
+			"packages": ["rootMaterialApplicationPackage"]
+		},
+		"orderFormAuditPackage/pages/myAuditOrderForm/myAuditOrderForm": {
+			"network": "all",
+			"packages": ["rootOrderFormAuditPackage"]
 		}
 	},
 	"globalStyle": {

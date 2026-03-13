@@ -439,6 +439,8 @@
 				 };
 				 .product-center {
 					 flex: 1;
+					 margin-right: 10px;
+					  @include no-wrap;
 					 .product-name {
 						 @include no-wrap;
 						 margin-bottom: 4px;
@@ -452,6 +454,7 @@
 					 };
 					 .product-specification {
 						 display: flex;
+						 @include no-wrap;
 						 .product-specification-left {
 							 margin-right: 10px;
 							 >text {
@@ -460,6 +463,8 @@
 							 }
 						 };
 						 .product-specification-right {
+							 flex: 1;
+							  @include no-wrap;
 							 >text {
 								 font-size: 12px;
 								 color: #F44E23;
@@ -565,7 +570,6 @@
 				};
 				.remark-box {
 					display: flex;
-					align-items: center;
 					margin-top: 10px;
 					>text {
 						 display: inline-block;
@@ -575,7 +579,7 @@
 							 margin-right: 6px;
 						 };
 						 &:nth-child(2) {
-							 @include no-wrap;
+							 word-break: break-all;
 							 flex: 1;
 							 color: #000000 !important;
 						 }

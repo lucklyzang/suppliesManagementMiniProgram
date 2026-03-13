@@ -397,10 +397,10 @@
 			 display: flex;
 			 flex-direction: column;
 			 .status-date-box {
-				 height: 40px;
 				 display: flex;
 				 align-items: center;
 				 justify-content: space-between;
+				 margin-top: 10px;
 				 .status-box {
 					 width: 70px;
 					 margin-right: 20px;
@@ -477,7 +477,10 @@
 					 background-color: rgba(255,255,255,1);
 					 box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.23);
 					 border-radius: 7px;
-					 margin-bottom: 6px;
+					 margin-bottom: 10px;
+					 &:nth-child(1) {
+						 margin-top: 10px;
+					 };
 					 .order-list-top {
 						 display: flex;
 						 height: 50px;
@@ -540,7 +543,6 @@
 						 box-sizing: border-box;
 						 .product-list {
 							 display: flex;
-							 align-items: center;
 							 >text {
 								 display: inline-block;
 								 font-size: 14px;
@@ -549,7 +551,7 @@
 									 margin-right: 6px;
 								 };
 								 &:nth-child(2) {
-									 @include no-wrap;
+									 word-break: break-all;
 									 flex: 1;
 									 color: #101010;
 								 }

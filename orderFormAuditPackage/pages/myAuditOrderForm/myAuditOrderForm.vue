@@ -9,7 +9,10 @@
 		<light-hint ref="alertToast"></light-hint>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="历史订单" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="审核" @backClick="backTo">
+				<view slot="right" @click="enterAuditHistoryOrderEvent">
+					<text>历史</text>
+				</view>
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -73,83 +76,43 @@
 					</view>
 					<view class="order-list-bottom">
 						<view class="order-list-btn">
-							<view class="edit-right" @click.stop="evaluateEvent(item,index)">
-								<text>评价</text>
+							<view class="delete-left" @click.stop="auditNoPassEvent(item,index)">
+								<text>不通过</text>
+							</view>
+							<view class="edit-right" @click.stop="auditPassEvent(item,index)">
+								<text>通过</text>
 							</view>
 						</view>
 					</view>
 				</view>
 			</view>
 		</view>
-		<!-- 评价弹框	 -->
+		<!-- 不通过弹框	 -->
 		<view class="evaluate-modal">
-			<u-modal :show="evaluateModalShow" :showConfirmButton="false">
+			<u-modal :show="noPassModalShow" :showConfirmButton="false">
 				<view class="evaluate-model-content">
 					<view class="evaluate-modal-top">
-						<text>评价</text>
-						<u-icon name="close" color="#101010" size="20" @click="evaluateModalShow = false"></u-icon>
+						<text></text>
+						<u-icon name="close" color="#101010" size="20" @click="noPassModalShow = false"></u-icon>
 					</view>
 					<view class="evaluate-modal-center">
-						<view class="score-box">
-							<view class="score-text">
-								<text>评分:</text>
-							</view>
-							<view class="score-content">
-								<u-rate v-if="evaluateModalShow" gutter="10" :count="scoreCount" size="26" active-color="#F2A15F" v-model="scoreValue"></u-rate>
-							</view>
-						</view>
 						<view class="evaluate-box">
 							<view class="evaluate-text">
-								<text>评价:</text>
+								<text>*</text>
+								<text>审核意见:</text>
 							</view>
 							<view class="evaluate-content">
-								<u--textarea v-model="evaluateValue" placeholder="请输入" ></u--textarea>
+								<u--textarea v-model="auditOpinionValue" placeholder="请输入" ></u--textarea>
 							</view>
 						</view>
 					</view>
 					<view class="evaluate-modal-bottom">
 						<view class="evaluate-modal-btn">
-							<view class="cancel-left" @click.stop="evaluateModalCancelEvent">
+							<view class="cancel-left" @click.stop="noPassModalCancelEvent">
 								<text>取消</text>
 							</view>
-							<view class="submit-right" @click.stop="evaluateModalSubmitEvent">
+							<view class="submit-right" @click.stop="noPassModalSubmitEvent">
 								<text>提交</text>
-							</view>
-						</view>
-					</view>
-				</view>
-			</u-modal>
-		</view>
-		<!-- 查看评价弹框	 -->
-		<view class="evaluate-modal view-evaluate-modal">
-			<u-modal :show="viewEvaluateModalShow" :showConfirmButton="false">
-				<view class="evaluate-model-content">
-					<view class="evaluate-modal-top">
-						<text>评价</text>
-						<u-icon name="close" color="#101010" size="20" @click="viewEvaluateModalShow = false"></u-icon>
-					</view>
-					<view class="evaluate-modal-center">
-						<view class="score-box">
-							<view class="score-text">
-								<text>评分:</text>
-							</view>
-							<view class="score-content">
-								<u-rate v-if="viewEvaluateModalShow" gutter="10" :count="viewScoreCount" size="26" readonly active-color="#F2A15F" v-model="viewScoreValue"></u-rate>
-							</view>
-						</view>
-						<view class="evaluate-box">
-							<view class="evaluate-text">
-								<text>评价:</text>
-							</view>
-							<view class="evaluate-content">
-								飒飒撒
-							</view>
-						</view>
-					</view>
-					<view class="evaluate-modal-bottom">
-						<view class="evaluate-modal-btn">
-							<view class="close-center" @click.stop="viewEvaluateModalShow = false">
-								<text>关闭</text>
 							</view>
 						</view>
 					</view>
@@ -187,21 +150,49 @@
 				infoText: '修改中···',
 				showLoadingHint: false,
 				showCalendar: false,
-				evaluateModalShow: false,
-				viewEvaluateModalShow: false,
-				viewScoreCount: 5,
-				viewScoreValue: 5,
-				scoreCount: 5,
-				scoreValue: 0,
-				evaluateValue: '',
+				noPassModalShow: false,
+				auditOpinionValue: '',
 				defaultDateArr: [],
 				startDate: '',
 				endDate: '',
+				currentStatusText: '全部状态',
+				currentStatusIndex: 0,
+				orderStatusListShow: false,
 				orderList: [
 					{
 						orderType: '计划订单',
 						orderNumber: '5552H5552',
 						status: 0,
+						productList: 'XXX、XXX、XXXX',
+						createTime: '05-31 17:21',
+						deliveryDate: '05-31',
+						deliveryAddress: '检验科',
+						remark: '一周一送'
+					},
+					{
+						orderType: '计划订单',
+						orderNumber: '5552H5552',
+						status: 1,
+						productList: 'XXX、XXX、XXXX',
+						createTime: '05-31 17:21',
+						deliveryDate: '05-31',
+						deliveryAddress: '检验科',
+						remark: '一周一送'
+					},
+					{
+						orderType: '计划订单',
+						orderNumber: '5552H5552',
+						status: 2,
+						productList: 'XXX、XXX、XXXX',
+						createTime: '05-31 17:21',
+						deliveryDate: '05-31',
+						deliveryAddress: '检验科',
+						remark: '一周一送'
+					},
+					{
+						orderType: '计划订单',
+						orderNumber: '5552H5552',
+						status: 3,
 						productList: 'XXX、XXX、XXXX',
 						createTime: '05-31 17:21',
 						deliveryDate: '05-31',
@@ -247,16 +238,6 @@
 			...mapMutations([
 			]),
 			
-			// 评价弹框取消事件
-			evaluateModalCancelEvent() {
-				this.evaluateModalShow = false;
-			},
-			
-			// 评价弹框提交事件
-			evaluateModalSubmitEvent() {
-				this.evaluateModalShow = false;
-			},
-			
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
@@ -290,8 +271,22 @@
 				} 
 			},
 			
-			// 进入历史订单事件
-			enterHistoryOrderEvent () {},
+			// 不通过弹框取消事件
+			noPassModalCancelEvent () {
+				this.noPassModalShow = false
+			},
+			
+			// 不通过弹提交事件
+			noPassModalSubmitEvent () {
+				this.noPassModalShow = false
+			},
+			
+			// 进入历史审核订单事件
+			enterAuditHistoryOrderEvent () {
+				uni.navigateTo({
+					url: '/orderFormAuditPackage/pages/historyAuditOrderForm/historyAuditOrderForm'
+				})
+			},
 			
 			// 日历日期选择确认事件
 			calendarConfirm(e) {
@@ -327,6 +322,13 @@
 			  return `${y}-${m}-${d}`;
 			},
 			
+			// 订单列表点击事件
+			statusListEvent(item,index) {
+				this.currentStatusText = item;
+				this.currentStatusIndex = index;
+				this.orderStatusListShow = false;
+			},
+			
 			//进入订单详情事件
 			enterOrderDetailsEvent(item,index) {
 				uni.navigateTo({
@@ -334,14 +336,13 @@
 				})
 			},
 			
-			// 订单评价事件
-			evaluateEvent(item,index) {
-				this.evaluateModalShow = true;
+			// 订单审核通过事件
+			auditPassEvent(item,index) {
 			},
 			
-			// 查看评价事件
-			viewEvaluateEvent(item,index) {
-				this.viewEvaluateModalShow = true
+			// 订单审核不通过事件
+			auditNoPassEvent(item,index) {
+				this.noPassModalShow = true;
 			},
 			
 			// 顶部导航返回事件
@@ -398,31 +399,17 @@
 						.evaluate-modal-center {
 							padding: 10px 40px;
 							box-sizing: border-box;
-							.score-box {
-								display: flex;
-								margin-bottom: 20px;
-								.score-text {
-									margin-right: 10px;
-									>text {
-										font-size: #101010;
-										color: 14px;
-									}
-								};
-								.score-content {
-									.u-rate {
-										.u-rate__content {
-										}
-									}
-								}
-							};
 							.evaluate-box {
 								display: flex;
-								justify-content: space-between;
+								flex-direction: column;
 								.evaluate-text {
-									margin-right: 10px;
+									margin-bottom: 10px;
 									>text {
 										font-size: #101010;
 										color: 14px;
+										&:nth-child(1) {
+											color: red !important;
+										};
 									}
 								};
 								.evaluate-content {
@@ -460,7 +447,7 @@
 									 display: flex;
 									 align-items: center;
 									 justify-content: center;
-									 background: #11D183;
+									 background: #3B9DF9;
 									 border-radius: 5px;
 									 >text {
 										 font-size: 12px;
@@ -470,25 +457,6 @@
 							}
 						}
 					}
-				}
-			}
-		};
-		.view-evaluate-modal {
-			.evaluate-modal-btn {
-			 justify-content: center !important;
-				.close-center {
-					 width: 74px;
-					 height: 28px;
-					 display: flex;
-					 align-items: center;
-					 justify-content: center;
-					 border: 1px solid #BBBBBB;
-					 box-sizing: border-box;
-					 border-radius: 5px;
-					 >text {
-						 font-size: 12px;
-						 color: #BBBBBB;
-					 }
 				}
 			}
 		};
@@ -502,6 +470,14 @@
 		};
 		.nav {
 			width: 100%;
+			.header_fixed {
+				.header_content {
+					.header_right_info {
+						color: #fff;
+						font-size: 14px;
+					}
+				}
+			}
 		};
 		.content {
 			 flex: 1;
@@ -516,6 +492,7 @@
 			 .status-date-box {
 				 display: flex;
 				 align-items: center;
+				 justify-content: space-between;
 				 margin-top: 10px;
 				 .data-box {
 					 width: 70%;
@@ -694,6 +671,21 @@
 						 .order-list-btn {
 							 display: flex;
 							 align-items: center;
+								.delete-left {
+									 width: 65px;
+									 height: 28px;
+									 display: flex;
+									 align-items: center;
+									 justify-content: center;
+									 background: #E86F50;
+									 box-sizing: border-box;
+									 border-radius: 4px;
+									 margin-right: 10px;
+									 >text {
+										 font-size: 12px;
+										 color: #fff;
+									 }
+								};
 								.edit-right {
 									 width: 65px;
 									 height: 28px;

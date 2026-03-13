@@ -462,6 +462,7 @@ page {
 							width: 0;
 							display: flex;
 							align-items: center;
+							@include no-wrap;
 							>image {
 								width: 36px;
 								height: 36px;
@@ -471,6 +472,15 @@ page {
 								text {
 									font-size: 14px;
 									color: #101010;
+								};
+								&:nth-child(2) {
+									max-width: 150px;
+									@include no-wrap;
+									>text {
+										@include no-wrap;
+										display: inline-block;
+										width: 100%;
+									}
 								};
 								&:nth-child(3) {
 									margin: 0 4px;
@@ -639,6 +649,7 @@ page {
 				 };
 				 .product-center {
 					 flex: 1;
+					 @include no-wrap;
 					 .product-name {
 						 @include no-wrap;
 						 margin-bottom: 4px;
@@ -652,6 +663,7 @@ page {
 					 };
 					 .product-specification {
 						 display: flex;
+						  @include no-wrap;
 						 .product-specification-left {
 							 margin-right: 10px;
 							 >text {
@@ -660,6 +672,8 @@ page {
 							 }
 						 };
 						 .product-specification-right {
+							 flex: 1;
+							 @include no-wrap;
 							 >text {
 								 font-size: 12px;
 								 color: #F44E23;
@@ -671,8 +685,41 @@ page {
 					 display: flex;
 					 flex-direction: column;
 					 justify-content: center;
+					 width: 130px;
 					 .product-number-box {
 						 margin-bottom: 4px;
+						 ::v-deep .u-number-box {
+							 .u-number-box__minus {
+								 background: transparent !important;
+								 .u-icon {
+									 .u-icon__icon {
+										 color: #3B9DF9 !important;
+										 font-size: 18px !important;
+										 line-height: 18px !important;
+									 }
+								 }
+							 };
+							 .u-number-box__input {
+								 border-radius: 5px;
+								 height: 25px !important;
+								 background: #fff !important; 
+								 border: 1px solid #9EA1B6 !important;
+								 font-size: 14px !important;
+								 color: #101010 !important;
+								 flex: 1;
+								 box-sizing: border-box;
+							 };
+							 .u-number-box__plus {
+								background: transparent !important;
+								.u-icon {
+									.u-icon__icon {
+										 color: #3B9DF9 !important;
+										 font-size: 18px !important;
+										 line-height: 18px !important;
+									}
+								}
+							 }
+						 }
 					 };
 					 .product-total-price {
 						 text-align: center;
