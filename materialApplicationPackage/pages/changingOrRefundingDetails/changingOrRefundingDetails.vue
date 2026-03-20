@@ -241,7 +241,7 @@
 				display: flex;
 				flex-direction: column;
 				.delivery-table-title {
-					heigth: 30px;
+					height: 30px;
 					display: flex;
 					flex-wrap: nowrap;
 					background: #f5f5f5;
@@ -271,7 +271,7 @@
 					flex: 1;
 					overflow: auto;
 					.delivery-list {
-						heigth: 30px;
+						height: 30px;
 						display: flex;
 						flex-wrap: nowrap;
 						border-bottom: 1px solid #d8d0d0;

@@ -392,8 +392,8 @@
 							box-sizing: border-box;
 							background: #F6F9FB;
 							>text {
-								font-size: #101010;
-								color: 14px;
+								font-size: 14px;
+								color: #101010;
 							}
 						};
 						.evaluate-modal-center {
@@ -405,8 +405,8 @@
 								.evaluate-text {
 									margin-bottom: 10px;
 									>text {
-										font-size: #101010;
-										color: 14px;
+										font-size: 14px;
+										color: #101010;
 										&:nth-child(1) {
 											color: red !important;
 										};

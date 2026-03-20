@@ -1,5 +1,5 @@
 <template>
-	<view class="content-box">
+	<view class="content-box" @click="handleOutsideClick">
 		<u-transition :show="showLoadingHint" mode="fade-down">
 			<view class="loading-box" v-if="showLoadingHint">
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
@@ -17,7 +17,7 @@
 		</view>
 		<view class="content">
 			<view class="status-date-box">
-				<view class="status-box">
+				<view class="status-box" @click.stop="handleInsideClick">
 					<view class="status-text" @click="orderStatusListShow = !orderStatusListShow">
 						<text>{{ currentStatusText }}</text>
 						<u-icon :name="orderStatusListShow ? 'arrow-down' : 'arrow-up'" color="#101010" size="16" /></u-icon>
@@ -227,6 +227,17 @@
 			...mapMutations([
 			]),
 			
+			// 状态栏以外区域点击
+			handleOutsideClick() {
+				if (this.orderStatusListShow) {
+					this.orderStatusListShow = false;
+				}
+			},
+			
+			// 状态栏区域点击
+			handleInsideClick() {
+			},
+			
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
@@ -424,14 +435,11 @@
 						 max-height: 160px;
 						 overflow: auto;
 						 .status-list {
-							 heigth: 20px;
+							 height: 30px;
 							 width: 70px;
 							 display: flex;
 							 align-items: center;
 							 >text {
-								 display: inline-block;
-								 heigth: 20px;
-								 width: 70px;
 								 font-size: 12px;
 								 color: #101010
 							 };

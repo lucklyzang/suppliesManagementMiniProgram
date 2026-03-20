@@ -35,7 +35,7 @@ export function getDefaultCommonState() {
 		// 开发域名 https://blink.blinktech.cn/nblink
 		// 准生产域名 https://ver.blinktech.cn/nblink
 		// 测试域名 https://show.blinktech.cn/nblink
-		baseURL: 'https://ver.blinktech.cn'
+		baseURL: 'https://show.blinktech.cn/nblink'
 	}	
 }
 
