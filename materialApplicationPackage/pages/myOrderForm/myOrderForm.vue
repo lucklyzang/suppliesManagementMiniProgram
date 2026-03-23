@@ -49,13 +49,13 @@
 						</view>
 						<view class="order-status"
 						:class="{
-							'noStartStyle ' : item.state == 1 || item.state == 2, 
-							'underwayStyle' : item.state == 3,
-							'waitReviewStyle' : item.state == 4,
-							'completeStyle' : item.state == 5,
-							'haveReviewStyle' : item.state == 6,
-							'cancelStyle' : item.state == 7,
-							'reviewStyle' : item.state == 8
+							'noPassStyle ' : item.state == 1,
+							 'stayAuditStyle' : item.state == 2,
+							'stayConfirmedStyle' : item.state == 3,
+							'alreadyRefuseStyle' : item.state == 4,
+							'stayDeliverStyle' : item.state == 5,
+							'alreadyDeliverStyle' : item.state == 6,
+							'afterSaleIngStyle' : item.state == 7
 							}"
 						>
 							<text>{{ stateTransfer(item.status) }}</text>
@@ -87,13 +87,13 @@
 					</view>
 					<view class="order-list-bottom">
 						<view class="order-list-btn">
-							<view class="delete-left" v-if="false">
+							<view class="delete-left" @click.stop="deleteEvent(item,index)">
 								<text>删除</text>
 							</view>
 							<view class="delete-left" @click.stop="changingOrRefundingEvent(item,index)">
 								<text>退换货</text>
 							</view>
-							<view class="edit-right" v-if="false" @click.stop="editEvent(item,index)">
+							<view class="edit-right" @click.stop="editEvent(item,index)">
 								<text>编辑</text>
 							</view>
 							<view class="edit-right" @click.stop="sureReceivingEvent(item,index)">
@@ -103,6 +103,31 @@
 					</view>
 				</view>
 			</view>
+		</view>
+		<!-- 删除提示弹框	 -->
+		<view class="evaluate-modal">
+			<u-modal :show="deleteShow" :showConfirmButton="false">
+				<view class="evaluate-model-content">
+					<view class="evaluate-modal-top">
+					</view>
+					<view class="evaluate-modal-center">
+						<view class="evaluate-box">
+							<image src="/static/img/delete-info.png" mode="widthFix"></image>
+							<text>确定要删除该订单吗?</text>
+						</view>
+					</view>
+					<view class="evaluate-modal-bottom">
+						<view class="evaluate-modal-btn">
+							<view class="cancel-left" @click.stop="deleteModalCancelEvent">
+								<text>取消</text>
+							</view>
+							<view class="submit-right" @click.stop="deleteModalSureEvent">
+								<text>确定</text>
+							</view>
+						</view>
+					</view>
+				</view>
+			</u-modal>
 		</view>
 		<!-- 日历 -->
 		<u-calendar minDate="2026-03-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
@@ -135,6 +160,7 @@
 				infoText: '修改中···',
 				showLoadingHint: false,
 				showCalendar: false,
+				deleteShow: false,
 				defaultDateArr: [],
 				startDate: '',
 				endDate: '',
@@ -143,9 +169,13 @@
 				orderStatusListShow: false,
 				orderStatusList: [
 					'全部状态',
-					'待确认',
 					'待审核',
-					'已审核'
+					'未通过',
+					'待确认',
+					'已拒绝',
+					'待发货',
+					'已发货',
+					'售后中'
 				],
 				orderList: [
 					{
@@ -238,6 +268,16 @@
 			handleInsideClick() {
 			},
 			
+			// 删除弹框取消事件
+			deleteModalCancelEvent () {
+				this.deleteShow = false;
+			},
+			
+			// 删除弹框确定事件
+			deleteModalSureEvent () {
+				this.deleteShow = false;
+			},
+			
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
@@ -327,10 +367,16 @@
 			},
 			
 			// 订单删除事件
-			deleteEvent(item,index) {},
+			deleteEvent(item,index) {
+				this.deleteShow = true;
+			},
 			
 			// 订单编辑事件
-			editEvent(item,index) {},
+			editEvent(item,index) {
+				uni.navigateTo({
+					url: '/materialApplicationPackage/pages/materialApplication/materialApplication'
+				})
+			},
 			
 			// 订单退换货事件
 			changingOrRefundingEvent(item,index) {
@@ -377,6 +423,82 @@
 		};
 		::v-deep .u-transition {
 			z-index: 100000 !important;
+		};
+		.evaluate-modal {
+			::v-deep .u-modal {
+				.u-modal__content {
+					padding: 0 !important;
+					.evaluate-model-content {
+						width: 100%;
+						.evaluate-modal-top {
+							height: 37px;
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							padding: 0 10px;
+							box-sizing: border-box;
+						};
+						.evaluate-modal-center {
+							padding: 0 40px;
+							box-sizing: border-box;
+							.evaluate-box {
+								display: flex;
+								flex-direction: column;
+								justify-content: center;
+								align-items: center;
+								>image {
+									width: 50px;
+									height: 50px;
+									margin-bottom: 15px;
+								};
+								>text {
+									font-size: 14px;
+									color: #101010;
+								}
+							}
+						};
+						.evaluate-modal-bottom {
+							padding: 30px 45px;
+							box-sizing: border-box;
+							display: flex;
+							align-items: center;
+							.evaluate-modal-btn {
+							 width: 100%;
+							 display: flex;
+							 align-items: center;
+							 justify-content: space-between;
+								.cancel-left {
+									 width: 100px;
+									 height: 35px;
+									 display: flex;
+									 align-items: center;
+									 justify-content: center;
+									 border: 1px solid #11D183;
+									 box-sizing: border-box;
+									 border-radius: 4px;
+									 >text {
+										 font-size: 14px;
+										 color: #11D183;
+									 }
+								};
+								.submit-right {
+									 width: 100px;
+									 height: 35px;
+									 display: flex;
+									 align-items: center;
+									 justify-content: center;
+									 background: #11D183;
+									 border-radius: 4px;
+									 >text {
+										 font-size: 14px;
+										 color: #fff
+									 }
+								}
+							}
+						}
+					}
+				}
+			}
 		};
 		.top-background-area {
 			width: 100%;
@@ -520,29 +642,47 @@
 								 color: #E8CB51;
 							 }
 						 };
-						 .noStartStyle {
-						 	background: #BBBBBB !important
+						 .stayAuditStyle {
+								background: rgba(232,203,81,0.16) !important;
+								>text {
+								 color: #E8CB51 !important;
+								}
 						 };
-						 .underwayStyle {
-						 	background: #289E8E !important
+						 .noPassStyle {
+								background: rgba(241,74,51,0.16) !important;
+								>text {
+								 color: #F14A33 !important;
+								}
 						 };
-						 .completeStyle {
-						 	background: #242424 !important
+						 .stayConfirmedStyle {
+								background: rgba(109,122,223,0.21) !important;
+								>text {
+								 color: #6D7ADF !important;
+								}
 						 };
-						 .reviewStyle {
-						 	background: #F2A15F !important
+						 .alreadyRefuseStyle {
+								background: rgba(241,74,51,0.16) !important;
+								>text {
+								 color: #F14A33 !important;
+								}
 						 };
-						 .haveReviewStyle {
-						 	background: #9B7D31 !important
+						 .stayDeliverStyle {
+								background: rgba(59,157,249,0.15) !important;
+								>text {
+								 color: #3B9DF9 !important;
+								}
 						 };
-						 .waitReviewStyle {
-						 	background: orange !important
+						 .alreadyDeliverStyle {
+								background: rgba(40,158,142,0.21) !important;
+								>text {
+								 color: #289E8E !important;
+								}
 						 };
-						 .cancelStyle {
-						 	background: #E8CB51 !important
-						 };
-						 .completeStyle {
-						 	background: #101010 !important
+						 .afterSaleIngStyle {
+								background: rgba(242,161,95,0.17) !important;
+								>text {
+								 color: #F2A15F !important;
+								}
 						 }
 					 };
 					 .order-list-center {

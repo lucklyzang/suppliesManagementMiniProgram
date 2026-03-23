@@ -22,7 +22,7 @@
 					<view class="subproject-list-box">
 							<view class="subproject-list" v-for="(item,index) in cleaningManagementList" 
 									:key="index"
-									@click="patrolTaskEvent(item,index)"
+									@click="backlogMatterEvent(item,index)"
 							>
 									<text>{{ item.name }}</text>
 									<view>
@@ -214,6 +214,15 @@
 				return Math.floor(rpx)
 			},
 			
+			// 待办事项点击事件
+			backlogMatterEvent () {
+				if (item.name == '待审核') {
+					uni.navigateTo({
+						url: '/orderFormAuditPackage/pages/myAuditOrderForm/myAuditOrderForm'
+					})
+				}
+			},
+			
 			// 功能区点击事件
 			functionalZoneEvent (item, index) {
 				if (item.text == '临时申领') {
@@ -221,6 +230,9 @@
 						url: '/materialApplicationPackage/pages/materialApplication/materialApplication'
 					})
 				} else if (item.text == '计划申领') {
+					uni.navigateTo({
+						url: '/materialApplicationPackage/pages/materialApplication/materialApplication'
+					})
 				} else if (item.text == '我的订单') {
 					uni.navigateTo({
 						url: '/materialApplicationPackage/pages/myOrderForm/myOrderForm'

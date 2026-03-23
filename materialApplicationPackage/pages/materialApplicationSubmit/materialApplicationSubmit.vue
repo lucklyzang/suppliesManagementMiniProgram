@@ -215,6 +215,14 @@
 
 				// 确认事件
 				sureEvent () {
+					this.$refs.alertToast.show({
+						type: 'success',
+						message: `提交成功!`,
+						supplementMessage: '请在“订单”里面查看申领进度',
+						isShow: true,
+						isShowSupplement: true
+					});
+					return;
 					// 任务类型不能为空
 					if (this.currentTaskType == '请选择') {
 						this.$refs.uToast.show({
@@ -377,7 +385,8 @@
 						font-size: 14px;
 						margin-top: 6px;
 						.select-box-left {
-							padding-right: 10px;
+							min-width: 88px;
+							padding-right: 6px;
 							box-sizing: border-box;
 							>text {
 								&:nth-child(1) {

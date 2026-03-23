@@ -33,17 +33,7 @@
 							<text>{{ item.orderType }}</text>
 							<text>{{ item.orderNumber }}</text>
 						</view>
-						<view class="order-status"
-						:class="{
-							'noStartStyle ' : item.state == 1 || item.state == 2, 
-							'underwayStyle' : item.state == 3,
-							'waitReviewStyle' : item.state == 4,
-							'completeStyle' : item.state == 5,
-							'haveReviewStyle' : item.state == 6,
-							'cancelStyle' : item.state == 7,
-							'reviewStyle' : item.state == 8
-							}"
-						>
+						<view class="order-status">
 							<text>{{ stateTransfer(item.status) }}</text>
 						</view>
 					</view>
@@ -390,36 +380,12 @@
 							 justify-content: center;
 							 width: 67px;
 							 height: 25px;
-							 background: rgba(232,203,81,0.16);
+							 background: rgba(59,157,249,0.15);
 							 border-radius: 4px;
 							 >text {
 								 font-size: 14px;
-								 color: #E8CB51;
+								 color: #3B9DF9;
 							 }
-						 };
-						 .noStartStyle {
-						 	background: #BBBBBB !important
-						 };
-						 .underwayStyle {
-						 	background: #289E8E !important
-						 };
-						 .completeStyle {
-						 	background: #242424 !important
-						 };
-						 .reviewStyle {
-						 	background: #F2A15F !important
-						 };
-						 .haveReviewStyle {
-						 	background: #9B7D31 !important
-						 };
-						 .waitReviewStyle {
-						 	background: orange !important
-						 };
-						 .cancelStyle {
-						 	background: #E8CB51 !important
-						 };
-						 .completeStyle {
-						 	background: #101010 !important
 						 }
 					 };
 					 .order-list-center {

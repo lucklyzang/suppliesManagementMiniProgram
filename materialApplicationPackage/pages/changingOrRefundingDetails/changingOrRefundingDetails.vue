@@ -152,6 +152,12 @@
 			}
 		},
 		onLoad () {
+			const pages = getCurrentPages();
+			if (pages.length > 1) {
+			  // 当前页面的上一个页面实例
+			  const prevPage = pages[pages.length - 2]; 
+			  console.log('上一个页面的路由:', prevPage.route);
+			}
 		},
 		methods: {
 			...mapMutations([

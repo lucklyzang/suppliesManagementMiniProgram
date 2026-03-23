@@ -97,7 +97,7 @@
 				<view class="delivery-information-text">
 					<text>送货信息:</text>
 				</view>
-				<view class="delivery-information">
+				<view class="delivery-information" @click="enterChangingOrRefundingDetailsEvent">
 					<view class="delivery-information-left">
 						<view class="delivery-number-message">
 							<view class="delivery-number">
@@ -327,6 +327,13 @@
 				 const value = Math.round(num * 100) / 100;
 				 return value.toFixed(2);
 			},
+			
+			// 进入退换货详情事件
+			enterChangingOrRefundingDetailsEvent () {
+				uni.navigateTo({
+					url: '/materialApplicationPackage/pages/changingOrRefundingDetails/changingOrRefundingDetails'
+				})
+			}
 		}
 	}
 </script>
