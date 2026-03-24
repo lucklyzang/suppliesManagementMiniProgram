@@ -54,14 +54,6 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
-	import {
-		queryTaskType,
-		queryAllDestination,
-		departmentRoom,
-		reportProblem,
-		getRemarks,
-		querySpace
-	} from '@/api/project.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
 	import _ from 'lodash'

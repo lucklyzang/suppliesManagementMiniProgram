@@ -153,7 +153,6 @@
 </template>
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { repairsDetails, repairsImage } from "@/api/project.js";
 import { setCache, removeAllLocalStorage, deepClone} from '@/common/js/utils'
 import navBar from "@/components/zhouWei-navBar"
 export default {
@@ -210,7 +209,7 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo",'statusBarHeight','navigationBarHeight']),
+    ...mapGetters(["userInfo",'statusBarHeight','navigationBarHeight','addMaterialApplicationMessage']),
 		userName() {
 			return this.userInfo['name']
 		},
@@ -236,6 +235,7 @@ export default {
 
   methods: {
     ...mapMutations([
+			'changeAddMaterialApplicationMessage'
 		]),
 
     // 顶部导航返回事件

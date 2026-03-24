@@ -22,27 +22,23 @@ export function getDefaultCommonState() {
 		navigationBarHeight: 0,
 		// 胶囊信息
 		capsuleMessage: {},
-		// 各种类型订单取消原因
-		allOrderCancelReason: {
-			cancelReason: {},
-			environmentCancelReason: {},
-			projectCancelReason: {},
-			affairCancelReason: {}
-		},
-		// 订单列表点击索引
-		currentIndex: 0,
 		// 生产域名 https://blinktech.cn/nblink
 		// 开发域名 https://blink.blinktech.cn/nblink
 		// 准生产域名 https://ver.blinktech.cn/nblink
 		// 测试域名 https://show.blinktech.cn/nblink
-		baseURL: 'https://show.blinktech.cn/nblink'
+		baseURL: 'https://test.spd.blinktech.cn/infra/swagger'
 	}	
 }
 
-// 工程订单信息store的初始值
-export function getDefaultProjectState() {
+// 物资申领和订单信息store的初始值
+export function getDefaultMaterialApplicationOrderFormState() {
 	return {
-		// 工程订单详情
-		projectTaskMessage: {}
+		addMaterialApplicationMessage: {}
+	}	
+}
+
+// 订单审核信息store的初始值
+export function getDefaultOrderFormAuditState() {
+	return {
 	}	
 }
