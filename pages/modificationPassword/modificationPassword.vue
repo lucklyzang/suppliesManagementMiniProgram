@@ -210,6 +210,8 @@
 						},2000);
 						// 清空store和localStorage
 						store.dispatch('resetLoginState');
+						store.dispatch('resetSuppliesManagementInfoState');
+						if(store.getters.suppliesHomeGlobalTimer) {window.clearInterval(store.getters.suppliesHomeGlobalTimer)};
 						removeAllLocalStorage();
 						this.$refs.alertToast.show({
 							type: 'success',

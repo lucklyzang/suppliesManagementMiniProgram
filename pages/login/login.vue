@@ -306,8 +306,7 @@
 				};
 				let loginMessage = {
 				  username: this.form.username,
-				  password: this.form.password,
-					logType: 1
+				  password: this.form.password
 				};
 				this.showLoadingHint = true;
 				logIn(loginMessage).then((res) => {

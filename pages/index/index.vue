@@ -70,6 +70,7 @@
 		mapMutations
 	} from 'vuex'
 	import store from '@/store'
+	let windowTimer;
 	export default{
 		data() {
 			return {
@@ -77,6 +78,7 @@
 				triangleRectListInfoShow: false,
 				infoText: '加载中···',
 				loadingText: '加载中···',
+				isTimeoutContinue: true,
 				cleaningManagementList: [
 						{
 								name: '待审核',
@@ -111,7 +113,8 @@
 				'statusBarHeight',
 				'navigationBarHeight',
 				'capsuleMessage',
-				'chooseHospitalArea'
+				'chooseHospitalArea',
+				'suppliesHomeGlobalTimer',
 			]),
 			userName() {
 				return this.userInfo['name']
@@ -140,14 +143,34 @@
 			}
 		},
 		
+		onUnload () {
+			if (this.suppliesHomeGlobalTimer) {
+				clearTimeout(this.suppliesHomeGlobalTimer);
+				windowTimer = null;
+				this.changeSuppliesHomeGlobalTimer(null)
+			}
+		},
+		
 		onShow() {
+			// 获取任务数量
+			// if (!this.suppliesHomeGlobalTimer) {
+			//     windowTimer = window.setInterval(() => {
+			//     if (this.isTimeoutContinue) {
+			//         setTimeout(this.getTaskCount(this.proId,this.workerId), 0);
+			//         this.changeSuppliesHomeGlobalTimer(windowTimer)
+			//     } else {
+			//         this.changeSuppliesHomeGlobalTimer(null)
+			//     }
+			//     }, 3000)
+			// }
 		},
 		
 		methods: {
 			...mapMutations([
 				'changeSocketOpen',
 				'storeCurrentIndex',
-				'storeLocationMessage'
+				'storeLocationMessage',
+				'changeSuppliesHomeGlobalTimer'
 			]),
 			
 			// 控制服务管理模块显示隐藏
@@ -160,6 +183,25 @@
 						}
 					})
 				}
+			},
+			
+			// 查询任务数量
+			getTaskCount (proId,workerId) {
+					queryTaskCount(proId,workerId).then((res) => {
+							if (res && res.data.code == 200) {
+									const {bxTask, sxTask, kxTask} = res.data.data;
+									this.repairsWorkerOrderCount = bxTask;
+									this.deviceServiceCount = sxTask;
+									this.departmentServieCount = kxTask
+							}
+					})
+					.catch((err) => {
+					this.$dialog.alert({
+							message: `${err.message}`,
+							closeOnPopstate: true
+					}).then(() => {
+					})
+					})
 			},
 			
 			// 格式化时间

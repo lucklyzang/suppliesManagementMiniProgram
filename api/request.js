@@ -150,6 +150,8 @@ instance.interceptors.response.use(function (response) {
 		};
 		// 清空store和localStorage
 		removeAllLocalStorage();
+		if(store.getters.suppliesHomeGlobalTimer) {window.clearInterval(store.getters.suppliesHomeGlobalTimer)};
+		store.dispatch('resetSuppliesManagementInfoState');
 		store.dispatch('resetLoginState');
 	};
 	return response
