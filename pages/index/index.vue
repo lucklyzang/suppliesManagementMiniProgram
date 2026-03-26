@@ -281,7 +281,7 @@
 					})
 				} else if (item.text == '审核') {
 					uni.navigateTo({
-						url: '/orderFormAuditPackage/pages/myAuditOrderForm/myAuditOrderForm'
+						url: '/materialApplicationPackage/pages/myAuditOrderForm/myAuditOrderForm'
 					})
 				}
 			}

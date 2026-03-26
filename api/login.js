@@ -9,53 +9,27 @@ export function logIn(data) {
 	  })
 }
 
+// 获取用户详情
+export function getUserInfo(userId) {
+	return request({
+	    url: `spd/admin-api/system/user/get?id=${userId}`,
+	    method: 'get'
+	  })
+}
+
 // 用户退出登录
-export function userSignOut(proId,workerId) {
+export function userSignOut() {
   return request({
-    url: `trans/login/signOut/${proId}/${workerId}`,
-    method: 'get'
+    url: 'spd/app-api/system/auth/logout',
+    method: 'post'
   })
 };
-
-// 微信登录
-export function weixinLogIn(code) {
-	return request({
-	    url: `trans/login/wx/${code}`,
-	    method: 'get'
-	})
-}
-
-// 微信授权绑定已存在账号
-export function boundExist(code,data) {
-	return request({
-	    url: `trans/login/wx/boundExist/${code}`,
-	    method: 'post',
-			data
-	})
-}
-
-// 微信授权不绑定账号
-export function boundNotExist(proId,code) {
-	return request({
-	    url: `trans/login/wx/boundNotExist/${proId}/${code}`,
-	    method: 'post',
-			data: {}
-	})
-}
 
 // 修改密码
 export function modificationPassword(data) {
   return request({
-    url: 'project/user/update-password',
+    url: '/spd/admin-api/system/user/profile/update-password',
     method: 'put',
     data
-  })
-};
-
-// 查询模板
-export function getTemplateType(proId) {
-  return request({
-    url: `trans/project/template/${proId}`,
-    method: 'get'
   })
 };

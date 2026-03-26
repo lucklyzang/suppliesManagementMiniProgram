@@ -14,15 +14,15 @@ export default {
 		changeSuppliesHomeGlobalTimer (state, payLoad) {
 			state.suppliesHomeGlobalTimer = payLoad
 		},
-		//重置公共信息的状态
-		resetSuppliesManagementInfoState(state) {
-			Object.assign(state, getDefaultSuppliesManagementState())
+		//重置订单审核信息的状态
+		resetOrderFormAuditInfoState(state) {
+			Object.assign(state, getDefaultOrderFormAuditState())
 		}
   },
   
   actions:{
-		resetSuppliesManagementState({ commit }) {
-			commit('resetSuppliesManagementInfoState')
+		resetOrderFormAuditState({ commit }) {
+			commit('resetOrderFormAuditInfoState')
 		}
 	}
 }

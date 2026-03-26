@@ -111,7 +111,8 @@
 		},
 		methods: {
 			...mapMutations([
-				'changeUserBasicInfo'
+				'changeUserBasicInfo',
+				'changeOverDueWay'
 			]),
 			
 			// 修改密码事件
@@ -141,15 +142,17 @@
 			userSignOutEvent () {
 				this.showLoadingHint = true;
 				this.infoText = '退出登录中...';
-				userSignOut(this.proId,this.workerId).then((res) => {
-					if ( res && res.data.code == 200) {
+				userSignOut().then((res) => {
+					if (res && res.data.code == 0 && res.data.data) {
 						uni.redirectTo({
 							url: '/pages/login/login'
 						});
+						this.changeOverDueWay(true);
 						// 清空store和localStorage
 						removeAllLocalStorage();
 						if(store.getters.suppliesHomeGlobalTimer) {window.clearInterval(store.getters.suppliesHomeGlobalTimer)};
-						store.dispatch('resetSuppliesManagementInfoState');
+						store.dispatch('resetOrderFormAuditState');
+						store.dispatch('resetMaterialApplicationOrderFormState');
 						store.dispatch('resetLoginState');
 					} else {
 						this.$refs.uToast.show({
@@ -163,7 +166,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						message: err.message,
+						message: err,
 						type: 'error',
 						position: 'bottom'
 					})

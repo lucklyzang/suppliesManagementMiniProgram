@@ -15,8 +15,16 @@ export default {
 			if (playLoad && playLoad != 'null') {
 				state.addMaterialApplicationMessage = playLoad
 			}
+		},
+		//重置物资申请信息的状态
+		resetMaterialApplicationOrderFormInfoState(state) {
+			Object.assign(state, getDefaultMaterialApplicationOrderFormState())
 		}
   },
   
-  actions:{}
+  actions:{
+		resetMaterialApplicationOrderFormState({ commit }) {
+			commit('resetMaterialApplicationOrderFormInfoState')
+		}
+	}
 }

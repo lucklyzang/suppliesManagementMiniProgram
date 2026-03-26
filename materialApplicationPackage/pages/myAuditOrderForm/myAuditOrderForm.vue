@@ -284,7 +284,7 @@
 			// 进入历史审核订单事件
 			enterAuditHistoryOrderEvent () {
 				uni.navigateTo({
-					url: '/orderFormAuditPackage/pages/historyAuditOrderForm/historyAuditOrderForm'
+					url: '/materialApplicationPackage/pages/historyAuditOrderForm/historyAuditOrderForm'
 				})
 			},
 			

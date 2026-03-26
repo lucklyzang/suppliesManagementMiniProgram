@@ -145,13 +145,7 @@
 						"backgroundColorBottom": "#fff",
 						"navigationStyle" : "custom"
 					}
-				}
-			]
-		},
-		{
-			"root": "orderFormAuditPackage",
-			"name": "rootOrderFormAuditPackage",
-			"pages": [
+				},
 				{
 					"path": "pages/myAuditOrderForm/myAuditOrderForm",
 					"style": {
@@ -179,10 +173,6 @@
 		"materialApplicationPackage/pages/materialApplication/materialApplication": {
 			"network": "all",
 			"packages": ["rootMaterialApplicationPackage"]
-		},
-		"orderFormAuditPackage/pages/myAuditOrderForm/myAuditOrderForm": {
-			"network": "all",
-			"packages": ["rootOrderFormAuditPackage"]
 		}
 	},
 	"globalStyle": {

@@ -2,13 +2,10 @@
 export function getDefaultLoginState() {
 	return {
 		userInfo: {},
+		userTokenInfo: {},
 		token: null, //请求token,
-		affairToken: null, //事务订单专用token
 		isLogin: false,
 		overDueWay: false,
-		isMedicalMan: true,
-		templateType: '',
-		socketOpen: false,
 		chooseHospitalArea: {}
 	}	
 }

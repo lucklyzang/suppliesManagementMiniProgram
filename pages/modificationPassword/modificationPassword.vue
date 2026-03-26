@@ -123,6 +123,7 @@
 		},
 		methods: {
 			...mapMutations([
+				'changeOverDueWay'
 			]),
 			
 			// 顶部导航返回事件
@@ -197,21 +198,22 @@
 				};
 				this.showLoadingHint = true;
 				modificationPassword({
-					username: this.userAccount,
-					password: this.formerPasswordValue,
+					oldPassword: this.formerPasswordValue,
 					newPassword: this.newPasswordValue
 				}).then((res) => {
 					this.showLoadingHint = false;
 				  if (res && res.data.code == 200) {
+						this.changeOverDueWay(true);
 						setTimeout(()=>{
 							uni.redirectTo({
 								url: '/pages/login/login'
 							})
 						},2000);
 						// 清空store和localStorage
-						store.dispatch('resetLoginState');
-						store.dispatch('resetSuppliesManagementInfoState');
 						if(store.getters.suppliesHomeGlobalTimer) {window.clearInterval(store.getters.suppliesHomeGlobalTimer)};
+						store.dispatch('resetOrderFormAuditState');
+						store.dispatch('resetMaterialApplicationOrderFormState');
+						store.dispatch('resetLoginState');
 						removeAllLocalStorage();
 						this.$refs.alertToast.show({
 							type: 'success',
