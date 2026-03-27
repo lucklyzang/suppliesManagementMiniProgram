@@ -208,25 +208,25 @@
 				'navigationBarHeight'
 			]),
 			userName() {
-				return this.userInfo['name']
+				return this.userInfo['nickname']
 			},
 			userAccount() {
-				return this.userInfo['userName']
-			},
-			proName () {
-			  return this.userInfo['proName']
-			},
-			proId() {
-				return this.userInfo['proId']
+				return this.userInfo['username']
 			},
 			workerId() {
-				return this.userInfo['user']['id']
+				return this.userInfo['id']
+			},
+			proName () {
+				return this.userInfo['deptName']
+			},
+			proId() {
+				return this.userInfo['deptId']
 			},
 			depId() {
-				return this.userInfo['depId'] === null ? '' : this.userInfo['depId']
+				return this.userInfo['departmentId']
 			},
 			depName() {
-				return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
+				return ''
 			}
 		},
 		

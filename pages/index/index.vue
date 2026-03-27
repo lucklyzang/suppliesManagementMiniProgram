@@ -9,10 +9,10 @@
 				</view>
 				<view class="user-message">
 						<view class="user-name">
-								回家飒飒
+								{{ userName }}
 						</view>
 						<view class="account-name">
-								蝴蝶卡
+								{{ loginDate }}
 						</view>
 				</view>
     </view>
@@ -20,13 +20,13 @@
 			 <view class="task-board">
 					<h2>待办事项</h2>
 					<view class="subproject-list-box">
-							<view class="subproject-list" v-for="(item,index) in cleaningManagementList" 
+							<view class="subproject-list" v-for="(item,index) in backlogList" 
 									:key="index"
 									@click="backlogMatterEvent(item,index)"
 							>
 									<text>{{ item.name }}</text>
-									<view>
-											<text class="message-number">2</text>
+									<view class="message-number">
+											<text>{{ item.value }}</text>
 									</view>
 							</view> 
 					</view>
@@ -70,6 +70,7 @@
 		mapMutations
 	} from 'vuex'
 	import store from '@/store'
+	import SOtime from '@/common/js/utils/SOtime.js'
 	let windowTimer;
 	export default{
 		data() {
@@ -79,9 +80,10 @@
 				infoText: '加载中···',
 				loadingText: '加载中···',
 				isTimeoutContinue: true,
-				cleaningManagementList: [
+				backlogList: [
 						{
 								name: '待审核',
+								state: 0,
 								value: 1
 						}
 				],
@@ -117,31 +119,30 @@
 				'suppliesHomeGlobalTimer',
 			]),
 			userName() {
-				return this.userInfo['name']
+				return this.userInfo['nickname']
 			},
-			proName () {
-			  return this.userInfo['proName']
-			},
-			proId() {
-				return this.userInfo['proId']
+			userAccount() {
+				return this.userInfo['username']
 			},
 			workerId() {
-				return this.userInfo['user']['id']
+				return this.userInfo['id']
+			},
+			proName () {
+				return this.userInfo['deptName']
+			},
+			proId() {
+				return this.userInfo['deptId']
 			},
 			depId() {
-				return this.userInfo['depId'] === null ? '' : this.userInfo['depId']
+				return this.userInfo['departmentId']
 			},
 			depName() {
-				return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
+				return ''
 			},
-			depNum() {
-				if (this.userInfo.hasOwnProperty('depNum')) {
-					return this.userInfo['depNum'] === null ? '' : this.userInfo['depNum']
-				} else {
-					return ''
-				}
+			loginDate() {
+					return SOtime.time8(this.userInfo['loginDate'])
 			}
-		},
+	},
 		
 		onUnload () {
 			if (this.suppliesHomeGlobalTimer) {
@@ -189,10 +190,11 @@
 			getTaskCount (proId,workerId) {
 					queryTaskCount(proId,workerId).then((res) => {
 							if (res && res.data.code == 200) {
-									const {bxTask, sxTask, kxTask} = res.data.data;
-									this.repairsWorkerOrderCount = bxTask;
-									this.deviceServiceCount = sxTask;
-									this.departmentServieCount = kxTask
+									this.backlogList.forEach((item,index) => {
+											if (item.name == '待审核') {
+												item.value = ''
+											}
+									})
 							}
 					})
 					.catch((err) => {
@@ -410,22 +412,26 @@
 								text-align: center
 							}
 						};
-						>view {
-							position: absolute;
-							width: 17px;
-							height: 17px;
-							display: flex;
-							justify-content: center;
-							align-items: center;
-							background: #E86F50;
-							border-radius: 50%;
-							top: -10px;
-							right: 0;
-							text {
-								@include no-wrap();
-								font-size: 12px;
-								color: #fff;
-							}
+						 .message-number {
+								position: absolute;
+								top: -10px;
+								right: 0;
+								display: inline-flex;
+								justify-content: center;
+								align-items: center;
+								vertical-align: middle;
+								background-color: #E86F50;
+								color: #ffffff;              
+								font-size: 12px;              
+								min-width: 17px;
+								max-width: 24px;
+								aspect-ratio: 1;
+								border-radius: 50%;
+								padding: 0 4px;
+								box-sizing: border-box;
+								>text {
+										@include no-wrap();
+								}                      
 						}
 					};
 					>view:nth-child(5) {

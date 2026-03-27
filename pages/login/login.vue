@@ -274,9 +274,10 @@
 						}
 					})
 					.catch((err) => {
-						reject(err);
 						this.infoText = '';
 						this.showLoadingHint = false;
+						if (err === '') { return };
+						reject(err);
 						this.modalShow = true;
 						this.modalContent = err;
 					})
@@ -291,6 +292,7 @@
 						password: this.form.password
 					};
 					this.showLoadingHint = true;
+					this.infoText = '登录中···';
 					logIn(loginMessage).then((res) => {
 						this.showLoadingHint = false;
 						this.infoText = '';
@@ -318,9 +320,10 @@
 						};
 						})
 						.catch((err) => {
-							reject(err);
 							this.infoText = '';
 							this.showLoadingHint = false;
+							if (err === '') { return };
+							reject(err);
 							this.modalShow = true;
 							this.modalContent = err;
 						})
@@ -353,10 +356,10 @@
 						url: '/pages/index/index'
 					});
 				} catch (err) {
-					this.$dialog.alert({
-						message: `${err}`,
-						closeOnPopstate: true
-					}).then(() => {})
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error'
+					})
 				}
 			},
 			
