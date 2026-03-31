@@ -87,6 +87,7 @@
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
+	import { createPlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import _ from 'lodash'
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
@@ -101,11 +102,11 @@
 			return {
 				showLoadingHint: false,
 				infoText: '加载中···',
-				valueName: 0,
 				loadingShow: false,
-				searchValue: '',
+				chooseMaterialList: [],
 				taskDescribe: '',
 				deliveryAddress: '',
+				deliveryAddressId: '',
 				deliveryDate: getDate(),
 				deliveryDatevalue: this.normalizeTimestamp(),
 				showDeliveryDate: false,
@@ -128,14 +129,17 @@
 				],
 				hospitalDefaultIndex: [0],
 				showHospital: false,
-				currentHospital: '请选择'
+				currentHospital: '请选择',
+				currentHospitalId: ''
 			}
 		},
 		computed: {
 			...mapGetters([
 				'userInfo',
 				'statusBarHeight',
-				'navigationBarHeight'
+				'navigationBarHeight',
+				'addMaterialApplicationMessage',
+				'materialApplicationOrderType'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -159,15 +163,53 @@
 				return ''
 			}
 		},
-		onLoad () {
+		onShow () {
+			this.disposeAddMaterialListEvent()
 		},
 		methods: {
 			...mapMutations([
+				'changeAddMaterialApplicationMessage'
 			]),
 			
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 处理添加产品列表信息
+			disposeAddMaterialListEvent () {
+				this.chooseMaterialList = [];
+				 if (this.addMaterialApplicationMessage.length > 0) {
+					 for (let item of this.addMaterialApplicationMessage) {
+							this.chooseMaterialList.push({
+								id: '', /*订单项编号 */
+								productId: item['id'], /*产品编号 */
+								productUnitId: item['unitId'], /*单位编号 */
+								productPrice: item['salePrice'], /*产品单价，单位：元 */
+								count: item['quantity'], /*数量*/
+								taxPercen: '', /*产品税率*/
+								remark: item['remark'] === '无' ? '' : item['remark'] /*产品备注 */
+							}) 
+					 }
+				 }
+			},
+			
+			// 回显医院和科室信息
+			echoHospitalMessage () {
+				// 医院信息
+				if (this.proId || this.proId === 0) {
+					this.currentHospitalId = this.proId
+				};
+				if (this.proName) {
+					this.currentHospital = this.proName
+				};
+				// 科室信息
+				if (this.depId || this.depId === 0) {
+					this.deliveryAddressId = this.depId
+				};
+				if (this.depName) {
+					this.deliveryAddress = this.depName
+				}
 			},
 			
 			// 将时间戳转换为当天的 00:00:00
@@ -181,9 +223,11 @@
 				hospitalSureEvent (val,value,id) {
 					if (val) {
 						this.hospitalDefaultIndex = [id];
-						this.currentHospital = val
+						this.currentHospital = val;
+						this.currentHospitalId = value
 					} else {
-						this.currentHospital = '请选择'
+						this.currentHospital = '请选择';
+						this.currentHospitalId = ''
 					};
 					this.showHospital = false
 				},
@@ -206,59 +250,62 @@
 
 				// 确认事件
 				sureEvent () {
-					this.$refs.alertToast.show({
-						type: 'success',
-						message: `提交成功!`,
-						supplementMessage: '请在“订单”里面查看申领进度',
-						isShow: true,
-						isShowSupplement: true
-					});
-					return;
-					// 任务类型不能为空
-					if (this.currentTaskType == '请选择') {
+					// 医院不能为空
+					if (this.currentHospital == '请选择') {
 						this.$refs.uToast.show({
-							message: '任务类型不能为空',
+							message: '医院不能为空',
 							position: 'center'
 						});
 						return
 					};
-					// 创建工程维保任务
-					let temporaryMessage = {
-						typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型id
-						typeName: this.currentTaskType, // 任务类型名称
-						depName: this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment, //科室名称
-						depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
-						spaceId: this.currentGoalSpaces == '请选择' ? '' : this.goalSpacesOption.filter((item) => { return item['text'] == this.currentGoalSpaces})[0]['value'], //目的房间id
-						space: this.currentGoalSpaces == '请选择' ? '' : this.currentGoalSpaces, //目的房间名称
-						priority: this.priorityRadioValue,
-						taskDesc: this.taskDescribe, //任务描述
-						proId: this.proId,
-						workerId: this.workerId,
-						workerName: this.userAccount,
-						flag: 1,
-						images: this.imgArr, // 问题图片信息 非必输
-						createType: 3,
-						flag: this.isMedicalMan ? 1 : 0 // 上报人类型，0-维修人员，1-医护人员
+					// 送货地址不能为空
+					if (this.deliveryAddress === '') {
+						this.$refs.uToast.show({
+							message: '送货地址不能为空',
+							position: 'center'
+						});
+						return
 					};
-					this.postGenerateRepairsTask(temporaryMessage)
+					// 创建计划订单
+					let temporaryMessage = {
+							creator: this.userName, //创建者
+						  orderTime: this.deliveryDate, //下单时间
+						  creatorId: this.workerId, //当前用户ID
+						  customerId: this.workerId,  //客户编号
+							remark: this.taskDescribe, //备注
+							address: this.deliveryAddress, //送货地址
+							departmentId: this.depId, //科室ID
+							items: this.chooseMaterialList, //订单清单列表
+							id: '', //编号
+						  saleUserId: '', //销售员编号
+						  accountId: '', //结算账户编号
+						  discountPercent: '', //优惠率，百分比
+						  depositPrice: '', //定金金额，单位：元
+						  fileUrl: '', //附件地址
+						  createUserType: '', //创建人类型
+						  orderType: this.materialApplicationOrderType, //订单类型 0-计划订单 1-临时订单
+						  version:'' 
+					};
+					this.createPlanOrderEvent(temporaryMessage)
 				},
 
-				// 生成工程任务
-				postGenerateRepairsTask (data) {
+				// 物资申领提交
+				createPlanOrderEvent (data) {
 					this.infoText = '提交中···';
 					this.showLoadingHint = true;
-					reportProblem(data).then((res) => {
+					createPlanOrder(data).then((res) => {
 						this.showLoadingHint = false;
-						if (res && res.data.code == 200) {
+						if (res && res.data.code == 0) {
 							this.$refs.alertToast.show({
 								type: 'success',
 								message: '提交成功!',
-								isShow: true
+								isShow: true,
+								isShowSupplement: true
 							});
 							setTimeout(() => {
 								this.backTo();
 							},2000);
-							this.resetEvent();
+							this.changeAddMaterialApplicationMessage([]);
 						} else {
 							this.$refs.alertToast.show({
 								type: 'error',
@@ -447,17 +494,16 @@
 		};
 		.btn-box {
 			width: 100%;
-			background: #F8F8F8;
 			height: 100px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			>text {
-				width: 35%;
+				width: 40%;
 				display: inline-block;
-				height: 45px;
+				height: 32px;
 				font-size: 14px;
-				line-height: 45px;
+				line-height: 32px;
 				background: #fff;
 				text-align: center;
 				border-radius: 4px;

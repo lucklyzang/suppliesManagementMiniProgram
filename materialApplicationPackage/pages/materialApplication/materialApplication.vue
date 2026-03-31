@@ -1,5 +1,6 @@
 <template>
   <view class="content-box">
+		<u-overlay :show="showLoadingHint"></u-overlay>
 		<u-transition :show="showLoadingHint" mode="fade-down">
 			<view class="loading-box" v-if="showLoadingHint">
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
@@ -18,7 +19,7 @@
 				</view>
 				<view class="content-top-right" @click="addProductEvent">
 					<u-icon name="plus-circle" color="#fff" size="18"></u-icon>
-					<text>添加产品</text>
+					<text>{{ productChooseShow ? '添加物资' : '添加产品' }}</text>
 				</view>
 			</view>
 			<view class="content-center">
@@ -44,7 +45,7 @@
 							<view class="product-specification-right">
 								<text>￥</text>
 								<text>
-									{{ item.unitPrice }}
+									{{ item.salePrice }}
 								</text>
 								<text>
 									{{ `/${item.unit}` }}
@@ -54,7 +55,7 @@
 					</view>
 					<view class="product-right">
 						<view class="product-number-box">
-							<u-number-box v-model="item.quantity" @change="function(val){productNumberBoxChange(item,index,val)}" integer :min="0"></u-number-box>
+							<u-number-box :max="item.warningCount" v-model="item.quantity" @change="function(val){productNumberBoxChange(item,index,val)}" integer :min="0"></u-number-box>
 						</view>
 						<view class="product-total-price">
 							<text>￥</text>
@@ -70,7 +71,7 @@
 				</view>
 			</view>
 			<view class="content-bottom">
-				<view class="content-bottom-left">
+				<view class="content-bottom-left" @click="materialApplicationSaveEvent">
 					<text>保存</text>
 				</view>
 				<view class="content-bottom-right" @click="materialApplicationSubmitEvent">
@@ -98,7 +99,7 @@
 							<view class="empty-info" v-if="materialList.length == 0">
 								<u-empty text="暂无产品" mode="list"></u-empty>
 							</view>
-							<view class="add-product-popup-list" v-for="(item,index) in materialList" :key="item.productName" @click="addProductItemEvent(item,index)">
+							<view class="add-product-popup-list" v-for="(item,index) in materialList" :key="item.id" @click="addProductItemEvent(item,index)">
 								<view class="add-product-popup-top">
 									<view class="add-product-popup-top-left">
 										<image :src="item.productImage" mode="widthFix"></image>
@@ -115,7 +116,7 @@
 										<view>
 											<text>￥</text>
 											<text>
-												{{ item.unitPrice }}
+												{{ item.salePrice }}
 											</text>
 											<text>
 												{{ `/${item.unit}` }}
@@ -132,11 +133,20 @@
 									<u--input 
 									   v-model="item.quantity"
 										 :disabled="item.disabled"
-									   placeholder=""
+										 placeholder="请输入数量"
 									   border="none"
 									 ></u--input>
 								</view>
 							</view>
+					</view>
+					<view class="page-area">
+						<view class="page-left" @click="pageClickEvent('previous')" :class="{'pageSpanStyle' : currentPage == 1}">上一页</view>
+						<view class="page-center">
+							<text>{{ totalPage == 0 ? 0 : currentPage }}</text>
+							<text>/</text>
+							<text>{{ totalPage }}</text>
+						</view>
+						<view class="page-right" @click="pageClickEvent('next')" :class="{'pageSpanStyle' : currentPage == totalPage}">下一页</view>
 					</view>
 					<view class="product-popup-bottom">
 							<view class="cancel-box" @click="productChoosePopupCloseEvent">
@@ -154,6 +164,7 @@
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import { setCache, removeAllLocalStorage, deepClone} from '@/common/js/utils'
+import { getProductSimpleList } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 import navBar from "@/components/zhouWei-navBar"
 export default {
   components: {
@@ -163,33 +174,16 @@ export default {
     return {
 			infoText: '加载中···',
 			showLoadingHint: false,
+			productDefaultImage: require('@/static/img/basic-message.png'),
 			tierNum: 0,
 			searchValue: '',
 			allChooseProductPrice: 0,
+			totalPage: '',
+			pageSize: 6,
+			currentPage: 1,
 			temporaryMaterialList: [],
 			originalMaterialList: [],
-			materialList: [
-				{
-					productName: '洗手液',
-					specification: '500ML',
-					unit: '瓶',
-					unitPrice: '4.5',
-					quantity: 0,
-					checked: false,
-					disabled: false,
-					productImage: require('@/static/img/basic-message.png')
-				},
-				{
-					productName: '一次性垫',
-					specification: '90*40cm',
-					unit: '包',
-					unitPrice: '8.3',
-					quantity: 0,
-					checked: false,
-					disabled: false,
-					productImage: require('@/static/img/basic-message.png')
-				}
-			],
+			materialList: [],
 			chooseMaterialList: [],
 			productChooseShow: false
     }
@@ -202,8 +196,8 @@ export default {
 		} else {
 			this.tierNum = pages.length;
 		};
-		this.originalMaterialList = deepClone(this.materialList);
-		this.temporaryMaterialList = deepClone(this.materialList);
+		this.echoAddMaterialListEvent();
+		this.getProductSimpleListEvent();
 	},
 	
   watch: {},
@@ -242,7 +236,89 @@ export default {
      backTo () {
      	uni.navigateBack()
      },
-		 handleClick () {},
+		 
+		 // 回显保存的添加产品列表信息
+		 echoAddMaterialListEvent () {
+			 if (this.addMaterialApplicationMessage.length > 0) {
+				 this.chooseMaterialList = deepClone(this.addMaterialApplicationMessage);
+				 this.reduceTotal();
+			 }
+		 },
+		 
+		// 获取产品列表
+		getProductSimpleListEvent () {
+			this.infoText = '加载中···';
+			this.showLoadingHint = true;
+			this.materialList = [];
+			this.originalMaterialList = [];
+			this.temporaryMaterialList = [];
+			getProductSimpleList().then((res) => {
+				this.showLoadingHint = false;
+				if (res && res.data.code == 0) {
+					if (res.data.data.length > 0) {
+						let temporaryData = res.data.data;
+						for (let item of temporaryData) {
+							this.originalMaterialList.push({
+								id: item['id'], /*产品编号 */
+								productName: item['name'], /*产品名称 */
+								specification: item['standard'] ? item['standard'] : '无', /*产品规格 */
+								unit: item['unitName'], /*单位 */
+								warningCount: item['warningCount'] ? item['warningCount'] : 100, /*预警数量 */
+								productImage: item['images'] ? item['images'] : this.productDefaultImage,
+								barCode: item['barCode'], /*产品条码 */
+								categoryId: item['categoryId'], /*产品分类编号 */
+								categoryName: item['categoryName'], /*产品分类 */
+								unitId: item['unitId'], /*单位编号 */
+								remark: item['remark'] ? item['remark'] : '无', /*产品备注 */
+								expiryDay: item['expiryDay'] ? item['expiryDay'] : '无', /*保质期天数 */
+								weight: item['weight'] ? item['weight'] : '无', /*基础重量（kg） */
+								purchasePrice: item['purchasePrice'], /*采购价格，单位：元 */
+								salePrice: item['salePrice'] ? item['salePrice'] : 0, /*销售价格，单位：元 */
+								minPrice: item['minPrice'], 	/*最低价格，单位：元 */
+								checked: false,
+								disabled: false,
+								quantity: 0
+							})
+						};
+						this.temporaryMaterialList = deepClone(this.originalMaterialList);
+						this.totalPage =  Math.ceil(this.temporaryMaterialList.length/this.pageSize);
+						// 默认展示第一页的物料信息
+						this.materialList = this.temporaryMaterialList.slice((this.currentPage - 1) * this.pageSize,(this.currentPage - 1) * this.pageSize + this.pageSize);
+					}
+				} else {
+					this.$refs.uToast.show({
+						message: res.data.msg,
+						position: 'center',
+						type: 'error'
+					})
+				}
+			})
+			.catch((err) => {
+				this.showLoadingHint = false;
+				this.$refs.uToast.show({
+					message: err,
+					position: 'center',
+					type: 'error'
+				})
+			})
+		},
+		
+		// 产品分页点击事件
+		pageClickEvent (text) {
+			if (this.totalPage == 0) { return };
+			if (text == 'previous') {
+				if ( this.currentPage == 1) { return };
+				this.currentPage--;
+			} else if (text == 'next') {
+				if ( this.currentPage == this.totalPage ) { return }
+				this.currentPage++
+			};
+			// 根据页码分割展示对应的数据
+			this.materialList = this.temporaryMaterialList.slice((this.currentPage - 1) * this.pageSize,(this.currentPage - 1) * this.pageSize + this.pageSize);
+		},
+		 
+		handleClick () {},
+		 
 		 // 求和函数(计算所有添加产品总价格)
 		 reduceTotal() {
 			 let targetMsg = this.chooseMaterialList.filter((item) => {
@@ -250,8 +326,7 @@ export default {
 			 });
 			 this.allChooseProductPrice = targetMsg.reduce((accumulator, currentValue) => {
 				 return accumulator + currentValue.totalPrice
-			 }, 0);
-			 console.log('飒飒',targetMsg,this.chooseMaterialList,this.chooseMaterialList[0]['quantity']);
+			 }, 0)
 		 },
 		 
 		 // 保留两位小数，返回数字类型，修复精度问题
@@ -266,8 +341,8 @@ export default {
 			 if (val['value'] == 0) {
 				 this.chooseMaterialList.splice(index,1);
 			 };
-			 item['showTotalPrice'] = this.formatPrice(item['unitPrice'] * val['value']);
-			 item['totalPrice'] = item['unitPrice'] * val['value'];
+			 item['showTotalPrice'] = this.formatPrice(item['salePrice'] * val['value']);
+			 item['totalPrice'] = item['salePrice'] * val['value'];
 			 item['quantity'] = val['value'];
 			 this.reduceTotal();
 		 },
@@ -276,11 +351,9 @@ export default {
 		 addProductEvent () {
 				this.productChooseShow = true;
 				this.searchValue = '';
-				// 打开产品弹框就显示全部产品信息
-				this.materialList = deepClone(this.originalMaterialList);
 				// 添加过的产品不允许再次添加
-				for (let item of this.materialList) {
-					 let isExist = this.chooseMaterialList.filter((innerItem) => { return innerItem.productName == item.productName});
+				for (let item of this.originalMaterialList) {
+					 let isExist = this.chooseMaterialList.filter((innerItem) => { return innerItem.id == item.id});
 					 if (isExist.length > 0) {
 						 item['checked'] = true;
 						 item['disabled'] = true;
@@ -290,7 +363,11 @@ export default {
 						 item['disabled'] = false;
 						 item['quantity'] = 0;
 					 }
-				}
+				};
+				// 打开物料弹框就显示全部物料信息
+				this.temporaryMaterialList = this.originalMaterialList;
+				this.totalPage = Math.ceil(this.temporaryMaterialList.length/this.pageSize);
+				this.materialList = this.temporaryMaterialList.slice((this.currentPage - 1) * this.pageSize,(this.currentPage - 1) * this.pageSize + this.pageSize)
 		 },
 		 
 		 // 添加产品弹框关闭事件
@@ -301,22 +378,18 @@ export default {
 		 // 搜索框值改变事件
 		 searchChange () {
 			 if (this.searchValue === '') {
-				 this.materialList = deepClone(this.originalMaterialList);
+				this.temporaryMaterialList = deepClone(this.originalMaterialList);
+				this.materialList = deepClone(this.originalMaterialList);
+				this.currentPage = 1;
+			  this.totalPage =  Math.ceil(this.temporaryMaterialList.length/this.pageSize);
+				// 根据页码分割展示对应的数据
+				this.materialList = this.temporaryMaterialList.slice((this.currentPage - 1) * this.pageSize,(this.currentPage - 1) * this.pageSize + this.pageSize);
 			 } else {
-				  this.materialList = this.temporaryMaterialList.filter((item) => { return item['productName'].indexOf(this.searchValue) != -1 });
-			 };
-			 // 添加过的产品不允许再次添加
-			 for (let item of this.materialList) {
-			 	 let isExist = this.chooseMaterialList.filter((innerItem) => { return innerItem.productName == item.productName});
-			 	 if (isExist.length > 0) {
-			 		 item['checked'] = true;
-			 		 item['disabled'] = true;
-			 		 item['quantity'] = isExist[0]['quantity'];
-			 	 } else {
-			 		 item['checked'] = false;
-			 		 item['disabled'] = false;
-			 		 item['quantity'] = 0;
-			 	 }
+				this.materialList = this.originalMaterialList.filter((item) => { return item['productName'].indexOf(this.searchValue) != -1 });
+			  this.temporaryMaterialList = this.materialList;
+			  this.currentPage = 1;
+			  this.totalPage =  Math.ceil(this.temporaryMaterialList.length/this.pageSize);
+			  this.materialList = this.temporaryMaterialList.slice((this.currentPage - 1) * this.pageSize,(this.currentPage - 1) * this.pageSize + this.pageSize);
 			 }
 		 },
 		 
@@ -331,36 +404,80 @@ export default {
 				return;
 			 };
 			 this.productChooseShow = false;
-			 let temporaryMaterialList = this.materialList.filter((item) => { return item['checked'] === true && !item.disabled });
+			 let temporaryMaterialList = this.originalMaterialList.filter((item) => { return item['checked'] === true && !item.disabled });
 			 for (let item of temporaryMaterialList) {
 				this.chooseMaterialList.push({
-					productName: item['productName'],
-					specification: item['specification'],
-					unit: item['unit'],
-					unitPrice: item['unitPrice'],
+					id: item['id'], /*产品编号 */
+					productName: item['productName'], /*产品名称 */
+					specification: item['standard'] ? item['standard'] : '无', /*产品规格 */
+					unit: item['unit'], /*单位 */
+					warningCount: item['warningCount'], /*预警数量 */
+					productImage: item['productImage'],
+					barCode: item['barCode'], /*产品条码 */
+					categoryId: item['categoryId'], /*产品分类编号 */
+					categoryName: item['categoryName'], /*产品分类 */
+					unitId: item['unitId'], /*单位编号 */
+					remark: item['remark'], /*产品备注 */
+					expiryDay: item['expiryDay'], /*保质期天数 */
+					weight: item['weight'], /*基础重量（kg） */
+					purchasePrice: item['purchasePrice'], /*采购价格，单位：元 */
+					salePrice: item['salePrice'] ? item['salePrice'] : 0, /*销售价格，单位：元 */
+					minPrice: item['minPrice'], 	/*最低价格，单位：元 */
 					quantity: item['quantity'],
 					totalPrice: 0,
-					showTotalPrice: '0.00',
-					productImage: item['productImage']
+					showTotalPrice: '0.00'
 				}) 
 			 };
 			 // 计算选中产品的对应价格
 			 for (let item of this.chooseMaterialList) {
-				 item['showTotalPrice'] = this.formatPrice(item['unitPrice'] * item['quantity']);
-				 item['totalPrice'] = item['unitPrice'] * item['quantity'];
+				 item['showTotalPrice'] = this.formatPrice(item['salePrice'] * item['quantity']);
+				 item['totalPrice'] = item['salePrice'] * item['quantity'];
 			 }; 
 			 this.reduceTotal();
 		 },
 		 
 		 // 添加产品弹框内产品项点击事件
 		 addProductItemEvent(item,index) {
-			 if (!item.disabled) {
-				 item.checked = !item.checked;
+			 if (!this.materialList[index]['disabled']) {
+				 this.materialList[index]['checked'] = !this.materialList[index]['checked'];
 			 }
+		 },
+		 
+		 // 添加物资保存事件
+		 materialApplicationSaveEvent () {
+			 if (this.chooseMaterialList.length == 0) {
+				 this.$refs.uToast.show({
+				 	message: '请先添加产品',
+				 	position: 'center',
+				 	type: 'warning'
+				 });
+				 return
+			 };
+			 this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
+			 this.$refs.uToast.show({
+			 	message: '保存成功',
+			 	position: 'center',
+			 	type: 'success'
+			 });
+			 this.backTo()
 		 },
 		 
 		 // 物资申请提交事件
 		 materialApplicationSubmitEvent () {
+			if (this.chooseMaterialList.length == 0) {
+				 this.$refs.uToast.show({
+					message: '请先添加产品',
+					position: 'center',
+					type: 'warning'
+				 });
+				 return
+			 };
+			 this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
+			 this.$refs.uToast.show({
+			 	message: '保存成功',
+			 	position: 'center',
+			 	type: 'success'
+			 });
 			 uni.navigateTo({
 			 	url: '/materialApplicationPackage/pages/materialApplicationSubmit/materialApplicationSubmit'
 			 })
@@ -401,7 +518,7 @@ page {
 			};
 			.popup-content {
 				width: 100%;
-				height: 50vh;
+				height: 75vh;
 				display: flex;
 				flex-direction: column;
 				padding: 0 14px;
@@ -478,7 +595,6 @@ page {
 									@include no-wrap;
 									>text {
 										@include no-wrap;
-										display: inline-block;
 										width: 100%;
 									}
 								};
@@ -529,6 +645,40 @@ page {
 							border: 1px solid #11D183;
 						}
 					}
+				}
+			};
+			.page-area {
+				height: 40px;
+				width: 70%;
+				margin: 0 auto;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				.page-left {
+					font-size: 14px;
+					padding: 4px 6px;
+					border-radius: 2px;
+					box-sizing: border-box;
+					border: 1px solid #d0d0d0;
+				};
+				.page-center {
+					>text {
+						font-size: 12px;
+						color: #333;
+						&:nth-child(1) {
+							color: #3B9DF9
+						}
+					}
+				};
+				.page-right {
+					font-size: 14px;
+					border-radius: 2px;
+					padding: 4px 6px;
+					box-sizing: border-box;
+					border: 1px solid #d0d0d0
+				};
+				.pageSpanStyle {
+					color: #d0d0d0 !important
 				}
 			};
 			.product-popup-bottom {

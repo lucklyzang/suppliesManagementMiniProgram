@@ -4,9 +4,12 @@ export default {
   state: getDefaultMaterialApplicationOrderFormState(),
 	
   getters:{
-		addMaterialApplicationMessage:(state) => {
+		addMaterialApplicationMessage: (state) => {
 			return state.addMaterialApplicationMessage
 		},
+		materialApplicationOrderType: (state) => {
+			return state.materialApplicationOrderType
+		}
   },
 
   mutations:{
@@ -15,6 +18,10 @@ export default {
 			if (playLoad && playLoad != 'null') {
 				state.addMaterialApplicationMessage = playLoad
 			}
+		},
+		// 保存物质申领订单类型
+		changeMaterialApplicationOrderType (state, playLoad) {
+			state.materialApplicationOrderType = playLoad
 		},
 		//重置物资申请信息的状态
 		resetMaterialApplicationOrderFormInfoState(state) {

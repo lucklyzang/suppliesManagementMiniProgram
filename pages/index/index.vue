@@ -5,7 +5,7 @@
     <!-- 顶部标题 -->
     <view class="topTabbar" :style="{ 'height': navigationBarHeight + 20 + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
 			 <view class="user-photo">
-					<image src="/static/img/home-icon.png" mode="widthFix"></image>
+					<image src="/static/img/default-person-photo.png" mode="widthFix"></image>
 				</view>
 				<view class="user-message">
 						<view class="user-name">
@@ -111,7 +111,6 @@
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'socketOpen',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'capsuleMessage',
@@ -171,7 +170,8 @@
 				'changeSocketOpen',
 				'storeCurrentIndex',
 				'storeLocationMessage',
-				'changeSuppliesHomeGlobalTimer'
+				'changeSuppliesHomeGlobalTimer',
+				'changeMaterialApplicationOrderType'
 			]),
 			
 			// 控制服务管理模块显示隐藏
@@ -270,10 +270,12 @@
 			// 功能区点击事件
 			functionalZoneEvent (item, index) {
 				if (item.text == '临时申领') {
+					this.changeMaterialApplicationOrderType(1);
 					uni.navigateTo({
 						url: '/materialApplicationPackage/pages/materialApplication/materialApplication'
 					})
 				} else if (item.text == '计划申领') {
+					this.changeMaterialApplicationOrderType(0);
 					uni.navigateTo({
 						url: '/materialApplicationPackage/pages/materialApplication/materialApplication'
 					})

@@ -30,7 +30,8 @@ export function getDefaultCommonState() {
 // 物资申领和订单信息store的初始值
 export function getDefaultMaterialApplicationOrderFormState() {
 	return {
-		addMaterialApplicationMessage: {}
+		addMaterialApplicationMessage: [],
+		materialApplicationOrderType: 0
 	}	
 }
 
