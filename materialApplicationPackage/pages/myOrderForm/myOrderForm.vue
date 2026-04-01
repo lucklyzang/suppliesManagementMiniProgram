@@ -52,12 +52,12 @@
 							<view class="order-status"
 							:class="{
 								'noPassStyle ' : item.status == 21,
-								'stayAuditStyle' : item.state == 10,
-								'stayConfirmedStyle' : item.state == 20,
-								'alreadyRefuseStyle' : item.state == 31,
-								'stayDeliverStyle' : item.state == 30,
-								'alreadyDeliverStyle' : item.state == 40,
-								'afterSaleIngStyle' : item.state == 41
+								'stayAuditStyle' : item.status == 10,
+								'stayConfirmedStyle' : item.status == 20,
+								'alreadyRefuseStyle' : item.status == 31,
+								'stayDeliverStyle' : item.status == 30,
+								'alreadyDeliverStyle' : item.status == 40,
+								'afterSaleIngStyle' : item.status == 41
 								}"
 							>
 								<text>{{ stateTransfer(item.status) }}</text>
@@ -152,7 +152,7 @@
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import { modificationPassword } from '@/api/login.js'
-	import { getPlanOrderPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getPlanOrderPage, deletePlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
@@ -164,10 +164,12 @@
 			return {
 				infoText: '加载中···',
 				showLoadingHint: false,
+				isShowNoData: false,
 				currentPageNum: 1,
 				pageSize: 20,
 				totalCount: 0,
 				status: 'nomore',
+				currentOrderId: '',
 				showCalendar: false,
 				deleteShow: false,
 				defaultDateArr: [],
@@ -276,6 +278,7 @@
 			// 删除弹框确定事件
 			deleteModalSureEvent () {
 				this.deleteShow = false;
+				this.deletePlanOrderEvent([this.currentOrderId]);
 			},
 			
 			// 上拉加载数据
@@ -295,13 +298,60 @@
 				}
 			},
 			
+			// 删除订单
+			deletePlanOrderEvent(data) {
+				this.showLoadingHint = true;
+				this.infoText = '删除中···';
+				deletePlanOrder(data).then((res) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					if ( res && res.data.code == 0) {
+						if (res.data.data) {
+							this.getPlanOrderPageEvent({
+								pageNo: this.currentPageNum,
+								pageSize: this.pageSize,
+								status: this.currentStatusValue,
+								orderTime: [`${this.startDate}`,`${this.endDate}`]
+							},true);
+							this.$refs.uToast.show({
+								message: '删除成功!',
+								type: 'success',
+								position: 'bottom'
+							})
+						} else {
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+								position: 'bottom'
+							})
+						}
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
 			// 查询订单列表
 			getPlanOrderPageEvent(data,flag) {
 				this.orderList = [];
 				this.isShowNoData = false;
 				if (flag) {
 					this.fullOrderList = [];
-					this.showLoadingHint = true
+					this.showLoadingHint = true;
+					this.infoText = '加载中···';
 				} else {
 					this.showLoadingHint = false;
 					this.infoText = '';
@@ -328,6 +378,7 @@
 						})
 					};
 					if (flag) {
+						this.infoText = '';
 						this.showLoadingHint = false;
 					} else {
 						let totalPage = Math.ceil(this.totalCount/this.pageSize);
@@ -340,6 +391,7 @@
 				})
 				.catch((err) => {
 					if (flag) {
+						this.infoText = '';
 						this.showLoadingHint = false;
 					} else {
 						this.status = 'loadmore'
@@ -421,10 +473,10 @@
 			// 获取开始和结束日期(中间相隔一个月)
 		  getDateRange() {
 				this.defaultDateArr = [];
-			  const start = new Date(); 
-			  const end = new Date(start);
-			  end.setMonth(start.getMonth() + 1);
-			  end.setHours(23, 59, 59, 999);
+			  const end = new Date(); 
+			  const start = new Date(end);
+			  start.setMonth(end.getMonth() - 1);
+			  start.setHours(23, 59, 59, 999);
 				this.startDate = this.formatDate(start);
 				this.endDate = this.formatDate(end);
 				this.defaultDateArr.push(this.startDate);
@@ -455,19 +507,20 @@
 			//进入订单详情事件
 			enterOrderDetailsEvent(item,index) {
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/orderDetails/orderDetails'
+					url: `/materialApplicationPackage/pages/orderDetails/orderDetails?id=${item.id}`
 				})
 			},
 			
 			// 订单删除事件
 			deleteEvent(item,index) {
 				this.deleteShow = true;
+				this.currentOrderId = item['id']
 			},
 			
 			// 订单编辑事件
 			editEvent(item,index) {
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/materialApplication/materialApplication'
+					url: `/materialApplicationPackage/pages/materialApplication/materialApplication?id=${item.id}`
 				})
 			},
 			

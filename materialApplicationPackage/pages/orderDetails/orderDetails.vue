@@ -24,7 +24,7 @@
 				</view>
 				<view class="product-list" v-for="(item,index) in materialList" :key="item.productName">
 					<view class="product-left">
-						<image :src="item.productImage" mode="widthFix"></image>
+						<image :src="item['images'] ? item['images'] : productDefaultImage" mode="widthFix"></image>
 					</view>
 					<view class="product-center">
 						<view class="product-name">
@@ -35,16 +35,16 @@
 						<view class="product-specification">
 							<view class="product-specification-left">
 								<text>
-									{{ item.specification }}
+									{{ item.specification ? item.specification : '无' }}
 								</text>
 							</view>
 							<view class="product-specification-right">
 								<text>￥</text>
 								<text>
-									{{ item.unitPrice }}
+									{{ formatPrice(item.productPrice) }}
 								</text>
 								<text>
-									{{ `/${item.unit}` }}
+									{{ `/${item.productUnitName}` }}
 								</text>
 							</view>
 						</view>
@@ -52,11 +52,11 @@
 					<view class="product-right">
 						<view class="product-number-box">
 							<text>数量:</text>
-							<text>4</text>
+							<text>{{ item.count }}</text>
 						</view>
 						<view class="product-total-price">
 							<text>总额:</text>
-							<text>{{ `￥20.00` }}</text>
+							<text>{{ `￥${formatPrice(item.totalPrice)}` }}</text>
 						</view>
 					</view>
 				</view>
@@ -71,26 +71,26 @@
 				<view class="create-delivery-date">
 					<view class="create-delivery-date-left">
 						<text>创建时间:</text>
-						<text>05-31 17:21</text>
+						<text>{{ orderMessage['orderTime'] }}</text>
 					</view>
 					<view class="create-delivery-date-left">
 						<text>交货日期:</text>
-						<text>05-31</text>
+						<text></text>
 					</view>
 				</view>
 				<view class="create-delivery-date">
 					<view class="create-delivery-date-left">
 						<text>下单医院:</text>
-						<text>打卡善良的凯撒</text>
+						<text></text>
 					</view>
 					<view class="create-delivery-date-left">
 						<text>送货地址:</text>
-						<text>大苏打的</text>
+						<text>{{ orderMessage['address'] ? orderMessage['address'] : '无' }}</text>
 					</view>
 				</view>
 				<view class="product-list remark-box">
 					<text>备注:</text>
-					<text>沙龙课傻了傻了时间</text>
+					<text>{{ orderMessage['remark'] ? orderMessage['remark'] : '无' }}</text>
 				</view>
 			</view>
 			<view class="delivery-information-list">
@@ -235,7 +235,9 @@
 		mapMutations
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
+	import SOtime from '@/common/js/utils/SOtime.js';
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
+	import { getPlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
@@ -249,28 +251,9 @@
 				infoText: '加载中···',
 				loadingShow: false,
 				allChooseProductPrice: 0,
-				materialList: [
-					{
-						productName: '洗手液',
-						specification: '500ML',
-						unit: '瓶',
-						unitPrice: '4.5',
-						quantity: 0,
-						checked: false,
-						disabled: false,
-						productImage: require('@/static/img/basic-message.png')
-					},
-					{
-						productName: '一次性垫',
-						specification: '90*40cm',
-						unit: '包',
-						unitPrice: '8.3',
-						quantity: 0,
-						checked: false,
-						disabled: false,
-						productImage: require('@/static/img/basic-message.png')
-					}
-				]
+				productDefaultImage: require('@/static/img/basic-message.png'),
+				orderMessage: {},
+				materialList: []
 			}
 		},
 		computed: {
@@ -301,7 +284,8 @@
 				return ''
 			}
 		},
-		onLoad () {
+		onLoad (options) {
+			this.getPlanOrderEvent(Number(options.id));
 		},
 		methods: {
 			...mapMutations([
@@ -310,6 +294,64 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 查询订单详情
+			getPlanOrderEvent(id) {
+				this.showLoadingHint = true;
+				this.infoText = '加载中···';
+				getPlanOrder(id).then((res) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					if ( res && res.data.code == 0) {
+						this.orderMessage = res.data.data;
+						this.materialList = this.orderMessage['items'];
+						this.allChooseProductPrice = this.orderMessage['totalProductPrice'];
+						this.orderMessage['orderTime'] = SOtime.time3(this.orderMessage['orderTime']);
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
+			//任务状态转换
+			stateTransfer (num) {
+				switch(num) {
+						case 10:
+							return '待审核'
+							break;
+						case 20:
+								return '待确认'
+								break;
+						case 21:
+								return '未通过'
+								break;
+						case 30:
+								return '待发货'
+								break;
+						case 31:
+								return '已拒绝'
+								break;
+						case 40:
+								return '已发货'
+								break;
+						case 41:
+								return '售后中'
+								break;
+				} 
 			},
 			
 			// 保留两位小数，返回数字类型，修复精度问题

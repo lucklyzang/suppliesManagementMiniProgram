@@ -55,7 +55,7 @@
 					</view>
 					<view class="product-right">
 						<view class="product-number-box">
-							<u-number-box :max="item.warningCount" v-model="item.quantity" @change="function(val){productNumberBoxChange(item,index,val)}" integer :min="0"></u-number-box>
+							<u-number-box v-model="item.quantity" @change="function(val){productNumberBoxChange(item,index,val)}" integer :min="0"></u-number-box>
 						</view>
 						<view class="product-total-price">
 							<text>￥</text>
@@ -164,7 +164,7 @@
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import { setCache, removeAllLocalStorage, deepClone} from '@/common/js/utils'
-import { getProductSimpleList } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+import { getProductSimpleList, getPlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 import navBar from "@/components/zhouWei-navBar"
 export default {
   components: {
@@ -173,6 +173,7 @@ export default {
   data() {
     return {
 			infoText: '加载中···',
+			isEdit: false,
 			showLoadingHint: false,
 			productDefaultImage: require('@/static/img/basic-message.png'),
 			tierNum: 0,
@@ -181,6 +182,7 @@ export default {
 			totalPage: '',
 			pageSize: 6,
 			currentPage: 1,
+			orderMessage: {},
 			temporaryMaterialList: [],
 			originalMaterialList: [],
 			materialList: [],
@@ -189,14 +191,16 @@ export default {
     }
   },
 	
-	onShow () {
-		const pages = getCurrentPages(); //获取当前页面栈的实例数组
-		if (pages.length == 1) {
-			this.tierNum = 1
+	onLoad (options) {
+		// 编辑
+		if (JSON.stringify(options) != '{}') {
+			this.isEdit = true;
+			this.getPlanOrderEvent(Number(options.id));
 		} else {
-			this.tierNum = pages.length;
+			// 新建
+			this.isEdit = false;
+			this.echoAddMaterialListEvent();
 		};
-		this.echoAddMaterialListEvent();
 		this.getProductSimpleListEvent();
 	},
 	
@@ -243,6 +247,59 @@ export default {
 				 this.chooseMaterialList = deepClone(this.addMaterialApplicationMessage);
 				 this.reduceTotal();
 			 }
+		 },
+		 
+		 // 查询订单详情
+		 getPlanOrderEvent(id) {
+		 	this.showLoadingHint = true;
+		 	this.infoText = '加载中···';
+			this.chooseMaterialList = [];
+		 	getPlanOrder(id).then((res) => {
+		 		this.showLoadingHint = false;
+		 		this.infoText = '';
+		 		if ( res && res.data.code == 0) {
+					this.orderMessage = res.data.data;
+					this.allChooseProductPrice = res.data.data['totalProductPrice'];
+		 			for (let item of res.data.data['items']) {
+						this.chooseMaterialList.push({
+							id: item['productId'], /*产品编号 */
+							productName: item['productName'], /*产品名称 */
+							specification: item['standard'] ? item['standard'] : '无', /*产品规格 */
+							unit: item['productUnitName'], /*单位 */
+							warningCount: item['stockCount'], /*预警数量 */
+							productImage: item['productImage'] ? item['productImage'] : this.productDefaultImage,
+							barCode: item['productBarCode'] ? item['productBarCode'] : '', /*产品条码 */
+							categoryId: item['categoryId'] ? item['categoryId'] : '', /*产品分类编号 */
+							categoryName: item['categoryName'] ? item['categoryName'] : '', /*产品分类 */
+							unitId: item['productUnitId'], /*单位编号 */
+							remark: item['remark'] ? item['remark'] : '', /*产品备注 */
+							expiryDay: item['expiryDay'] ? item['expiryDay'] : '', /*保质期天数 */
+							weight: item['weight'] ? item['weight'] : '', /*基础重量（kg） */
+							purchasePrice: item['purchasePrice'] ? item['purchasePrice'] : '', /*采购价格，单位：元 */
+							salePrice: item['productPrice'] ? item['productPrice'] : 0, /*销售价格，单位：元 */
+							minPrice: item['minPrice'] ? item['minPrice'] : '', 	/*最低价格，单位：元 */
+							quantity: item['count'],
+							totalPrice: item['totalPrice'],
+							showTotalPrice: item['totalPrice']
+						}) 
+		 			}
+		 		} else {
+		 			this.$refs.uToast.show({
+		 				message: res.data.msg,
+		 				type: 'error',
+		 				position: 'bottom'
+		 			})
+		 		}
+		 	})
+		 	.catch((err) => {
+		 		this.showLoadingHint = false;
+		 		this.infoText = '';
+		 		this.$refs.uToast.show({
+		 			message: err,
+		 			type: 'error',
+		 			position: 'bottom'
+		 		})
+		 	})
 		 },
 		 
 		// 获取产品列表
@@ -478,9 +535,24 @@ export default {
 			 	position: 'center',
 			 	type: 'success'
 			 });
-			 uni.navigateTo({
-			 	url: '/materialApplicationPackage/pages/materialApplicationSubmit/materialApplicationSubmit'
-			 })
+			 if (!this.isEdit) {
+					uni.navigateTo({
+						url: '/materialApplicationPackage/pages/materialApplicationSubmit/materialApplicationSubmit'
+					})
+			 } else {
+				 let transmitParams = encodeURIComponent(
+					 JSON.stringify({
+						 id: this.orderMessage['id'],
+						 orderType: this.orderMessage['orderType'],
+						 orderTime: this.orderMessage['orderTime'],
+						 remark: this.orderMessage['remark'],
+						 address: this.orderMessage['address']
+					 })
+				 );
+				 uni.navigateTo({
+				 	url: `/materialApplicationPackage/pages/materialApplicationSubmit/materialApplicationSubmit?transmitParams=${transmitParams}`
+				 })
+			 }
 		 }
 	}
 };

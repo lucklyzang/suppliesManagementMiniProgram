@@ -87,7 +87,7 @@
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
-	import { createPlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { createPlanOrder,updatePlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import _ from 'lodash'
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
@@ -130,7 +130,9 @@
 				hospitalDefaultIndex: [0],
 				showHospital: false,
 				currentHospital: '请选择',
-				currentHospitalId: ''
+				currentHospitalId: '',
+				orderMessage: {},
+				isEdit: false
 			}
 		},
 		computed: {
@@ -163,8 +165,21 @@
 				return ''
 			}
 		},
-		onShow () {
-			this.disposeAddMaterialListEvent()
+		 onLoad(options) {
+			this.disposeAddMaterialListEvent();
+			if (options.transmitParams) {
+				this.isEdit = true;
+				try {
+					const rawData = decodeURIComponent(options.transmitParams);
+					this.orderMessage = JSON.parse(rawData);
+					this.echoOrderMessage();
+				} catch (e) {
+					console.error('参数解析失败', e);
+				}
+			} else {
+				this.isEdit = false;
+				this.echoHospitalMessage()
+			}
 		},
 		methods: {
 			...mapMutations([
@@ -174,6 +189,12 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 编辑时回显部分订单信息
+			echoOrderMessage () {
+				this.taskDescribe = this.orderMessage['remark']; //备注
+				this.deliveryAddress = this.orderMessage['address'] //送货地址
 			},
 			
 			// 处理添加产品列表信息
@@ -251,13 +272,13 @@
 				// 确认事件
 				sureEvent () {
 					// 医院不能为空
-					if (this.currentHospital == '请选择') {
-						this.$refs.uToast.show({
-							message: '医院不能为空',
-							position: 'center'
-						});
-						return
-					};
+					// if (this.currentHospital == '请选择') {
+					// 	this.$refs.uToast.show({
+					// 		message: '医院不能为空',
+					// 		position: 'center'
+					// 	});
+					// 	return
+					// };
 					// 送货地址不能为空
 					if (this.deliveryAddress === '') {
 						this.$refs.uToast.show({
@@ -266,27 +287,32 @@
 						});
 						return
 					};
-					// 创建计划订单
 					let temporaryMessage = {
 							creator: this.userName, //创建者
-						  orderTime: this.deliveryDate, //下单时间
+						  orderTime: SOtime.time8(new Date().getTime()), //下单时间
 						  creatorId: this.workerId, //当前用户ID
 						  customerId: this.workerId,  //客户编号
 							remark: this.taskDescribe, //备注
 							address: this.deliveryAddress, //送货地址
 							departmentId: this.depId, //科室ID
 							items: this.chooseMaterialList, //订单清单列表
-							id: '', //编号
+							id: this.isEdit ? this.orderMessage['id'] : '', //编号
 						  saleUserId: '', //销售员编号
 						  accountId: '', //结算账户编号
 						  discountPercent: '', //优惠率，百分比
 						  depositPrice: '', //定金金额，单位：元
 						  fileUrl: '', //附件地址
 						  createUserType: '', //创建人类型
-						  orderType: this.materialApplicationOrderType, //订单类型 0-计划订单 1-临时订单
+						  orderType: this.isEdit ? this.orderMessage['orderType'] : this.materialApplicationOrderType, //订单类型 0-计划订单 1-临时订单
 						  version:'' 
 					};
-					this.createPlanOrderEvent(temporaryMessage)
+					if (!this.isEdit) {
+						// 创建计划订单
+						this.createPlanOrderEvent(temporaryMessage);
+					} else {
+						// 更新计划订单
+						this.updatePlanOrderEvent(temporaryMessage);
+					}
 				},
 
 				// 物资申领提交
@@ -294,6 +320,41 @@
 					this.infoText = '提交中···';
 					this.showLoadingHint = true;
 					createPlanOrder(data).then((res) => {
+						this.showLoadingHint = false;
+						if (res && res.data.code == 0) {
+							this.$refs.alertToast.show({
+								type: 'success',
+								message: '提交成功!',
+								isShow: true,
+								isShowSupplement: true
+							});
+							setTimeout(() => {
+								this.backTo();
+							},2000);
+							this.changeAddMaterialApplicationMessage([]);
+						} else {
+							this.$refs.alertToast.show({
+								type: 'error',
+								message: `${res.data.msg}!`,
+								isShow: true
+							})
+						}
+					})
+					.catch((err) => {
+						this.showLoadingHint = false;
+						this.$refs.alertToast.show({
+							type: 'error',
+							message: `${err}!`,
+							isShow: true
+						})
+					})
+				},
+				
+				// 更新计划订单
+				updatePlanOrderEvent (data) {
+					this.infoText = '提交中···';
+					this.showLoadingHint = true;
+					updatePlanOrder(data).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 0) {
 							this.$refs.alertToast.show({
