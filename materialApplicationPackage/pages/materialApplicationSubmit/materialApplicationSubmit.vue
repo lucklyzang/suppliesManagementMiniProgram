@@ -326,6 +326,7 @@
 								type: 'success',
 								message: '提交成功!',
 								isShow: true,
+								supplementMessage: '请在“订单”里面查看申领进度',
 								isShowSupplement: true
 							});
 							setTimeout(() => {
@@ -361,6 +362,7 @@
 								type: 'success',
 								message: '提交成功!',
 								isShow: true,
+								supplementMessage: '请在“订单”里面查看申领进度',
 								isShowSupplement: true
 							});
 							setTimeout(() => {
