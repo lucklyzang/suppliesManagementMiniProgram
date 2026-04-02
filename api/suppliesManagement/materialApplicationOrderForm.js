@@ -64,10 +64,11 @@ export function getPlanOrder(id) {
 }
 
 // 获得退换货分页
-export function getSaleReturnPage(id) {
+export function getSaleReturnPage(data) {
 	return request({
 	    url: '/spd/admin-api/erp/sale-return/page',
-	    method: 'get'
+	    method: 'get',
+			params: data
 	  })
 }
 
@@ -93,6 +94,24 @@ export function confirmSaleReturn(data) {
 	return request({
 	    url: '/spd/admin-api/erp/sale-out/confirm',
 	    method: 'put',
+			params: data
+	  })
+}
+
+// 创建订单评价信息
+export function createOrderEvaluate(data) {
+	return request({
+	    url: '/spd/admin-api/erp/order-evaluate/create',
+	    method: 'post',
+			data
+	  })
+}
+
+// 获得订单评价信息
+export function getOrderEvaluate(data) {
+	return request({
+	    url: '/spd/admin-api/erp/order-evaluate/get-by-order-id',
+	    method: 'post',
 			params: data
 	  })
 }

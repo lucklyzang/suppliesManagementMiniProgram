@@ -27,48 +27,52 @@
 				</view>
 			</view>
 			<view class="order-list-box">
-				<view class="order-list" v-for="(item,index) in orderList" :key="index" @click="enterOrderDetailsEvent(item,index)">
-					<view class="order-list-top">
-						<view class="order-type">
-							<text>{{ item.orderType }}</text>
-							<text>{{ item.orderNumber }}</text>
-						</view>
-						<view class="order-status">
-							<text>{{ stateTransfer(item.status) }}</text>
-						</view>
-					</view>
-					<view class="order-list-center">
-						<view class="product-list">
-							<text>产品清单:</text>
-							<text>{{ item.productList }}</text>
-						</view>
-						<view class="create-delivery-date">
-							<view class="create-delivery-date-left">
-								<text>创建时间:</text>
-								<text>{{ item.createTime }}</text>
+				<u-empty text="您还没有相关订单" mode="list" v-if="isShowNoData"></u-empty>
+				<scroll-view class="scroll-view" scroll-y="true"  @scrolltolower="scrolltolower">
+					<view class="order-list" v-for="(item,index) in fullOrderList" :key="index" @click="enterOrderDetailsEvent(item,index)">
+						<view class="order-list-top">
+							<view class="order-type">
+								<text>计划订单</text>
+								<text>{{ item.no }}</text>
 							</view>
-							<view class="create-delivery-date-left">
-								<text>交货日期:</text>
-								<text>{{ item.deliveryDate }}</text>
+							<view class="order-status">
+								<text>{{ stateTransfer(item.status) }}</text>
 							</view>
 						</view>
-						<view class="product-list delivery-address">
-							<text>送货地址:</text>
-							<text>{{ item.deliveryAddress }}</text>
+						<view class="order-list-center">
+							<view class="product-list">
+								<text>产品清单:</text>
+								<text>{{ extractProductInventoryMessage(item['items']) }}</text>
+							</view>
+							<view class="create-delivery-date">
+								<view class="create-delivery-date-left">
+									<text>创建时间:</text>
+									<text>{{ item.createTime }}</text>
+								</view>
+								<view class="create-delivery-date-right">
+									<text>交货日期:</text>
+									<text>{{ item.deliveryDate }}</text>
+								</view>
+							</view>
+							<view class="product-list delivery-address">
+								<text>送货地址:</text>
+								<text>{{ item.address }}</text>
+							</view>
+							<view class="product-list remark-box">
+								<text>备注:</text>
+								<text>{{ item.remark ? item.remark : '无' }}</text>
+							</view>
 						</view>
-						<view class="product-list remark-box">
-							<text>备注:</text>
-							<text>{{ item.remark }}</text>
-						</view>
-					</view>
-					<view class="order-list-bottom">
-						<view class="order-list-btn">
-							<view class="edit-right" @click.stop="evaluateEvent(item,index)">
-								<text>评价</text>
+						<view class="order-list-bottom">
+							<view class="order-list-btn">
+								<view class="edit-right" @click.stop="evaluateEvent(item,index)">
+									<text>{{ item.evaluate ? '查看评价' : '评价'}}</text>
+								</view>
 							</view>
 						</view>
 					</view>
-				</view>
+					<u-loadmore :status="status" v-if="fullOrderList.length > 0" />
+				</scroll-view>
 			</view>
 		</view>
 		<!-- 评价弹框	 -->
@@ -164,7 +168,7 @@
 	} from '@/common/js/utils'
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
-	import { modificationPassword } from '@/api/login.js'
+	import { getPlanOrderPage, createOrderEvaluate, getOrderEvaluate } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
@@ -176,29 +180,27 @@
 			return {
 				infoText: '修改中···',
 				showLoadingHint: false,
+				isShowNoData: false,
+				currentPageNum: 1,
+				pageSize: 20,
+				totalCount: 0,
+				status: 'nomore',
 				showCalendar: false,
+				currentOrderId: '',
+				currentOrderNo: '',
+				currentOrderIndex: 0,
 				evaluateModalShow: false,
 				viewEvaluateModalShow: false,
-				viewScoreCount: 5,
-				viewScoreValue: 5,
+				viewScoreCount: 0,
+				viewScoreValue: 0,
 				scoreCount: 5,
 				scoreValue: 0,
 				evaluateValue: '',
 				defaultDateArr: [],
 				startDate: '',
 				endDate: '',
-				orderList: [
-					{
-						orderType: '计划订单',
-						orderNumber: '5552H5552',
-						status: 0,
-						productList: 'XXX、XXX、XXXX',
-						createTime: '05-31 17:21',
-						deliveryDate: '05-31',
-						deliveryAddress: '检验科',
-						remark: '一周一送'
-					}
-				]
+				orderList: [],
+				fullOrderList: []
 			}
 		},
 		computed: {
@@ -232,10 +234,96 @@
 		
 		onShow () {
 			this.getDateRange();
+			this.getPlanOrderPageEvent({
+				pageNo: this.currentPageNum,
+				pageSize: this.pageSize,
+			  status: 50,
+				orderTime: [`${this.startDate}`,`${this.endDate}`],
+				creator: ''
+			},true)
 		},
 		methods: {
 			...mapMutations([
 			]),
+			
+			// 上拉加载数据
+			scrolltolower () {
+				let totalPage = Math.ceil(this.totalCount/this.pageSize);
+				if (this.currentPageNum >= totalPage) {
+					this.status = 'nomore'
+				} else {
+					this.status = 'loadmore';
+					this.currentPageNum = this.currentPageNum + 1;
+					this.getPlanOrderPageEvent({
+						pageNo: this.currentPageNum,
+						pageSize: this.pageSize,
+						status: this.currentStatusValue,
+						orderTime: [`${this.startDate}`,`${this.endDate}`],
+						creator: ''
+					},false)
+				}
+			},
+			
+			
+			// 查询订单列表
+			getPlanOrderPageEvent(data,flag) {
+				this.orderList = [];
+				this.isShowNoData = false;
+				if (flag) {
+					this.fullOrderList = [];
+					this.showLoadingHint = true;
+					this.infoText = '加载中···';
+				} else {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					this.status = 'loading';
+				};
+				getPlanOrderPage(data).then((res) => {
+					if ( res && res.data.code == 0) {
+						this.orderList = res.data.data.list;
+						this.totalCount = res.data.data.total;
+						this.orderList.forEach((item)=>{
+							item.createTime = SOtime.time3(item.createTime)
+						});
+						this.fullOrderList = this.fullOrderList.concat(this.orderList);
+						if (this.fullOrderList.length == 0) {
+							this.isShowNoData = true
+						} else {
+							this.isShowNoData = false
+						};
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					};
+					if (flag) {
+						this.infoText = '';
+						this.showLoadingHint = false;
+					} else {
+						let totalPage = Math.ceil(this.totalCount/this.pageSize);
+						if (this.currentPage >= totalPage) {
+							this.status = 'nomore'
+						} else {
+							this.status = 'loadmore';
+						}	
+					}
+				})
+				.catch((err) => {
+					if (flag) {
+						this.infoText = '';
+						this.showLoadingHint = false;
+					} else {
+						this.status = 'loadmore'
+					};
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
 			
 			// 评价弹框取消事件
 			evaluateModalCancelEvent() {
@@ -245,49 +333,68 @@
 			// 评价弹框提交事件
 			evaluateModalSubmitEvent() {
 				this.evaluateModalShow = false;
+				this.createOrderEvaluateEvent({
+					orderId: this.currentOrderNo, //销售订单编号
+					content: this.evaluateValue, // 评分内容
+					score: this.scoreCount // 评分
+				})
 			},
 			
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
-						case 0:
-							return '未分配'
+						case 10:
+							return '待审核'
 							break;
-						case 1:
-								return '未查阅'
+						case 20:
+								return '待确认'
 								break;
-						case 2:
-								return '未开始'
+						case 21:
+								return '未通过'
 								break;
-						case 3:
-								return '进行中'
+						case 30:
+								return '待发货'
 								break;
-						case 4:
-								return '待复核'
+						case 31:
+								return '已拒绝'
 								break;
-						case 5:
+						case 40:
+								return '已发货'
+								break;
+						case 41:
+								return '售后中'
+								break;
+						case 50:
 								return '已完成'
 								break;
-						case 6:
-								return '已复核'
-								break;
-						case 7:
-								return '已取消'
-								break
-						case 8:
-								return '复核中'
-								break
 				} 
 			},
 			
-			// 进入历史订单事件
-			enterHistoryOrderEvent () {},
+			// 提取产品清单信息
+			extractProductInventoryMessage (items) {
+				if (items.length == 0) {
+					return ''
+				};
+				let temporaryArray = [];
+				for (let item of items) {
+					temporaryArray.push(item.productName);
+				};
+				return temporaryArray.join("、")
+			},
 			
 			// 日历日期选择确认事件
 			calendarConfirm(e) {
 				this.showCalendar = false;
 				this.startDate = e[0];
-				this.endDate = e[e.length - 1]
+				this.endDate = e[e.length - 1];
+				this.currentPageNum = 1;
+				this.getPlanOrderPageEvent({
+					pageNo: this.currentPageNum,
+					pageSize: this.pageSize,
+				  status: 50,
+					orderTime: [`${this.startDate}`,`${this.endDate}`],
+					creator: ''
+				},true)
 			},
 			
 			// 将时间戳转换为当天的 00:00:00
@@ -300,10 +407,10 @@
 			// 获取开始和结束日期(中间相隔一个月)
 		  getDateRange() {
 				this.defaultDateArr = [];
-			  const start = new Date(); 
-			  const end = new Date(start);
-			  end.setMonth(start.getMonth() + 1);
-			  end.setHours(23, 59, 59, 999);
+				const end = new Date(); 
+				const start = new Date(end);
+				start.setMonth(end.getMonth() - 1);
+				start.setHours(23, 59, 59, 999);
 				this.startDate = this.formatDate(start);
 				this.endDate = this.formatDate(end);
 				this.defaultDateArr.push(this.startDate);
@@ -317,21 +424,93 @@
 			  return `${y}-${m}-${d}`;
 			},
 			
-			//进入订单详情事件
+			//进入历史订单详情事件
 			enterOrderDetailsEvent(item,index) {
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/orderDetails/orderDetails'
+					url: `/materialApplicationPackage/pages/orderDetails/orderDetails?id=${item.id}`
 				})
 			},
 			
 			// 订单评价事件
 			evaluateEvent(item,index) {
-				this.evaluateModalShow = true;
+				this.currentOrderIndex = index;
+				this.currentOrderId = item['id'];
+				this.currentOrderNo = item['no'];
+				if (!item.evaluate) {
+					this.evaluateModalShow = true;
+				} else {
+					this.viewEvaluateEvent()
+				}
 			},
 			
 			// 查看评价事件
 			viewEvaluateEvent(item,index) {
-				this.viewEvaluateModalShow = true
+				this.getOrderEvaluateEvent({
+					orderId: this.currentOrderNo, //销售订单编号
+					id: this.currentOrderId
+				})
+			},
+			
+			// 创建订单评价
+			createOrderEvaluateEvent(data) {
+				this.showLoadingHint = true;
+				this.infoText = '提交中···';
+				createOrderEvaluate(data).then((res) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 0) {
+						this.$refs.uToast.show({
+							message: '评价成功!',
+							type: 'success',
+							position: 'bottom'
+						})
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
+			// 获取订单评价信息
+			getOrderEvaluateEvent(data) {
+				this.showLoadingHint = true;
+				this.infoText = '加载中···';
+				getOrderEvaluate(data).then((res) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 0) {
+						this.viewScoreCount = rea.data.data['score'];
+						this.viewScoreValue = rea.data.data['content'];
+						this.viewEvaluateModalShow = true;
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
 			},
 			
 			// 顶部导航返回事件
@@ -536,6 +715,16 @@
 				 overflow: auto;
 				 padding-bottom: 10px;
 				 box-sizing: border-box;
+				 position: relative;
+				 ::v-deep .u-empty {
+				 	position: absolute;
+				 	top: 50%;
+				 	left: 50%;
+				 	transform: translate(-50%,-50%)
+				 };
+				 .scroll-view {
+				 		height: 100%
+				 };
 				 .order-list {
 					 padding: 0 6px 20px 6px;
 					 box-sizing: border-box;

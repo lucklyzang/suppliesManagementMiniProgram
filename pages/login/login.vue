@@ -289,7 +289,8 @@
 				return new Promise((resolve,reject)=> {
 					let loginMessage = {
 						username: this.form.username,
-						password: this.form.password
+						password: this.form.password,
+						terminal : 1
 					};
 					this.showLoadingHint = true;
 					this.infoText = '登录中···';

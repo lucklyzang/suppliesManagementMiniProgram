@@ -39,32 +39,32 @@
 					</view>
 				</view>
 				<view class="delivery-list-box">
-					<view class="delivery-list">
+					<view class="delivery-list" v-for="(item,index) in saleReturnOrderDetailsList['items']" :key="item.id">
 						<view class="product-content">
-							<text>面签</text>
+							<text>{{ item.productName }}</text>
 						</view>
 						<view class="specification-content">
-							<text>5/盒</text>
+							<text>{{ item.model }}</text>
 						</view>
 						<view class="deliver-number-content">
-							<text>100</text>
+							<text>{{ item.count }}</text>
 						</view>
 						<view class="sales-return-content">
 							 <u--input
 							    border="none"
 									type="digit"
-							    v-model="alesReturnValue"
+							    v-model="item.alesReturnCount"
 							  ></u--input>
 						</view>
 						<view class="barter-content">
 							 <u--input
 							    border="none"
 									type="digit"
-							    v-model="barterValue"
+							    v-model="item.barterCount"
 							  ></u--input>
 						</view>
 						<view class="unit-content">
-							<text>盒</text>
+							<text>{{ item.productUnitName }}</text>
 						</view>
 					</view>
 				</view>
@@ -110,9 +110,9 @@
 				showLoadingHint: false,
 				infoText: '加载中···',
 				loadingShow: false,
-				alesReturnValue: 100,
-				barterValue: 100,
-				exchangeReason: ''
+				exchangeReason: '',
+				saleReturnOrderDetailsList: [],
+				saleReturnOrderMessage: {}
 			}
 		},
 		computed: {
@@ -143,12 +143,17 @@
 				return ''
 			}
 		},
-		onLoad () {
-			const pages = getCurrentPages();
-			if (pages.length > 1) {
-			  // 当前页面的上一个页面实例
-			  const prevPage = pages[pages.length - 2]; 
-			  console.log('上一个页面的路由:', prevPage.route);
+		onLoad (options) {
+			if (options.transmitParams) {
+				try {
+					const rawData = decodeURIComponent(options.transmitParams);
+					this.saleReturnOrderMessage = JSON.parse(rawData);
+					this.getSaleReturnEvent({
+						orderNo: Number(this.saleReturnOrderMessage.id) //编号
+					})
+				} catch (e) {
+					console.error('参数解析失败', e);
+				}
 			}
 		},
 		methods: {
@@ -163,11 +168,86 @@
 			// 取消事件
 			cancelEvent () {},
 			
+			// 查询退换货详情
+			getSaleReturnEvent(data) {
+				this.showLoadingHint = true;
+				this.infoText = '加载中···';
+				this.saleReturnOrderDetailsList = [];
+				getSaleReturn(data).then((res) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 0) {
+						this.saleReturnOrderDetailsList = res.data.data;
+						this.saleReturnOrderDetailsList['item'].forEach((item) => {
+							item['alesReturnCount'] = 0;
+							item['barterCount'] = 0;
+						})
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
+			// 提交退换货
+			updateSaleReturnEvent(data) {
+				this.showLoadingHint = true;
+				this.infoText = '提交中···';
+				updateSaleReturn(data).then((res) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 0) {
+						if (res.data.data) {
+							uni.navigateTo({
+								url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
+							})
+						} else {
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+								position: 'bottom'
+							})
+						}
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
 			// 提交事件
 			submitEvent () {
-				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
-				})
+				let temporaryMessage = {
+						returnTime: '', //退货时间
+						orderId: Number(this.saleReturnOrderMessage.orderId), // 销售订单编号
+						id: Number(this.saleReturnOrderMessage.id), // 编号
+						items: [] // 退货清单列表
+				};
+				this.updateSaleReturnEvent()
 			}
 		}
 	}

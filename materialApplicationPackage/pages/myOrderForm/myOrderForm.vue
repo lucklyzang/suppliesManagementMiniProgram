@@ -170,6 +170,7 @@
 				totalCount: 0,
 				status: 'nomore',
 				currentOrderId: '',
+				currentOrderIndex: 0,
 				showCalendar: false,
 				deleteShow: false,
 				defaultDateArr: [],
@@ -252,7 +253,8 @@
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
 			  status: this.currentStatusValue,
-				orderTime: [`${this.startDate}`,`${this.endDate}`]
+				orderTime: [`${this.startDate}`,`${this.endDate}`],
+				creator: ''
 			},true)
 		},
 		methods: {
@@ -293,7 +295,8 @@
 						pageNo: this.currentPageNum,
 						pageSize: this.pageSize,
 						status: this.currentStatusValue,
-						orderTime: [`${this.startDate}`,`${this.endDate}`]
+						orderTime: [`${this.startDate}`,`${this.endDate}`],
+						creator: ''
 					},false)
 				}
 			},
@@ -307,12 +310,7 @@
 					this.infoText = '';
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
-							this.getPlanOrderPageEvent({
-								pageNo: this.currentPageNum,
-								pageSize: this.pageSize,
-								status: this.currentStatusValue,
-								orderTime: [`${this.startDate}`,`${this.endDate}`]
-							},true);
+							this.fullOrderList.splice(this.currentOrderIndex,1);
 							this.$refs.uToast.show({
 								message: '删除成功!',
 								type: 'success',
@@ -359,8 +357,12 @@
 				};
 				getPlanOrderPage(data).then((res) => {
 					if ( res && res.data.code == 0) {
+						// 不显示已完成的订单
+						this.orderList = res.data.data.list.filter((item) => { return item.status != 50});
+						// 已完成订单列表(重新计算总条数)
+						let completeOrderList = res.data.data.list.filter((item) => { return item.status == 50});
 						this.totalCount = res.data.data.total;
-						this.orderList = res.data.data.list;
+						// this.totalCount = this.totalCount - completeOrderList.length;
 						this.orderList.forEach((item)=>{
 							item.createTime = SOtime.time3(item.createTime)
 						});
@@ -428,6 +430,9 @@
 						case 41:
 								return '售后中'
 								break;
+						case 50:
+								return '已完成'
+								break;
 				} 
 			},
 			
@@ -455,11 +460,13 @@
 				this.showCalendar = false;
 				this.startDate = e[0];
 				this.endDate = e[e.length - 1];
+				this.currentPageNum = 1;
 				this.getPlanOrderPageEvent({
 					pageNo: this.currentPageNum,
 					pageSize: this.pageSize,
 				  status: this.currentStatusValue,
-					orderTime: [`${this.startDate}`,`${this.endDate}`]
+					orderTime: [`${this.startDate}`,`${this.endDate}`],
+					creator: ''
 				},true)
 			},
 			
@@ -496,11 +503,13 @@
 				this.currentStatusValue = item.value,
 				this.currentStatusIndex = index;
 				this.orderStatusListShow = false;
+				this.currentPageNum = 1;
 				this.getPlanOrderPageEvent({
 					pageNo: this.currentPageNum,
 					pageSize: this.pageSize,
 					status: this.currentStatusValue,
-					orderTime: [`${this.startDate}`,`${this.endDate}`]
+					orderTime: [`${this.startDate}`,`${this.endDate}`],
+					creator: ''
 				},true)
 			},
 			
@@ -514,6 +523,7 @@
 			// 订单删除事件
 			deleteEvent(item,index) {
 				this.deleteShow = true;
+				this.currentOrderIndex = index;
 				this.currentOrderId = item['id']
 			},
 			
@@ -527,14 +537,14 @@
 			// 订单退换货事件
 			changingOrRefundingEvent(item,index) {
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/changingOrRefunding/changingOrRefunding'
+					url: `/materialApplicationPackage/pages/changingOrRefunding/changingOrRefunding?id=${item.id}`
 				})
 			},
 			
 			// 订单确认收货事件
 			sureReceivingEvent(item,index) {
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/confirmReceipt/confirmReceipt'
+					url: `/materialApplicationPackage/pages/confirmReceipt/confirmReceipt?id=${item.id}`
 				})
 			},
 			

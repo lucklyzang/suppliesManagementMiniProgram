@@ -39,32 +39,32 @@
 					</view>
 				</view>
 				<view class="delivery-list-box">
-					<view class="delivery-list">
+					<view class="delivery-list" v-for="(item,index) in saleReturnOrderDetailsList['items']" :key="item.id">
 						<view class="product-content">
-							<text>面签</text>
+							<text>{{ item.productName }}</text>
 						</view>
 						<view class="specification-content">
-							<text>5/盒</text>
+							<text>{{ item.model }}</text>
 						</view>
 						<view class="deliver-number-content">
-							<text>100</text>
+							<text>{{ item.count }}</text>
 						</view>
 						<view class="sales-return-content">
 							 <u--input
 							    border="none"
 									type="digit"
-							    v-model="alesReturnValue"
+							    v-model="item.alesReturnCount"
 							  ></u--input>
 						</view>
 						<view class="barter-content">
 							 <u--input
 							    border="none"
 									type="digit"
-							    v-model="barterValue"
+							    v-model="item.barterCount"
 							  ></u--input>
 						</view>
 						<view class="unit-content">
-							<text>盒</text>
+							<text>{{ item.productUnitName }}</text>
 						</view>
 					</view>
 				</view>
@@ -84,7 +84,7 @@
 		mapMutations
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
-	import { confirmSaleReturn } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { confirmSaleReturn, getSaleReturn } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
@@ -98,9 +98,8 @@
 				showLoadingHint: false,
 				infoText: '加载中···',
 				loadingShow: false,
-				alesReturnValue: 100,
-				barterValue: 100,
-				exchangeReason: ''
+				saleReturnOrderDetailsList: [],
+				saleReturnOrderMessage: {}
 			}
 		},
 		computed: {
@@ -131,7 +130,18 @@
 				return ''
 			}
 		},
-		onLoad () {
+		onLoad (options) {
+			if (options.transmitParams) {
+				try {
+					const rawData = decodeURIComponent(options.transmitParams);
+					this.saleReturnOrderMessage = JSON.parse(rawData);
+					this.getSaleReturnEvent({
+						orderNo: Number(this.saleReturnOrderMessage.id) //编号
+					})
+				} catch (e) {
+					console.error('参数解析失败', e);
+				}
+			}
 		},
 		methods: {
 			...mapMutations([
@@ -145,8 +155,80 @@
 			// 取消事件
 			cancelEvent () {},
 			
+			// 查询退换货详情
+			getSaleReturnEvent(data) {
+				this.showLoadingHint = true;
+				this.infoText = '加载中···';
+				this.saleReturnOrderDetailsList = [];
+				getSaleReturn(data).then((res) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 0) {
+						this.saleReturnOrderDetailsList = res.data.data;
+						this.saleReturnOrderDetailsList['item'].forEach((item) => {
+							item['alesReturnCount'] = 0;
+							item['barterCount'] = 0;
+						})
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
 			// 确认收货事件
-			confirmReceiptEvent () {}
+			confirmReceiptEvent () {
+				this.showLoadingHint = true;
+				this.infoText = '提交中···';
+				confirmSaleReturn({
+					id: this.currentId
+				}).then((res) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 0) {
+						if (res.data.data) {
+							this.$refs.uToast.show({
+								message: '确认成功',
+								type: 'success',
+								position: 'bottom'
+							})
+						} else {
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+								position: 'bottom'
+							})
+						}
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			}
 		}
 	}
 </script>

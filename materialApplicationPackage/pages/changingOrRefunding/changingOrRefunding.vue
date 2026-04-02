@@ -17,33 +17,37 @@
 				<view class="delivery-information-text">
 					<text>送货信息:</text>
 				</view>
-				<view class="delivery-information" @click="enterChangingOrRefundingDetailsEvent">
-					<view class="delivery-information-left">
-						<view class="delivery-number-message">
-							<view class="delivery-number">
-								<text>送货单号:</text>
-								<text>5564267</text>
+				<u-empty text="您还没有相关订单" mode="list" v-if="isShowNoData"></u-empty>
+				<scroll-view class="scroll-view" scroll-y="true"  @scrolltolower="scrolltolower">
+					<view class="delivery-information" v-for="(item,index) in saleReturnOrderList" :key="item.id" @click="enterChangingOrRefundingDetailsEvent(item,index)">
+						<view class="delivery-information-left">
+							<view class="delivery-number-message">
+								<view class="delivery-number">
+									<text>送货单号:</text>
+									<text>{{ item.id }}</text>
+								</view>
+								<view class="harvest-date">
+									<text>收货日期:</text>
+									<text></text>
+								</view>
 							</view>
-							<view class="harvest-date">
-								<text>收货日期:</text>
-								<text>2026-02-24</text>
+							<view class="related-order-number-message">
+								<view class="related-order-number">
+									<text>关联单号:</text>
+									<text>{{ item.orderId }}</text>
+								</view>
+								<view class="delivery-date">
+									<text>送货日期:</text>
+									<text></text>
+								</view>
 							</view>
 						</view>
-						<view class="related-order-number-message">
-							<view class="related-order-number">
-								<text>关联单号:</text>
-								<text>5564267</text>
-							</view>
-							<view class="delivery-date">
-								<text>送货日期:</text>
-								<text>2026-02-24</text>
-							</view>
+						<view class="delivery-information-right">
+							<text>已发货</text>
 						</view>
 					</view>
-					<view class="delivery-information-right">
-						<text>已发货</text>
-					</view>
-				</view>
+					<u-loadmore :status="status" v-if="fullSaleReturnOrderList.length > 0" />
+				</scroll-view>
 			</view>
 		</view>
 	</view>
@@ -68,7 +72,15 @@
 			return {
 				showLoadingHint: false,
 				infoText: '加载中···',
-				loadingShow: false
+				isShowNoData: false,
+				loadingShow: false,
+				currentPageNum: 1,
+				pageSize: 20,
+				totalCount: 0,
+				status: 'nomore',
+				currentId: 0,
+				saleReturnOrderList: [],
+				fullSaleReturnOrderList: []
 			}
 		},
 		computed: {
@@ -99,8 +111,19 @@
 				return ''
 			}
 		},
-		onLoad () {
+		
+		onLoad (options) {
+			if (JSON.stringify(options) != '{}') {
+				this.currentId = Number(options.id);
+				this.getSaleReturnPageEvent({
+					pageNo: this.currentPageNum,
+					pageSize: this.pageSize,
+					orderNo: this.currentId, // 销售单编号
+					creator: '' // 创建者
+				},true)
+			}
 		},
+		
 		methods: {
 			...mapMutations([
 			]),
@@ -110,10 +133,90 @@
 				uni.navigateBack()
 			},
 			
+			// 上拉加载数据
+			scrolltolower () {
+				let totalPage = Math.ceil(this.totalCount/this.pageSize);
+				if (this.currentPageNum >= totalPage) {
+					this.status = 'nomore'
+				} else {
+					this.status = 'loadmore';
+					this.currentPageNum = this.currentPageNum + 1;
+					this.getSaleReturnPageEvent({
+						pageNo: this.currentPageNum,
+						pageSize: this.pageSize,
+						orderNo: this.currentId, // 销售单编号
+						creator: '' // 创建者
+					},false)
+				}
+			},
+			
+			// 查询退换货列表
+			getSaleReturnPageEvent(data,flag) {
+				this.saleReturnOrderList = [];
+				this.isShowNoData = false;
+				if (flag) {
+					this.fullSaleReturnOrderList = [];
+					this.showLoadingHint = true;
+					this.infoText = '加载中···';
+				} else {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					this.status = 'loading';
+				};
+				getSaleReturnPage(data).then((res) => {
+					if ( res && res.data.code == 0) {
+						this.saleReturnOrderList = res.data.data.list;
+						this.totalCount = res.data.data.total;
+						this.fullSaleReturnOrderList = this.fullSaleReturnOrderList.concat(this.saleReturnOrderList);
+						if (this.fullSaleReturnOrderList.length == 0) {
+							this.isShowNoData = true
+						} else {
+							this.isShowNoData = false
+						};
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					};
+					if (flag) {
+						this.infoText = '';
+						this.showLoadingHint = false;
+					} else {
+						let totalPage = Math.ceil(this.totalCount/this.pageSize);
+						if (this.currentPage >= totalPage) {
+							this.status = 'nomore'
+						} else {
+							this.status = 'loadmore';
+						}	
+					}
+				})
+				.catch((err) => {
+					if (flag) {
+						this.infoText = '';
+						this.showLoadingHint = false;
+					} else {
+						this.status = 'loadmore'
+					};
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
 			// 进入退换货详情事件
-			enterChangingOrRefundingDetailsEvent () {
+			enterChangingOrRefundingDetailsEvent (item,index) {
+				let transmitParams = encodeURIComponent(
+				 JSON.stringify({
+					 id: item.id,
+					 orderId: this.currentId
+				 })
+				);
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/changingOrRefundingDetails/changingOrRefundingDetails'
+					url: `/materialApplicationPackage/pages/changingOrRefundingDetails/changingOrRefundingDetails?transmitParams=${transmitParams}`
 				})
 			}
 		}
@@ -164,6 +267,13 @@
 			overflow: auto;
 			padding: 0 0 20px 0;
 			box-sizing: border-box;
+			position: relative;
+			::v-deep .u-empty {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%)
+			};
 			.delivery-information-list {
 				padding: 0 3px;
 				box-sizing: border-box;
@@ -176,6 +286,9 @@
 						font-size: 14px;
 						color: #101010;
 					}
+				};
+				.scroll-view {
+						height: 100%
 				};
 				.delivery-information {
 					border-radius: 6px;
