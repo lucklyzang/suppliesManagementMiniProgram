@@ -63,29 +63,28 @@ export function getPlanOrder(id) {
 	  })
 }
 
-// 获得退换货分页
-export function getSaleReturnPage(data) {
+// 根据订单查询出货单
+export function getSaleReturnPage(id) {
 	return request({
-	    url: '/spd/admin-api/erp/sale-return/page',
-	    method: 'get',
-			params: data
-	  })
-}
-
-// 获得退换货详情
-export function getSaleReturn(id) {
-	return request({
-	    url: `/spd/admin-api/erp/sale-return/get?id=${id}`,
+	    url: `/spd/admin-api/erp/sale-out/query-by-orderId?orderId=${id}`,
 	    method: 'get'
 	  })
 }
 
-// 更新退换货
-export function updateSaleReturn(data) {
+// 获得出货单详情
+export function getSaleReturn(id) {
 	return request({
-	    url: '/spd/admin-api/erp/sale-return/update',
-	    method: 'put',
-			params: data
+	    url: `/spd/admin-api/erp/sale-out/get?id=${id}`,
+	    method: 'get'
+	  })
+}
+
+// 创建退换货
+export function createSaleReturn(data) {
+	return request({
+	    url: '/spd/admin-api/erp/sale-return/create',
+	    method: 'post',
+			data
 	  })
 }
 
@@ -111,7 +110,24 @@ export function createOrderEvaluate(data) {
 export function getOrderEvaluate(data) {
 	return request({
 	    url: '/spd/admin-api/erp/order-evaluate/get-by-order-id',
-	    method: 'post',
+	    method: 'get',
 			params: data
+	  })
+}
+
+// 更新订单状态
+export function checkOrder(data) {
+	return request({
+	    url: '/spd/admin-api/erp/check-order/update-status',
+	    method: 'put',
+			params: data
+	  })
+}
+
+// 查询订单操作记录
+export function queryorderOperationLog(orderId) {
+	return request({
+	    url: `/spd/admin-api/erp/order-operation-log/list-by-order-id?orderId=${orderId}`,
+	    method: 'get'
 	  })
 }

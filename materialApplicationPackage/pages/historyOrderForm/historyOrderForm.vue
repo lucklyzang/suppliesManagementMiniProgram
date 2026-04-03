@@ -136,7 +136,7 @@
 								<text>评价:</text>
 							</view>
 							<view class="evaluate-content">
-								飒飒撒
+								{{ viewScoreValue }}
 							</view>
 						</view>
 					</view>
@@ -334,7 +334,7 @@
 			evaluateModalSubmitEvent() {
 				this.evaluateModalShow = false;
 				this.createOrderEvaluateEvent({
-					orderId: this.currentOrderNo, //销售订单编号
+					orderId: this.currentOrderId, //销售订单编号
 					content: this.evaluateValue, // 评分内容
 					score: this.scoreCount // 评分
 				})
@@ -437,6 +437,7 @@
 				this.currentOrderId = item['id'];
 				this.currentOrderNo = item['no'];
 				if (!item.evaluate) {
+					this.scoreValue = '';
 					this.evaluateModalShow = true;
 				} else {
 					this.viewEvaluateEvent()
@@ -444,10 +445,10 @@
 			},
 			
 			// 查看评价事件
-			viewEvaluateEvent(item,index) {
+			viewEvaluateEvent() {
 				this.getOrderEvaluateEvent({
-					orderId: this.currentOrderNo, //销售订单编号
-					id: this.currentOrderId
+					orderId: this.currentOrderId, //销售订单编号
+					id: ''
 				})
 			},
 			
@@ -459,6 +460,11 @@
 					this.infoText = '';
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
+						this.fullOrderList.forEach((item,index)=>{
+							if (this.currentOrderIndex == index) {
+								item['evaluate'] = true;
+							}
+						});
 						this.$refs.uToast.show({
 							message: '评价成功!',
 							type: 'success',

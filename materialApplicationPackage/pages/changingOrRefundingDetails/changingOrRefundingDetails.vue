@@ -15,7 +15,7 @@
 		<view class="content">
 			<view class="delivery-number">
 				<text>送货单号:</text>
-				<text>5566247</text>
+				<text>{{ saleReturnOrderDetailsList.id }}</text>
 			</view>
 			<view class="delivery-table">
 				<view class="delivery-table-title">
@@ -96,7 +96,7 @@
 		mapMutations
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
-	import { getSaleReturn, updateSaleReturn } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getSaleReturn, createSaleReturn } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
@@ -148,9 +148,7 @@
 				try {
 					const rawData = decodeURIComponent(options.transmitParams);
 					this.saleReturnOrderMessage = JSON.parse(rawData);
-					this.getSaleReturnEvent({
-						orderNo: Number(this.saleReturnOrderMessage.id) //编号
-					})
+					this.getSaleReturnEvent(Number(this.saleReturnOrderMessage.id))
 				} catch (e) {
 					console.error('参数解析失败', e);
 				}
@@ -168,7 +166,7 @@
 			// 取消事件
 			cancelEvent () {},
 			
-			// 查询退换货详情
+			// 查询出库单详情
 			getSaleReturnEvent(data) {
 				this.showLoadingHint = true;
 				this.infoText = '加载中···';
@@ -202,10 +200,10 @@
 			},
 			
 			// 提交退换货
-			updateSaleReturnEvent(data) {
+			createSaleReturnEvent(data) {
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
-				updateSaleReturn(data).then((res) => {
+				createSaleReturn(data).then((res) => {
 					this.infoText = '';
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
@@ -247,7 +245,7 @@
 						id: Number(this.saleReturnOrderMessage.id), // 编号
 						items: [] // 退货清单列表
 				};
-				this.updateSaleReturnEvent()
+				this.createSaleReturnEvent(temporaryMessage)
 			}
 		}
 	}

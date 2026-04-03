@@ -30,61 +30,65 @@
 				</view>
 			</view>
 			<view class="order-list-box">
-				<view class="order-list" v-for="(item,index) in orderList" :key="index" @click="enterOrderDetailsEvent(item,index)">
-					<view class="order-list-top">
-						<view class="order-type">
-							<text>{{ item.orderType }}</text>
-							<text>{{ item.orderNumber }}</text>
+				<u-empty text="您还没有相关订单" mode="list" v-if="isShowNoData"></u-empty>
+				<scroll-view class="scroll-view" scroll-y="true"  @scrolltolower="scrolltolower">
+					<view class="order-list" v-for="(item,index) in fullOrderList" :key="index" @click="enterOrderDetailsEvent(item,index)">
+						<view class="order-list-top">
+							<view class="order-type">
+								<text>计划订单</text>
+								<text>{{ item.no }}</text>
+							</view>
+							<view class="order-status"
+							:class="{
+								'noPassStyle ' : item.status == 21,
+								'stayAuditStyle' : item.status == 10,
+								'stayConfirmedStyle' : item.status == 20,
+								'alreadyRefuseStyle' : item.status == 31,
+								'stayDeliverStyle' : item.status == 30,
+								'alreadyDeliverStyle' : item.status == 40,
+								'afterSaleIngStyle' : item.status == 41
+								}"
+							>
+								<text>{{ stateTransfer(item.status) }}</text>
+							</view>
 						</view>
-						<view class="order-status"
-						:class="{
-							'noStartStyle ' : item.state == 1 || item.state == 2, 
-							'underwayStyle' : item.state == 3,
-							'waitReviewStyle' : item.state == 4,
-							'completeStyle' : item.state == 5,
-							'haveReviewStyle' : item.state == 6,
-							'cancelStyle' : item.state == 7,
-							'reviewStyle' : item.state == 8
-							}"
-						>
-							<text>{{ stateTransfer(item.status) }}</text>
+						<view class="order-list-center">
+							<view class="product-list">
+								<text>产品清单:</text>
+								<text>{{ extractProductInventoryMessage(item['items']) }}</text>
+							</view>
+							<view class="create-delivery-date">
+								<view class="create-delivery-date-left">
+									<text>创建时间:</text>
+									<text>{{ item.createTime }}</text>
+								</view>
+								<view class="create-delivery-date-right">
+									<text>交货日期:</text>
+									<text>{{ item.deliveryDate }}</text>
+								</view>
+							</view>
+							<view class="product-list delivery-address">
+								<text>送货地址:</text>
+								<text>{{ item.address }}</text>
+							</view>
+							<view class="product-list remark-box">
+								<text>备注:</text>
+								<text>{{ item.remark ? item.remark : '无' }}</text>
+							</view>
+						</view>
+						<view class="order-list-bottom">
+							<view class="order-list-btn">
+								<view class="delete-left" @click.stop="auditNoPassEvent(item,index)">
+									<text>不通过</text>
+								</view>
+								<view class="edit-right" @click.stop="auditPassEvent(item,index)">
+									<text>通过</text>
+								</view>
+							</view>
 						</view>
 					</view>
-					<view class="order-list-center">
-						<view class="product-list">
-							<text>产品清单:</text>
-							<text>{{ item.productList }}</text>
-						</view>
-						<view class="create-delivery-date">
-							<view class="create-delivery-date-left">
-								<text>创建时间:</text>
-								<text>{{ item.createTime }}</text>
-							</view>
-							<view class="create-delivery-date-left">
-								<text>交货日期:</text>
-								<text>{{ item.deliveryDate }}</text>
-							</view>
-						</view>
-						<view class="product-list delivery-address">
-							<text>送货地址:</text>
-							<text>{{ item.deliveryAddress }}</text>
-						</view>
-						<view class="product-list remark-box">
-							<text>备注:</text>
-							<text>{{ item.remark }}</text>
-						</view>
-					</view>
-					<view class="order-list-bottom">
-						<view class="order-list-btn">
-							<view class="delete-left" @click.stop="auditNoPassEvent(item,index)">
-								<text>不通过</text>
-							</view>
-							<view class="edit-right" @click.stop="auditPassEvent(item,index)">
-								<text>通过</text>
-							</view>
-						</view>
-					</view>
-				</view>
+					<u-loadmore :status="status" v-if="fullOrderList.length > 0" />
+				</scroll-view>
 			</view>
 		</view>
 		<!-- 不通过弹框	 -->
@@ -138,6 +142,7 @@
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import { modificationPassword } from '@/api/login.js'
+	import { getPlanOrderPage, checkOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
@@ -149,57 +154,22 @@
 			return {
 				infoText: '修改中···',
 				showLoadingHint: false,
+				isShowNoData: false,
+				currentStatusValue: 10,
+				currentPageNum: 1,
+				pageSize: 20,
+				totalCount: 0,
+				status: 'nomore',
+				currentOrderId: '',
+				currentOrderIndex: 0,
 				showCalendar: false,
 				noPassModalShow: false,
 				auditOpinionValue: '',
 				defaultDateArr: [],
 				startDate: '',
 				endDate: '',
-				currentStatusText: '全部状态',
-				currentStatusIndex: 0,
-				orderStatusListShow: false,
-				orderList: [
-					{
-						orderType: '计划订单',
-						orderNumber: '5552H5552',
-						status: 0,
-						productList: 'XXX、XXX、XXXX',
-						createTime: '05-31 17:21',
-						deliveryDate: '05-31',
-						deliveryAddress: '检验科',
-						remark: '一周一送'
-					},
-					{
-						orderType: '计划订单',
-						orderNumber: '5552H5552',
-						status: 1,
-						productList: 'XXX、XXX、XXXX',
-						createTime: '05-31 17:21',
-						deliveryDate: '05-31',
-						deliveryAddress: '检验科',
-						remark: '一周一送'
-					},
-					{
-						orderType: '计划订单',
-						orderNumber: '5552H5552',
-						status: 2,
-						productList: 'XXX、XXX、XXXX',
-						createTime: '05-31 17:21',
-						deliveryDate: '05-31',
-						deliveryAddress: '检验科',
-						remark: '一周一送'
-					},
-					{
-						orderType: '计划订单',
-						orderNumber: '5552H5552',
-						status: 3,
-						productList: 'XXX、XXX、XXXX',
-						createTime: '05-31 17:21',
-						deliveryDate: '05-31',
-						deliveryAddress: '检验科',
-						remark: '一周一送'
-					}
-				]
+				orderList: [],
+				fullOrderList: []
 			}
 		},
 		computed: {
@@ -233,42 +203,170 @@
 		
 		onShow () {
 			this.getDateRange();
+			this.getPlanOrderPageEvent({
+				pageNo: this.currentPageNum,
+				pageSize: this.pageSize,
+			  status: this.currentStatusValue,
+				orderTime: [`${this.startDate}`,`${this.endDate}`],
+				creator: ''
+			},true)
 		},
 		methods: {
 			...mapMutations([
 			]),
 			
+			// 查询订单列表
+			getPlanOrderPageEvent(data,flag) {
+				this.orderList = [];
+				this.isShowNoData = false;
+				if (flag) {
+					this.fullOrderList = [];
+					this.showLoadingHint = true;
+					this.infoText = '加载中···';
+				} else {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					this.status = 'loading';
+				};
+				getPlanOrderPage(data).then((res) => {
+					if ( res && res.data.code == 0) {
+						// 不显示已完成的订单
+						this.orderList = res.data.data.list;
+						this.totalCount = res.data.data.total;
+						this.orderList.forEach((item)=>{
+							item.createTime = SOtime.time3(item.createTime)
+						});
+						this.fullOrderList = this.fullOrderList.concat(this.orderList);
+						if (this.fullOrderList.length == 0) {
+							this.isShowNoData = true
+						} else {
+							this.isShowNoData = false
+						};
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					};
+					if (flag) {
+						this.infoText = '';
+						this.showLoadingHint = false;
+					} else {
+						let totalPage = Math.ceil(this.totalCount/this.pageSize);
+						if (this.currentPage >= totalPage) {
+							this.status = 'nomore'
+						} else {
+							this.status = 'loadmore';
+						}	
+					}
+				})
+				.catch((err) => {
+					if (flag) {
+						this.infoText = '';
+						this.showLoadingHint = false;
+					} else {
+						this.status = 'loadmore'
+					};
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
-						case 0:
-							return '未分配'
+						case 10:
+							return '待审核'
 							break;
-						case 1:
-								return '未查阅'
+						case 20:
+								return '待确认'
 								break;
-						case 2:
-								return '未开始'
+						case 21:
+								return '未通过'
 								break;
-						case 3:
-								return '进行中'
+						case 30:
+								return '待发货'
 								break;
-						case 4:
-								return '待复核'
+						case 31:
+								return '已拒绝'
 								break;
-						case 5:
+						case 40:
+								return '已发货'
+								break;
+						case 41:
+								return '售后中'
+								break;
+						case 50:
 								return '已完成'
 								break;
-						case 6:
-								return '已复核'
-								break;
-						case 7:
-								return '已取消'
-								break
-						case 8:
-								return '复核中'
-								break
 				} 
+			},
+			
+			// 上拉加载数据
+			scrolltolower () {
+				let totalPage = Math.ceil(this.totalCount/this.pageSize);
+				if (this.currentPageNum >= totalPage) {
+					this.status = 'nomore'
+				} else {
+					this.status = 'loadmore';
+					this.currentPageNum = this.currentPageNum + 1;
+					this.getPlanOrderPageEvent({
+						pageNo: this.currentPageNum,
+						pageSize: this.pageSize,
+						status: this.currentStatusValue,
+						orderTime: [`${this.startDate}`,`${this.endDate}`],
+						creator: ''
+					},false)
+				}
+			},
+			
+			// 订单审核
+			checkOrderEvent(data) {
+				this.showLoadingHint = true;
+				this.infoText = '提交中···';
+				checkOrder(data).then((res) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 0) {
+						if (res.data.data) {
+							this.$refs.uToast.show({
+								message: '审核成功!',
+								type: 'success',
+								position: 'bottom'
+							});
+							this.currentPageNum = 1;
+							this.getPlanOrderPageEvent({
+								pageNo: this.currentPageNum,
+								pageSize: this.pageSize,
+							  status: this.currentStatusValue,
+								orderTime: [`${this.startDate}`,`${this.endDate}`],
+								creator: ''
+							},true)
+						} else {
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error'
+							})
+						}
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error'
+					})
+				})
 			},
 			
 			// 不通过弹框取消事件
@@ -278,7 +376,19 @@
 			
 			// 不通过弹提交事件
 			noPassModalSubmitEvent () {
-				this.noPassModalShow = false
+				this.noPassModalShow = false;
+				if (this.auditOpinionValue === '') {
+					this.$refs.uToast.show({
+						message: '审核意见不能为空',
+						type: 'error',
+					});
+					return;
+				};
+				this.checkOrderEvent({
+					id: this.currentOrderId ,
+					status: 21,
+					content: this.auditOpinionValue
+				})
 			},
 			
 			// 进入历史审核订单事件
@@ -292,7 +402,15 @@
 			calendarConfirm(e) {
 				this.showCalendar = false;
 				this.startDate = e[0];
-				this.endDate = e[e.length - 1]
+				this.endDate = e[e.length - 1];
+				this.currentPageNum = 1;
+				this.getPlanOrderPageEvent({
+					pageNo: this.currentPageNum,
+					pageSize: this.pageSize,
+				  status: this.currentStatusValue,
+					orderTime: [`${this.startDate}`,`${this.endDate}`],
+					creator: ''
+				},true)
 			},
 			
 			// 将时间戳转换为当天的 00:00:00
@@ -305,10 +423,10 @@
 			// 获取开始和结束日期(中间相隔一个月)
 		  getDateRange() {
 				this.defaultDateArr = [];
-			  const start = new Date(); 
-			  const end = new Date(start);
-			  end.setMonth(start.getMonth() + 1);
-			  end.setHours(23, 59, 59, 999);
+				const end = new Date(); 
+				const start = new Date(end);
+				start.setMonth(end.getMonth() - 1);
+				start.setHours(23, 59, 59, 999);
 				this.startDate = this.formatDate(start);
 				this.endDate = this.formatDate(end);
 				this.defaultDateArr.push(this.startDate);
@@ -322,26 +440,40 @@
 			  return `${y}-${m}-${d}`;
 			},
 			
-			// 订单列表点击事件
-			statusListEvent(item,index) {
-				this.currentStatusText = item;
-				this.currentStatusIndex = index;
-				this.orderStatusListShow = false;
+			// 提取产品清单信息
+			extractProductInventoryMessage (items) {
+				if (items.length == 0) {
+					return ''
+				};
+				let temporaryArray = [];
+				for (let item of items) {
+					temporaryArray.push(item.productName);
+				};
+				return temporaryArray.join("、")
 			},
 			
 			//进入订单详情事件
 			enterOrderDetailsEvent(item,index) {
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/orderDetails/orderDetails'
+					url: `/materialApplicationPackage/pages/orderDetails/orderDetails?id=${item.id}`
 				})
 			},
 			
 			// 订单审核通过事件
 			auditPassEvent(item,index) {
+				this.currentOrderIndex = index;
+				this.currentOrderId = item['id'];
+				this.checkOrderEvent({
+					id: this.currentOrderId ,
+					status: 20
+				})
 			},
 			
 			// 订单审核不通过事件
 			auditNoPassEvent(item,index) {
+				this.currentOrderIndex = index;
+				this.currentOrderId = item['id'];
+				this.auditOpinionValue = '';
 				this.noPassModalShow = true;
 			},
 			
@@ -523,6 +655,16 @@
 				 overflow: auto;
 				 padding-bottom: 10px;
 				 box-sizing: border-box;
+				 position: relative;
+				 ::v-deep .u-empty {
+				 	position: absolute;
+				 	top: 50%;
+				 	left: 50%;
+				 	transform: translate(-50%,-50%)
+				 };
+				 .scroll-view {
+				 		height: 100%
+				 };
 				 .order-list {
 					 padding: 0 6px 20px 6px;
 					 box-sizing: border-box;
@@ -564,29 +706,47 @@
 								 color: #E8CB51;
 							 }
 						 };
-						 .noStartStyle {
-						 	background: #BBBBBB !important
+						 .stayAuditStyle {
+								background: rgba(232,203,81,0.16) !important;
+								>text {
+								 color: #E8CB51 !important;
+								}
 						 };
-						 .underwayStyle {
-						 	background: #289E8E !important
+						 .noPassStyle {
+								background: rgba(241,74,51,0.16) !important;
+								>text {
+								 color: #F14A33 !important;
+								}
 						 };
-						 .completeStyle {
-						 	background: #242424 !important
+						 .stayConfirmedStyle {
+								background: rgba(109,122,223,0.21) !important;
+								>text {
+								 color: #6D7ADF !important;
+								}
 						 };
-						 .reviewStyle {
-						 	background: #F2A15F !important
+						 .alreadyRefuseStyle {
+								background: rgba(241,74,51,0.16) !important;
+								>text {
+								 color: #F14A33 !important;
+								}
 						 };
-						 .haveReviewStyle {
-						 	background: #9B7D31 !important
+						 .stayDeliverStyle {
+								background: rgba(59,157,249,0.15) !important;
+								>text {
+								 color: #3B9DF9 !important;
+								}
 						 };
-						 .waitReviewStyle {
-						 	background: orange !important
+						 .alreadyDeliverStyle {
+								background: rgba(40,158,142,0.21) !important;
+								>text {
+								 color: #289E8E !important;
+								}
 						 };
-						 .cancelStyle {
-						 	background: #E8CB51 !important
-						 };
-						 .completeStyle {
-						 	background: #101010 !important
+						 .afterSaleIngStyle {
+								background: rgba(242,161,95,0.17) !important;
+								>text {
+								 color: #F2A15F !important;
+								}
 						 }
 					 };
 					 .order-list-center {

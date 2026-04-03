@@ -15,7 +15,7 @@
 		<view class="content">
 			<view class="delivery-number">
 				<text>送货单号:</text>
-				<text>5566247</text>
+				<text>{{ saleReturnOrderDetailsList.id }}</text>
 			</view>
 			<view class="delivery-table">
 				<view class="delivery-table-title">
@@ -135,9 +135,7 @@
 				try {
 					const rawData = decodeURIComponent(options.transmitParams);
 					this.saleReturnOrderMessage = JSON.parse(rawData);
-					this.getSaleReturnEvent({
-						orderNo: Number(this.saleReturnOrderMessage.id) //编号
-					})
+					this.getSaleReturnEvent(Number(this.saleReturnOrderMessage.id))
 				} catch (e) {
 					console.error('参数解析失败', e);
 				}

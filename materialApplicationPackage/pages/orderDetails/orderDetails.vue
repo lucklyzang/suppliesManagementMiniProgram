@@ -97,26 +97,26 @@
 				<view class="delivery-information-text">
 					<text>送货信息:</text>
 				</view>
-				<view class="delivery-information" @click="enterChangingOrRefundingDetailsEvent">
+				<view class="delivery-information" v-for="(item,index) in saleReturnOrderList" :key="item.id" @click="enterChangingOrRefundingDetailsEvent(item,index)">
 					<view class="delivery-information-left">
 						<view class="delivery-number-message">
 							<view class="delivery-number">
 								<text>送货单号:</text>
-								<text>5564267</text>
+								<text>{{ item.id }}</text>
 							</view>
 							<view class="harvest-date">
 								<text>收货日期:</text>
-								<text>2026-02-24</text>
+								<text></text>
 							</view>
 						</view>
 						<view class="related-order-number-message">
 							<view class="related-order-number">
 								<text>关联单号:</text>
-								<text>5564267</text>
+								<text>{{ item.orderId }}</text>
 							</view>
 							<view class="delivery-date">
 								<text>送货日期:</text>
-								<text>2026-02-24</text>
+								<text>{{ item.outTime }}</text>
 							</view>
 						</view>
 					</view>
@@ -130,96 +130,54 @@
 					<text>订单状态记录:</text>
 				</view>
 				<view class="order-status-record-list-wrapper">
-					<view class="order-status-record-list">
-						<view class="order-status-record-list-line"></view>
+					<view class="order-status-record-list" v-for="(item,index) in orderStatusRecordList" :key="item.id">
+						<view class="order-status-record-list-line" v-if="index != orderStatusRecordList.length-1"></view>
 						<view class="order-status-record-left">
 							<text></text>
 						</view>
 						<view class="order-status-record-right">
-							<view class="order-status-text">
-								<text>待审核</text>
+							<view class="order-status-text"
+							:class="{
+								'noPassStyle ' : item.status == 21,
+								'stayAuditStyle' : item.status == 10,
+								'stayConfirmedStyle' : item.status == 20,
+								'alreadyRefuseStyle' : item.status == 31,
+								'stayDeliverStyle' : item.status == 30,
+								'alreadyDeliverStyle' : item.status == 40,
+								'afterSaleIngStyle' : item.status == 41,
+								'alreadyCompletedStyle' : item.status == 50,
+								'alreadyevaluatedStyle' : item.status == 51
+								}"
+							>
+								<text>{{ stateTransfer(item.status) }}</text>
 							</view>
 							<view class="commom-view operation-time">
 								<text>操作时间:</text>
-								<text>2025-05-12 12:10</text>
+								<text>{{ item.createTime }}</text>
 							</view>
 							<view class="commom-view operation-people">
 								<text>操作人:</text>
-								<text>沙克老师</text>
+								<text>{{ item.creatorName }}</text>
 							</view>
-							<view class="commom-view audit-opinion">
+							<view class="commom-view audit-opinion" v-if="item.status == 21">
 								<text>审核意见:</text>
-								<text>数量没有写对</text>
+								<text>{{ item.content }}</text>
 							</view>
-							<view class="commom-view refuse-reason">
+							<view class="commom-view refuse-reason" v-if="item.status == 31">
 								<text>拒绝理由:</text>
-								<text>数量没有写对</text>
+								<text>{{ item.content }}</text>
 							</view>
-							<view class="commom-view sales-return-reason">
+							<view class="commom-view sales-return-reason" v-if="item.status == 41 || item.status == 50">
 								<text>退货原因:</text>
-								<text>数量没有写对</text>
+								<text>{{ item.content }}</text>
 							</view>
-							<view class="commom-view score-box">
+							<view class="commom-view score-box" v-if="item.status == 51">
 								<text>评分:</text>
-								<text>5星</text>
+								<text>{{ item.content }}</text>
 							</view>
-							<view class="commom-view evaluate-box">
+							<view class="commom-view evaluate-box" v-if="item.status == 51">
 								<text>评价:</text>
-								<text>非常不错</text>
-							</view>
-						</view>
-					</view>
-					<view class="order-status-record-list">
-						<view class="order-status-record-list-line"></view>
-						<view class="order-status-record-left">
-							<text></text>
-						</view>
-						<view class="order-status-record-right">
-							<view class="order-status-text">
-								<text>待审核</text>
-							</view>
-							<view class="commom-view operation-time">
-								<text>操作时间:</text>
-								<text>2025-05-12 12:10</text>
-							</view>
-							<view class="commom-view operation-people">
-								<text>操作人:</text>
-								<text>沙克老师</text>
-							</view>
-							<view class="commom-view score-box">
-								<text>评分:</text>
-								<text>5星</text>
-							</view>
-							<view class="commom-view evaluate-box">
-								<text>评价:</text>
-								<text>非常不错</text>
-							</view>
-						</view>
-					</view>
-					<view class="order-status-record-list">
-						<view class="order-status-record-list-line" v-if="false"></view>
-						<view class="order-status-record-left">
-							<text></text>
-						</view>
-						<view class="order-status-record-right">
-							<view class="order-status-text">
-								<text>待审核</text>
-							</view>
-							<view class="commom-view operation-time">
-								<text>操作时间:</text>
-								<text>2025-05-12 12:10</text>
-							</view>
-							<view class="commom-view operation-people">
-								<text>操作人:</text>
-								<text>沙克老师</text>
-							</view>
-							<view class="commom-view score-box">
-								<text>评分:</text>
-								<text>5星</text>
-							</view>
-							<view class="commom-view evaluate-box">
-								<text>评价:</text>
-								<text>非常不错</text>
+								<text>{{ item.content }}</text>
 							</view>
 						</view>
 					</view>
@@ -237,7 +195,7 @@
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
-	import { getPlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getPlanOrder, queryorderOperationLog, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
@@ -251,9 +209,12 @@
 				infoText: '加载中···',
 				loadingShow: false,
 				allChooseProductPrice: 0,
+				orderId: '',
 				productDefaultImage: require('@/static/img/basic-message.png'),
+				saleReturnOrderList: [],
 				orderMessage: {},
-				materialList: []
+				materialList: [],
+				orderStatusRecordList: []
 			}
 		},
 		computed: {
@@ -285,7 +246,8 @@
 			}
 		},
 		onLoad (options) {
-			this.getPlanOrderEvent(Number(options.id));
+			this.orderId = Number(options.id);
+			this.parallelFunction();
 		},
 		methods: {
 			...mapMutations([
@@ -297,23 +259,110 @@
 			},
 			
 			// 查询订单详情
-			getPlanOrderEvent(id) {
+			getPlanOrderEvent() {
+				return new Promise((resolve,reject) => {
+					getPlanOrder(this.orderId).then((res) => {
+						this.showLoadingHint = false;
+						this.infoText = '';
+						if ( res && res.data.code == 0) {
+							resolve(res.data.data);
+						} else {
+							reject(res.data.msg);
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+								position: 'bottom'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err)
+					})
+				})
+			},
+			
+			// 查询订单操作记录
+			queryorderOperationLogEvent () {
+				return new Promise((resolve,reject) => {
+					queryorderOperationLog(this.orderId)
+					.then((res) => {
+						this.loadingText = '';
+						this.showLoadingHint = false;
+						if (res && res.data.code == 0) {
+							resolve(res.data.data)
+						} else {
+							reject(res.data.msg);
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err)
+					})
+				})
+			},
+			
+			// 查询出货单列表
+			getSaleReturnPageEvent() {
+				return new Promise((resolve,reject) => {
+					getSaleReturnPage(this.orderId).then((res) => {
+						this.loadingText = '';
+						this.showLoadingHint = false;
+						if ( res && res.data.code == 0) {
+							resolve(res.data.data)
+						} else {
+							reject(res.data.msg);
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+								position: 'bottom'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err)
+					})
+				})
+			},
+			
+		// 并行查询订单详情、订单操作记录、出货单列表
+		parallelFunction () {
 				this.showLoadingHint = true;
 				this.infoText = '加载中···';
-				getPlanOrder(id).then((res) => {
+				Promise.all([this.getPlanOrderEvent(),this.queryorderOperationLogEvent(),this.getSaleReturnPageEvent()])
+				.then((res) => {
 					this.showLoadingHint = false;
 					this.infoText = '';
-					if ( res && res.data.code == 0) {
-						this.orderMessage = res.data.data;
-						this.materialList = this.orderMessage['items'];
-						this.allChooseProductPrice = this.orderMessage['totalProductPrice'];
-						this.orderMessage['orderTime'] = SOtime.time3(this.orderMessage['orderTime']);
-					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
-							type: 'error',
-							position: 'bottom'
-						})
+					if (res && res.length > 0) {
+						this.saleReturnOrderList = [];
+						this.orderStatusRecordList = [];
+						this.orderMessage = {};
+						let [item1,item2,item3] = res;
+						if (item1) {
+							this.orderMessage = item1;
+							this.materialList = this.orderMessage['items'];
+							this.allChooseProductPrice = this.orderMessage['totalProductPrice'];
+							this.orderMessage['orderTime'] = SOtime.time3(this.orderMessage['orderTime']);
+						};
+						if (item2) {
+							this.orderStatusRecordList = item2;
+							this.orderStatusRecordList.forEach((item)=>{
+								item.createTime = SOtime.time3(item.createTime)
+							})
+						};
+						if (item3) {
+							this.saleReturnOrderList = item3;
+							if (this.saleReturnOrderList.length == 0) {
+								this.isShowNoData = true
+							} else {
+								this.saleReturnOrderList.forEach((item)=>{
+									item.outTime = SOtime.time8(item.outTime)
+								});
+								this.isShowNoData = false
+							}
+						}
 					}
 				})
 				.catch((err) => {
@@ -321,8 +370,7 @@
 					this.infoText = '';
 					this.$refs.uToast.show({
 						message: err,
-						type: 'error',
-						position: 'bottom'
+						type: 'error'
 					})
 				})
 			},
@@ -334,10 +382,10 @@
 							return '待审核'
 							break;
 						case 20:
-								return '待确认'
+								return '审核通过'
 								break;
 						case 21:
-								return '未通过'
+								return '审核未通过'
 								break;
 						case 30:
 								return '待发货'
@@ -351,6 +399,12 @@
 						case 41:
 								return '售后中'
 								break;
+						case 50:
+								return '已完成'
+								break;
+						case 51:
+								return '已评价'
+								break;
 				} 
 			},
 			
@@ -362,9 +416,15 @@
 			},
 			
 			// 进入退换货详情事件
-			enterChangingOrRefundingDetailsEvent () {
+			enterChangingOrRefundingDetailsEvent (item,index) {
+				let transmitParams = encodeURIComponent(
+				 JSON.stringify({
+					 id: item.id,
+					 orderId: this.orderId
+				 })
+				);
 				uni.navigateTo({
-					url: '/materialApplicationPackage/pages/changingOrRefundingDetails/changingOrRefundingDetails'
+					url: `/materialApplicationPackage/pages/changingOrRefundingDetails/changingOrRefundingDetails?transmitParams=${transmitParams}`
 				})
 			}
 		}
@@ -800,6 +860,7 @@
 							flex: 1;
 							display: flex;
 							flex-wrap: wrap;
+							align-items: center;
 							>view {
 								margin-right: 4px;
 								margin-bottom: 4px;
@@ -808,14 +869,68 @@
 								display: flex;
 								justify-content: center;
 								align-items: center;
-								width: 64px;
-								height: 22px;
+								padding: 4px 8px;
+								box-sizing: border-box;
 								background: #3370FF;
 								border-radius: 4px;
 								margin-bottom: 0 !important;
 								>text {
-									font-size: 14px;
+									font-size: 10px;
 									color: #fff;
+								}
+							};
+							.stayAuditStyle {
+								background: #3370FF !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.noPassStyle {
+								background: #F14A33 !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.stayConfirmedStyle {
+								background: #289E8E !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.alreadyRefuseStyle {
+								background: #F14A33 !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.stayDeliverStyle {
+								background: #3370FF !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.alreadyDeliverStyle {
+								background: #289E8E !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.afterSaleIngStyle {
+								background: #F2A15F !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.alreadyCompletedStyle {
+								background: #101010 !important;
+								>text {
+								 color: #fff !important;
+								}
+							};
+							.alreadyevaluatedStyle {
+								background: #3B9DF9 !important;
+								>text {
+								 color: #fff !important;
 								}
 							};
 							.commom-view {

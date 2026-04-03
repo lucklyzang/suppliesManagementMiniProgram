@@ -18,36 +18,33 @@
 					<text>送货信息:</text>
 				</view>
 				<u-empty text="您还没有相关订单" mode="list" v-if="isShowNoData"></u-empty>
-				<scroll-view class="scroll-view" scroll-y="true"  @scrolltolower="scrolltolower">
-					<view class="delivery-information" v-for="(item,index) in saleReturnOrderList" :key="item.id" @click="enterChangingOrRefundingDetailsEvent(item,index)">
-						<view class="delivery-information-left">
-							<view class="delivery-number-message">
-								<view class="delivery-number">
-									<text>送货单号:</text>
-									<text>{{ item.id }}</text>
-								</view>
-								<view class="harvest-date">
-									<text>收货日期:</text>
-									<text></text>
-								</view>
+				<view class="delivery-information" v-for="(item,index) in saleReturnOrderList" :key="item.id" @click="enterChangingOrRefundingDetailsEvent(item,index)">
+					<view class="delivery-information-left">
+						<view class="delivery-number-message">
+							<view class="delivery-number">
+								<text>送货单号:</text>
+								<text>{{ item.id }}</text>
 							</view>
-							<view class="related-order-number-message">
-								<view class="related-order-number">
-									<text>关联单号:</text>
-									<text>{{ item.orderId }}</text>
-								</view>
-								<view class="delivery-date">
-									<text>送货日期:</text>
-									<text></text>
-								</view>
+							<view class="harvest-date">
+								<text>收货日期:</text>
+								<text></text>
 							</view>
 						</view>
-						<view class="delivery-information-right">
-							<text>已发货</text>
+						<view class="related-order-number-message">
+							<view class="related-order-number">
+								<text>关联单号:</text>
+								<text>{{ item.orderId }}</text>
+							</view>
+							<view class="delivery-date">
+								<text>送货日期:</text>
+								<text>{{ item.outTime }}</text>
+							</view>
 						</view>
 					</view>
-					<u-loadmore :status="status" v-if="fullSaleReturnOrderList.length > 0" />
-				</scroll-view>
+					<view class="delivery-information-right">
+						<text>已发货</text>
+					</view>
+				</view>
 			</view>
 		</view>
 		<view class="bottom-btn">
@@ -64,6 +61,7 @@
 		mapMutations
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
+	import SOtime from '@/common/js/utils/SOtime.js'
 	import { confirmSaleReturn, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
 	import _ from 'lodash'
@@ -79,13 +77,8 @@
 				infoText: '加载中···',
 				isShowNoData: false,
 				loadingShow: false,
-				currentPageNum: 1,
-				pageSize: 20,
-				totalCount: 0,
-				status: 'nomore',
 				currentId: 0,
-				saleReturnOrderList: [],
-				fullSaleReturnOrderList: []
+				saleReturnOrderList: []
 			}
 		},
 		computed: {
@@ -119,12 +112,7 @@
 		onLoad (options) {
 			if (JSON.stringify(options) != '{}') {
 				this.currentId = Number(options.id);
-				this.getSaleReturnPageEvent({
-					pageNo: this.currentPageNum,
-					pageSize: this.pageSize,
-					orderNo: this.currentId, // 销售单编号
-					creator: '' // 创建者
-				},true)
+				this.getSaleReturnPageEvent(this.currentId)
 			}
 		},
 		methods: {
@@ -136,44 +124,22 @@
 				uni.navigateBack()
 			},
 			
-			// 上拉加载数据
-			scrolltolower () {
-				let totalPage = Math.ceil(this.totalCount/this.pageSize);
-				if (this.currentPageNum >= totalPage) {
-					this.status = 'nomore'
-				} else {
-					this.status = 'loadmore';
-					this.currentPageNum = this.currentPageNum + 1;
-					this.getSaleReturnPageEvent({
-						pageNo: this.currentPageNum,
-						pageSize: this.pageSize,
-						orderNo: this.currentId, // 销售单编号
-						creator: '' // 创建者
-					},false)
-				}
-			},
-			
-			// 查询退换货列表
-			getSaleReturnPageEvent(data,flag) {
+			getSaleReturnPageEvent(id) {
 				this.saleReturnOrderList = [];
 				this.isShowNoData = false;
-				if (flag) {
-					this.fullSaleReturnOrderList = [];
-					this.showLoadingHint = true;
-					this.infoText = '加载中···';
-				} else {
+				this.showLoadingHint = true;
+				this.infoText = '加载中···';
+				getSaleReturnPage(id).then((res) => {
 					this.showLoadingHint = false;
 					this.infoText = '';
-					this.status = 'loading';
-				};
-				getSaleReturnPage(data).then((res) => {
 					if ( res && res.data.code == 0) {
-						this.saleReturnOrderList = res.data.data.list;
-						this.totalCount = res.data.data.total;
-						this.fullSaleReturnOrderList = this.fullSaleReturnOrderList.concat(this.saleReturnOrderList);
-						if (this.fullSaleReturnOrderList.length == 0) {
+						this.saleReturnOrderList = res.data.data;
+						if (this.saleReturnOrderList.length == 0) {
 							this.isShowNoData = true
 						} else {
+							this.saleReturnOrderList.forEach((item)=>{
+								item.outTime = SOtime.time8(item.outTime)
+							});
 							this.isShowNoData = false
 						};
 					} else {
@@ -182,26 +148,11 @@
 							type: 'error',
 							position: 'bottom'
 						})
-					};
-					if (flag) {
-						this.infoText = '';
-						this.showLoadingHint = false;
-					} else {
-						let totalPage = Math.ceil(this.totalCount/this.pageSize);
-						if (this.currentPage >= totalPage) {
-							this.status = 'nomore'
-						} else {
-							this.status = 'loadmore';
-						}	
 					}
 				})
 				.catch((err) => {
-					if (flag) {
-						this.infoText = '';
-						this.showLoadingHint = false;
-					} else {
-						this.status = 'loadmore'
-					};
+					this.showLoadingHint = false;
+					this.infoText = '';
 					this.$refs.uToast.show({
 						message: err,
 						type: 'error',
@@ -331,9 +282,6 @@
 						font-size: 14px;
 						color: #101010;
 					}
-				};
-				.scroll-view {
-						height: 100%
 				};
 				.delivery-information {
 					border-radius: 6px;
