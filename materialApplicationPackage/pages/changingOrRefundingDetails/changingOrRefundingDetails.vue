@@ -52,14 +52,14 @@
 						<view class="sales-return-content">
 							 <u--input
 							    border="none"
-									type="digit"
+								type="digit"
 							    v-model="item.alesReturnCount"
 							  ></u--input>
 						</view>
 						<view class="barter-content">
 							 <u--input
 							    border="none"
-									type="digit"
+								type="digit"
 							    v-model="item.barterCount"
 							  ></u--input>
 						</view>
@@ -98,6 +98,7 @@
 	import navBar from "@/components/zhouWei-navBar"
 	import { getSaleReturn, createSaleReturn } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
+	import SOtime from '@/common/js/utils/SOtime.js';
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
@@ -163,6 +164,11 @@
 				uni.navigateBack()
 			},
 			
+			extractNeedArr (notNeedKey,targetArray) {
+				const newUsers = targetArray.map(({ notNeedKey, ...rest }) => rest );
+				return newUsers;
+			},
+			
 			// 取消事件
 			cancelEvent () {},
 			
@@ -201,51 +207,69 @@
 			
 			// 提交退换货
 			createSaleReturnEvent(data) {
-				this.showLoadingHint = true;
-				this.infoText = '提交中···';
-				createSaleReturn(data).then((res) => {
-					this.infoText = '';
-					this.showLoadingHint = false;
-					if ( res && res.data.code == 0) {
-						if (res.data.data) {
-							uni.navigateTo({
-								url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
-							})
+				return new Promise((resolve,reject) => {
+					createSaleReturn(data).then((res) => {
+						this.loadingText = '';
+						this.showLoadingHint = false;
+						if ( res && res.data.code == 0) {
+							if (res.data.data) {
+								resolve(res.data.data);
+							} else {
+								reject(res.data.msg)
+							}
 						} else {
-							this.$refs.uToast.show({
-								message: res.data.msg,
-								type: 'error',
-								position: 'bottom'
-							})
+							reject(res.data.msg)
 						}
-					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
-							type: 'error',
-							position: 'bottom'
-						})
-					}
-				})
-				.catch((err) => {
-					this.infoText = '';
-					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: err,
-						type: 'error',
-						position: 'bottom'
+					})
+					.catch((err) => {
+						reject(err)
 					})
 				})
 			},
 			
 			// 提交事件
 			submitEvent () {
-				let temporaryMessage = {
-						returnTime: '', //退货时间
-						orderId: Number(this.saleReturnOrderMessage.orderId), // 销售订单编号
-						id: Number(this.saleReturnOrderMessage.id), // 编号
-						items: [] // 退货清单列表
+				let baseMessage = {
+					returnTime: SOtime.time3(new Date.getTime()), //退货时间
+					orderId: Number(this.saleReturnOrderMessage.orderId), // 销售订单编号
+					id: Number(this.saleReturnOrderMessage.id), // 编号
 				};
-				this.createSaleReturnEvent(temporaryMessage)
+				// 退货清单列表
+				let saleReturnOrderList = this.saleReturnOrderDetailsList['item'].filter((item) => {item.alesReturnCount > 0});
+				let alesReturnMessage = Object.assign({},baseMessage,{
+					type: 1,
+					items: this.extractNeedArr('barterCount',saleReturnOrderList)
+				});
+				// 换货清单列表
+				let barterOrderList = this.saleReturnOrderDetailsList['item'].filter((item) => {item.barterCount > 0});
+				let barterMessage = Object.assign({},baseMessage,{
+					type: 2,
+					items: this.extractNeedArr('alesReturnCount',barterOrderList)
+				});
+				this.showLoadingHint = true;
+				this.infoText = '提交中···';
+				Promise.all([this.createSaleReturnEvent(alesReturnMessage),this.createSaleReturnEvent(barterMessage)])
+				.then((res) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					if (res && res.length > 0) {
+						let [item1,item2] = res;
+						if (item1) {};
+						if (item2) {
+							uni.navigateTo({
+								url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
+							})
+						}
+					}
+				})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error'
+					})
+				})
 			}
 		}
 	}

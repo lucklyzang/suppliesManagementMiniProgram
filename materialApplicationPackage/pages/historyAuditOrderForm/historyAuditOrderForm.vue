@@ -66,7 +66,7 @@
 						<view class="order-list-bottom">
 							<view class="order-list-btn">
 								<view class="edit-right">
-									<text>{{ item.audit == '通过' ? '通过' : '不通过' }}</text>
+									<text>{{ item.status == 20 ? '通过' : '不通过' }}</text>
 								</view>
 							</view>
 						</view>
@@ -155,7 +155,7 @@
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
-			  status: this.currentStatusValue,
+				status: this.currentStatusValue,
 				orderTime: [`${this.startDate}`,`${this.endDate}`],
 				creator: ''
 			},true)
@@ -179,7 +179,6 @@
 				};
 				getPlanOrderPage(data).then((res) => {
 					if ( res && res.data.code == 0) {
-						// 不显示已完成的订单
 						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
 						this.orderList.forEach((item)=>{
