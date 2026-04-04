@@ -229,6 +229,17 @@
 			
 			// 提交事件
 			submitEvent () {
+				let	isAllSaleReturnZero,isAllBarterOrderZero;
+				let questArr = [];
+				isAllSaleReturnZero = this.saleReturnOrderDetailsList['item'].every((item) => { item.alesReturnCount == 0});
+				isAllBarterOrderZero = this.saleReturnOrderDetailsList['item'].every((item) => { item.barterCount == 0});
+				if (isAllSaleReturnZero && isAllBarterOrderZero) {
+					this.$refs.uToast.show({
+						message: '退换货不能全部为0!',
+						type: 'error'
+					});
+					return;
+				};
 				let baseMessage = {
 					returnTime: SOtime.time3(new Date.getTime()), //退货时间
 					orderId: Number(this.saleReturnOrderMessage.orderId), // 销售订单编号
@@ -246,19 +257,33 @@
 					type: 2,
 					items: this.extractNeedArr('alesReturnCount',barterOrderList)
 				});
+				if (!isAllSaleReturnZero) {
+					questArr.push(this.createSaleReturnEvent(alesReturnMessage))
+				};
+				if (!isAllBarterOrderZero) {
+					questArr.push(this.createSaleReturnEvent(barterMessage))
+				};
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
-				Promise.all([this.createSaleReturnEvent(alesReturnMessage),this.createSaleReturnEvent(barterMessage)])
+				Promise.all(questArr)
 				.then((res) => {
 					this.showLoadingHint = false;
 					this.infoText = '';
 					if (res && res.length > 0) {
-						let [item1,item2] = res;
-						if (item1) {};
-						if (item2) {
-							uni.navigateTo({
-								url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
-							})
+						if (!isAllSaleReturnZero && !isAllBarterOrderZero) { 
+							let [item1,item2] = res;
+							if (item1 && item2) {
+								uni.navigateTo({
+									url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
+								})
+							}
+						} else if (!isAllSaleReturnZero || !isAllBarterOrderZero) {
+							let [item1] = res;
+							if (item1) {
+								uni.navigateTo({
+									url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
+								})
+							}
 						}
 					}
 				})
