@@ -206,7 +206,7 @@
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
-			  status: this.currentStatusValue,
+			    status: this.currentStatusValue,
 				orderTime: [`${this.startDate}`,`${this.endDate}`],
 				creator: ''
 			},true)

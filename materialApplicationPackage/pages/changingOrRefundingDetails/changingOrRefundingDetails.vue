@@ -53,6 +53,7 @@
 							 <u--input
 							    border="none"
 								type="digit"
+								@input="salesReturnInput(item, index, $event)"
 							    v-model="item.alesReturnCount"
 							  ></u--input>
 						</view>
@@ -60,6 +61,7 @@
 							 <u--input
 							    border="none"
 								type="digit"
+								@input="barterInput(item, index, $event)"
 							    v-model="item.barterCount"
 							  ></u--input>
 						</view>
@@ -71,8 +73,8 @@
 			</view>
 			<view class="exchange-reason">
 				<view class="exchange-reason-left">
-					<text>*</text>
-					<text>退换原因:</text>
+					<text class="exchange-reason-text-one" v-if="isExceedStockQuantity">*</text>
+					<text class="exchange-reason-text-two">退换原因:</text>
 				</view>
 				<view class="exchange-reason-right">
 					<u--textarea v-model="exchangeReason" placeholder="请输入退换原因" border="none"></u--textarea>
@@ -111,9 +113,25 @@
 				showLoadingHint: false,
 				infoText: '加载中···',
 				loadingShow: false,
+				isExceedStockQuantity: false,
 				exchangeReason: '',
-				saleReturnOrderDetailsList: [],
+				saleReturnOrderDetailsList: {
+					item: []
+				},
 				saleReturnOrderMessage: {}
+			}
+		},
+		watch: { 
+		    'saleReturnOrderDetailsList.item': {
+			  handler(newVal, oldVal) {
+				if (Number(newVal['alesReturnCount']) + Number(newVal['barterCount']) > Number(newVal['count'])) {
+					this.isExceedStockQuantity(true)
+				} else {
+					this.isExceedStockQuantity(false)
+				}
+			  },
+			  deep: true,
+			  immediate: true
 			}
 		},
 		computed: {
@@ -172,19 +190,31 @@
 			// 取消事件
 			cancelEvent () {},
 			
+			// 退货input框值变化事件
+			salesReturnInput(item,index,val) {
+				this.$set(this.saleReturnOrderDetailsList['item'][index],'alesReturnCount',val);
+			},
+			
+			// 换货input框值变化事件
+			barterInput(item, index,val) {
+				this.$set(this.saleReturnOrderDetailsList['item'][index],'barterCount',val);
+			},
+			
 			// 查询出库单详情
 			getSaleReturnEvent(data) {
 				this.showLoadingHint = true;
 				this.infoText = '加载中···';
-				this.saleReturnOrderDetailsList = [];
+				this.saleReturnOrderDetailsList = {
+					item: []
+				};
 				getSaleReturn(data).then((res) => {
 					this.infoText = '';
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						this.saleReturnOrderDetailsList = res.data.data;
-						this.saleReturnOrderDetailsList['item'].forEach((item) => {
-							item['alesReturnCount'] = 0;
-							item['barterCount'] = 0;
+						this.saleReturnOrderDetailsList['item'].forEach((item,index) => {
+							this.$set(this.saleReturnOrderDetailsList['item'][index],'alesReturnCount',0);
+							this.$set(this.saleReturnOrderDetailsList['item'][index],'barterCount',0);
 						})
 					} else {
 						this.$refs.uToast.show({
@@ -239,6 +269,14 @@
 						type: 'error'
 					});
 					return;
+				};
+				if (this.isExceedStockQuantity) {
+					if (this.exchangeReason === '') {
+						this.$refs.uToast.show({
+							message: '退换货理由不能为空',
+							type: 'error'
+						})
+					}
 				};
 				let baseMessage = {
 					returnTime: SOtime.time3(new Date.getTime()), //退货时间
@@ -458,13 +496,11 @@
 					font-size: 14px;
 					.exchange-reason-left {
 						margin-bottom: 6px;
-						>text {
-							&:nth-child(1) {
-								color: red;
-							}
-							&:nth-child(2) {
-								color: #101010;
-							}
+						.exchange-reason-text-one {
+							color: red;
+						};
+						.exchange-reason-text-two {
+							color: #101010;
 						}
 					};
 					.exchange-reason-right {

@@ -71,6 +71,7 @@
 	} from 'vuex'
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js'
+	import { getPlanOrderPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	let windowTimer;
 	export default{
 		data() {
@@ -153,16 +154,22 @@
 		
 		onShow() {
 			// 获取任务数量
-			// if (!this.suppliesHomeGlobalTimer) {
-			//     windowTimer = window.setInterval(() => {
-			//     if (this.isTimeoutContinue) {
-			//         setTimeout(this.getTaskCount(this.proId,this.workerId), 0);
-			//         this.changeSuppliesHomeGlobalTimer(windowTimer)
-			//     } else {
-			//         this.changeSuppliesHomeGlobalTimer(null)
-			//     }
-			//     }, 3000)
-			// }
+			if (!this.suppliesHomeGlobalTimer) {
+			    windowTimer = window.setInterval(() => {
+					if (this.isTimeoutContinue) {
+						setTimeout(this.getTaskCount({
+							pageNo: 1,
+							pageSize: 10,
+							status: 10,
+							orderTime: [],
+							creator: ''
+						}), 0);
+						this.changeSuppliesHomeGlobalTimer(windowTimer)
+					} else {
+						this.changeSuppliesHomeGlobalTimer(null)
+					}
+			    }, 3000)
+			}
 		},
 		
 		methods: {
@@ -187,23 +194,29 @@
 			},
 			
 			// 查询任务数量
-			getTaskCount (proId,workerId) {
-					queryTaskCount(proId,workerId).then((res) => {
-							if (res && res.data.code == 200) {
-									this.backlogList.forEach((item,index) => {
-											if (item.name == '待审核') {
-												item.value = ''
-											}
-									})
+			getTaskCount (data) {
+				this.isTimeoutContinue = false;
+				getPlanOrderPage(data).then((res) => {
+					if (res && res.data.code == 0) {
+						this.isTimeoutContinue = true;
+						this.backlogList.forEach((item,index) => {
+							if (item.name == '待审核') {
+								item.value = res.data.data.total;
 							}
+						})
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error'
 					})
-					.catch((err) => {
-					this.$dialog.alert({
-							message: `${err.message}`,
-							closeOnPopstate: true
-					}).then(() => {
-					})
-					})
+				})
 			},
 			
 			// 格式化时间
