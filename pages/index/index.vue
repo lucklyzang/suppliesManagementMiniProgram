@@ -81,11 +81,13 @@
 				infoText: '加载中···',
 				loadingText: '加载中···',
 				isTimeoutContinue: true,
+				startDate: '',
+				endDate: '',
 				backlogList: [
 						{
 								name: '待审核',
 								state: 0,
-								value: 1
+								value: 0
 						}
 				],
 				functionalZoneList: [
@@ -153,17 +155,20 @@
 		},
 		
 		onShow() {
+			this.getDateRange();
 			// 获取任务数量
 			if (!this.suppliesHomeGlobalTimer) {
-			    windowTimer = window.setInterval(() => {
+			    windowTimer = setInterval(() => {
 					if (this.isTimeoutContinue) {
-						setTimeout(this.getTaskCount({
-							pageNo: 1,
-							pageSize: 10,
-							status: 10,
-							orderTime: [],
-							creator: ''
-						}), 0);
+						setTimeout(() => {
+							this.getTaskCount({
+								pageNo: 1,
+								pageSize: 10,
+								status: 10,
+								orderTime: [`${this.startDate}`,`${this.endDate}`],
+								creator: ''
+							})
+						}, 0);
 						this.changeSuppliesHomeGlobalTimer(windowTimer)
 					} else {
 						this.changeSuppliesHomeGlobalTimer(null)
@@ -191,6 +196,23 @@
 						}
 					})
 				}
+			},
+			
+			// 获取开始和结束日期(中间相隔一个月)
+			getDateRange() {
+				const end = new Date(); 
+				const start = new Date(end);
+				start.setMonth(end.getMonth() - 1);
+				start.setHours(23, 59, 59, 999);
+				this.startDate = this.formatDate(start);
+				this.endDate = this.formatDate(end);
+			},
+			
+			formatDate(date) {
+			  const y = date.getFullYear();
+			  const m = String(date.getMonth() + 1).padStart(2, '0');
+			  const d = String(date.getDate()).padStart(2, '0');
+			  return `${y}-${m}-${d}`;
 			},
 			
 			// 查询任务数量
@@ -272,10 +294,10 @@
 			},
 			
 			// 待办事项点击事件
-			backlogMatterEvent () {
+			backlogMatterEvent (item,index) {
 				if (item.name == '待审核') {
 					uni.navigateTo({
-						url: '/orderFormAuditPackage/pages/myAuditOrderForm/myAuditOrderForm'
+						url: '/materialApplicationPackage/pages/myAuditOrderForm/myAuditOrderForm'
 					})
 				}
 			},

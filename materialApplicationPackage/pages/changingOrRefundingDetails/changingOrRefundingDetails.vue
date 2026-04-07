@@ -116,22 +116,24 @@
 				isExceedStockQuantity: false,
 				exchangeReason: '',
 				saleReturnOrderDetailsList: {
-					item: []
+					items: []
 				},
 				saleReturnOrderMessage: {}
 			}
 		},
 		watch: { 
-		    'saleReturnOrderDetailsList.item': {
-			  handler(newVal, oldVal) {
-				if (Number(newVal['alesReturnCount']) + Number(newVal['barterCount']) > Number(newVal['count'])) {
-					this.isExceedStockQuantity(true)
-				} else {
-					this.isExceedStockQuantity(false)
-				}
-			  },
-			  deep: true,
-			  immediate: true
+		    'saleReturnOrderDetailsList.items': {
+					handler(newVal, oldVal) {
+						if (newVal.length > 0) {
+							if (Number(newVal[0]['alesReturnCount']) + Number(newVal[0]['barterCount']) > Number(newVal[0]['count'])) {
+								this.isExceedStockQuantity = true;
+							} else {
+								this.isExceedStockQuantity = false;
+							}
+						}	
+					},
+					deep: true,
+					immediate: true
 			}
 		},
 		computed: {
@@ -183,8 +185,22 @@
 			},
 			
 			extractNeedArr (notNeedKey,targetArray) {
+				let needArr = [];
 				const newUsers = targetArray.map(({ notNeedKey, ...rest }) => rest );
-				return newUsers;
+				for (let item of newUsers) {
+					needArr.push({
+						count: item.hasOwnProperty('barterCount') ? item.barterCount : item.alesReturnCount,
+						outItemId: item.id,
+						orderItemId: item.orderItemId,
+						productId: item.productId,
+						productPrice: item.productPrice,
+						productUnitId: item.productUnitId,
+						remark: item.remark,
+						taxPercent: item.taxPercent,
+						warehouseId: item.warehouseId
+					})
+				};
+				return needArr;
 			},
 			
 			// 取消事件
@@ -192,12 +208,12 @@
 			
 			// 退货input框值变化事件
 			salesReturnInput(item,index,val) {
-				this.$set(this.saleReturnOrderDetailsList['item'][index],'alesReturnCount',val);
+				this.$set(this.saleReturnOrderDetailsList['items'][index],'alesReturnCount',val);
 			},
 			
 			// 换货input框值变化事件
 			barterInput(item, index,val) {
-				this.$set(this.saleReturnOrderDetailsList['item'][index],'barterCount',val);
+				this.$set(this.saleReturnOrderDetailsList['items'][index],'barterCount',val);
 			},
 			
 			// 查询出库单详情
@@ -205,16 +221,16 @@
 				this.showLoadingHint = true;
 				this.infoText = '加载中···';
 				this.saleReturnOrderDetailsList = {
-					item: []
+					items: []
 				};
 				getSaleReturn(data).then((res) => {
 					this.infoText = '';
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						this.saleReturnOrderDetailsList = res.data.data;
-						this.saleReturnOrderDetailsList['item'].forEach((item,index) => {
-							this.$set(this.saleReturnOrderDetailsList['item'][index],'alesReturnCount',0);
-							this.$set(this.saleReturnOrderDetailsList['item'][index],'barterCount',0);
+						this.saleReturnOrderDetailsList['items'].forEach((item,index) => {
+							this.$set(this.saleReturnOrderDetailsList['items'][index],'alesReturnCount',0);
+							this.$set(this.saleReturnOrderDetailsList['items'][index],'barterCount',0);
 						})
 					} else {
 						this.$refs.uToast.show({
@@ -261,8 +277,8 @@
 			submitEvent () {
 				let	isAllSaleReturnZero,isAllBarterOrderZero;
 				let questArr = [];
-				isAllSaleReturnZero = this.saleReturnOrderDetailsList['item'].every((item) => { item.alesReturnCount == 0});
-				isAllBarterOrderZero = this.saleReturnOrderDetailsList['item'].every((item) => { item.barterCount == 0});
+				isAllSaleReturnZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.alesReturnCount == 0});
+				isAllBarterOrderZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.barterCount == 0});
 				if (isAllSaleReturnZero && isAllBarterOrderZero) {
 					this.$refs.uToast.show({
 						message: '退换货不能全部为0!',
@@ -279,18 +295,19 @@
 					}
 				};
 				let baseMessage = {
-					returnTime: SOtime.time3(new Date.getTime()), //退货时间
+					returnTime: SOtime.time3(new Date().getTime()), //退换货时间
+					remark: this.exchangeReason, //退换货原因
 					orderId: Number(this.saleReturnOrderMessage.orderId), // 销售订单编号
-					id: Number(this.saleReturnOrderMessage.id), // 编号
+					id: Number(this.saleReturnOrderMessage.id) // 编号
 				};
 				// 退货清单列表
-				let saleReturnOrderList = this.saleReturnOrderDetailsList['item'].filter((item) => {item.alesReturnCount > 0});
+				let saleReturnOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.alesReturnCount) > 0});
 				let alesReturnMessage = Object.assign({},baseMessage,{
 					type: 1,
 					items: this.extractNeedArr('barterCount',saleReturnOrderList)
 				});
 				// 换货清单列表
-				let barterOrderList = this.saleReturnOrderDetailsList['item'].filter((item) => {item.barterCount > 0});
+				let barterOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.barterCount) > 0});
 				let barterMessage = Object.assign({},baseMessage,{
 					type: 2,
 					items: this.extractNeedArr('alesReturnCount',barterOrderList)
@@ -303,6 +320,7 @@
 				};
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
+				console.log('fd',alesReturnMessage,alesReturnMessage);
 				Promise.all(questArr)
 				.then((res) => {
 					this.showLoadingHint = false;
@@ -470,6 +488,8 @@
 								flex: none !important;
 								.u-input__content__field-wrapper__field {
 									text-align: center !important;
+									font-size: 12px !important;
+									color: #101010 !important;
 								}
 							}
 						};
@@ -480,6 +500,8 @@
 								flex: none !important;
 								.u-input__content__field-wrapper__field {
 									text-align: center !important;
+									font-size: 12px !important;
+									color: #101010 !important;
 								}
 							}
 						}
