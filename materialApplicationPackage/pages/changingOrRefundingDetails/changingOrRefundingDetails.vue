@@ -51,18 +51,20 @@
 						</view>
 						<view class="sales-return-content">
 							 <u--input
-							    border="none"
+							 :disabled="saleReturnOrderMessage.status != 20"
+							  border="none"
 								type="digit"
 								@input="salesReturnInput(item, index, $event)"
-							    v-model="item.alesReturnCount"
+							  v-model="item.alesReturnCount"
 							  ></u--input>
 						</view>
 						<view class="barter-content">
 							 <u--input
-							    border="none"
+							 :disabled="saleReturnOrderMessage.status != 20"
+							  border="none"
 								type="digit"
 								@input="barterInput(item, index, $event)"
-							    v-model="item.barterCount"
+							  v-model="item.barterCount"
 							  ></u--input>
 						</view>
 						<view class="unit-content">
@@ -71,7 +73,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="exchange-reason">
+			<view class="exchange-reason" v-if="saleReturnOrderMessage.status == 20">
 				<view class="exchange-reason-left">
 					<text class="exchange-reason-text-one" v-if="isExceedStockQuantity">*</text>
 					<text class="exchange-reason-text-two">退换原因:</text>
@@ -81,7 +83,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="bottom-btn">
+		<view class="bottom-btn" v-if="saleReturnOrderMessage.status == 20">
 				<view class="cancel-box" @click="cancelEvent">
 					<text>取消</text>
 				</view>
@@ -303,13 +305,13 @@
 				// 退货清单列表
 				let saleReturnOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.alesReturnCount) > 0});
 				let alesReturnMessage = Object.assign({},baseMessage,{
-					type: 1,
+					type: 0,
 					items: this.extractNeedArr('barterCount',saleReturnOrderList)
 				});
 				// 换货清单列表
 				let barterOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.barterCount) > 0});
 				let barterMessage = Object.assign({},baseMessage,{
-					type: 2,
+					type: 1,
 					items: this.extractNeedArr('alesReturnCount',barterOrderList)
 				});
 				if (!isAllSaleReturnZero) {

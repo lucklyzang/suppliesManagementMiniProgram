@@ -25,9 +25,9 @@
 								<text>送货单号:</text>
 								<text>{{ item.id }}</text>
 							</view>
-							<view class="harvest-date">
+							<view class="harvest-date" v-if="saleReturnOrderMessage.status == 60">
 								<text>收货日期:</text>
-								<text></text>
+								<text>{{ item.checkTime }}</text>
 							</view>
 						</view>
 						<view class="related-order-number-message">
@@ -42,7 +42,7 @@
 						</view>
 					</view>
 					<view class="delivery-information-right">
-						<text>已发货</text>
+						<text :class="{'aleradyCompleteStyle' : item.status == 60}">{{ stateTransfer(item.status) }}</text>
 					</view>
 				</view>
 			</view>
@@ -70,6 +70,7 @@
 			return {
 				showLoadingHint: false,
 				infoText: '加载中···',
+				isExecute: true,
 				isShowNoData: false,
 				loadingShow: false,
 				currentOrderNo: 0,
@@ -106,10 +107,21 @@
 		},
 		
 		onLoad (options) {
+			this.isExecute = false;
 			if (JSON.stringify(options) != '{}') {
 				this.currentId = Number(options.id);
 				this.getSaleReturnPageEvent(this.currentId)
 			}
+		},
+		
+		onShow () {
+			if (this.isExecute) {
+				this.getSaleReturnPageEvent(this.currentId)
+			}
+		},
+		
+		onHide () {
+			this.isExecute = true;
 		},
 		
 		methods: {
@@ -119,6 +131,30 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			//任务状态转换
+			stateTransfer (num) {
+				switch(num) {
+						case 10:
+							return '待送货'
+							break;
+						case 20:
+								return '已发货'
+								break;
+						case 30:
+								return '退换货'
+								break;
+						case 40:
+								return '已取消'
+								break;
+						case 50:
+								return '已撤销'
+								break;
+						case 60:
+								return '已确认'
+								break;
+				} 
 			},
 			
 			// 查询出货单列表
@@ -131,12 +167,13 @@
 					this.showLoadingHint = false;
 					this.infoText = '';
 					if ( res && res.data.code == 0) {
-						this.saleReturnOrderList = res.data.data;
+						this.saleReturnOrderList = res.data.data.filter((item) => { return item.status == 20 || item.status == 60 });
 						if (this.saleReturnOrderList.length == 0) {
 							this.isShowNoData = true
 						} else {
 							this.saleReturnOrderList.forEach((item)=>{
-								item.outTime = SOtime.time8(item.outTime)
+								item.outTime = SOtime.time8(item.outTime);
+								item.checkTime = SOtime.time8(item.checkTime);
 							});
 							this.isShowNoData = false
 						};
@@ -164,7 +201,8 @@
 				let transmitParams = encodeURIComponent(
 				 JSON.stringify({
 					 id: item.id,
-					 orderId: this.currentId
+					 orderId: this.currentId,
+					 status: item.status
 				 })
 				);
 				uni.navigateTo({
@@ -351,6 +389,9 @@
 							background: #E8CB51;
 							color: #fff;
 							font-size: 12px;
+						};
+						.aleradyCompleteStyle {
+							background: #9EA1B6 !important
 						}
 					}
 				}

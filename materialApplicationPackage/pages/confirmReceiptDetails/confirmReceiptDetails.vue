@@ -51,6 +51,7 @@
 						</view>
 						<view class="sales-return-content">
 							 <u--input
+									:disabled="saleReturnOrderMessage.status != 20"
 							    border="none"
 									type="digit"
 							    v-model="item.alesReturnCount"
@@ -58,6 +59,7 @@
 						</view>
 						<view class="barter-content">
 							 <u--input
+									:disabled="saleReturnOrderMessage.status != 20"
 							    border="none"
 									type="digit"
 							    v-model="item.barterCount"
@@ -70,7 +72,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="bottom-btn">
+		<view class="bottom-btn" v-if="saleReturnOrderMessage.status == 20">
 				<view class="back-box" @click="confirmReceiptEvent">
 					<text>确认收货</text>
 				</view>

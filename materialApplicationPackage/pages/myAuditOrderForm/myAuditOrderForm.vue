@@ -64,7 +64,7 @@
 								</view>
 								<view class="create-delivery-date-right">
 									<text>交货日期:</text>
-									<text>{{ item.deliveryDate }}</text>
+									<text>{{ item.orderTime }}</text>
 								</view>
 							</view>
 							<view class="product-list delivery-address">
@@ -202,6 +202,7 @@
 		},
 		
 		onShow () {
+			this.resetStatus();
 			this.getDateRange();
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
@@ -211,9 +212,15 @@
 				creator: ''
 			},true)
 		},
+		
 		methods: {
 			...mapMutations([
 			]),
+			
+			// 重置状态
+			resetStatus () {
+				this.currentPageNum = 1
+			},
 			
 			// 查询订单列表
 			getPlanOrderPageEvent(data,flag) {
@@ -230,11 +237,11 @@
 				};
 				getPlanOrderPage(data).then((res) => {
 					if ( res && res.data.code == 0) {
-						// 不显示已完成的订单
 						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
 						this.orderList.forEach((item)=>{
-							item.createTime = SOtime.time3(item.createTime)
+							item.createTime = SOtime.time3(item.createTime);
+							item.orderTime = SOtime.time3(item.orderTime);
 						});
 						this.fullOrderList = this.fullOrderList.concat(this.orderList);
 						if (this.fullOrderList.length == 0) {
@@ -333,19 +340,20 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
+							this.fullOrderList.splice(this.currentOrderIndex,1);
 							this.$refs.uToast.show({
 								message: '审核成功!',
 								type: 'success',
 								position: 'bottom'
 							});
-							this.currentPageNum = 1;
-							this.getPlanOrderPageEvent({
-								pageNo: this.currentPageNum,
-								pageSize: this.pageSize,
-							  status: this.currentStatusValue,
-								orderTime: [`${this.startDate}`,`${this.endDate}`],
-								creator: ''
-							},true)
+							// this.currentPageNum = 1;
+							// this.getPlanOrderPageEvent({
+							// 	pageNo: this.currentPageNum,
+							// 	pageSize: this.pageSize,
+							//   status: this.currentStatusValue,
+							// 	orderTime: [`${this.startDate}`,`${this.endDate}`],
+							// 	creator: ''
+							// },true)
 						} else {
 							this.$refs.uToast.show({
 								message: res.data.msg,

@@ -97,31 +97,33 @@
 				<view class="delivery-information-text">
 					<text>送货信息:</text>
 				</view>
-				<view class="delivery-information" v-for="(item,index) in saleReturnOrderList" :key="item.id" @click="enterChangingOrRefundingDetailsEvent(item,index)">
-					<view class="delivery-information-left">
-						<view class="delivery-number-message">
-							<view class="delivery-number">
-								<text>送货单号:</text>
-								<text>{{ item.id }}</text>
+				<view class="delivery-information-box">
+					<view class="delivery-information" v-for="(item,index) in saleReturnOrderList" :key="item.id" @click="enterChangingOrRefundingDetailsEvent(item,index)">
+						<view class="delivery-information-left">
+							<view class="delivery-number-message">
+								<view class="delivery-number">
+									<text>送货单号:</text>
+									<text>{{ item.id }}</text>
+								</view>
+								<view class="harvest-date">
+									<text>收货日期:</text>
+									<text></text>
+								</view>
 							</view>
-							<view class="harvest-date">
-								<text>收货日期:</text>
-								<text></text>
+							<view class="related-order-number-message">
+								<view class="related-order-number">
+									<text>关联单号:</text>
+									<text>{{ item.orderId }}</text>
+								</view>
+								<view class="delivery-date">
+									<text>送货日期:</text>
+									<text>{{ item.outTime }}</text>
+								</view>
 							</view>
 						</view>
-						<view class="related-order-number-message">
-							<view class="related-order-number">
-								<text>关联单号:</text>
-								<text>{{ item.orderId }}</text>
-							</view>
-							<view class="delivery-date">
-								<text>送货日期:</text>
-								<text>{{ item.outTime }}</text>
-							</view>
+						<view class="delivery-information-right">
+							<text :class="{'aleradyCompleteStyle' : item.status == 60}">{{ saleOutOrderStateTransfer(item.status) }}</text>
 						</view>
-					</view>
-					<view class="delivery-information-right">
-						<text>已发货</text>
 					</view>
 				</view>
 			</view>
@@ -208,6 +210,7 @@
 				showLoadingHint: false,
 				infoText: '加载中···',
 				loadingShow: false,
+				isExecute: true,
 				allChooseProductPrice: 0,
 				orderId: '',
 				productDefaultImage: require('@/static/img/basic-message.png'),
@@ -246,8 +249,17 @@
 			}
 		},
 		onLoad (options) {
+			this.isExecute = false;
 			this.orderId = Number(options.id);
 			this.parallelFunction();
+		},
+		onShow () {
+			if (this.isExecute) {
+				this.parallelFunction();
+			}
+		},
+		onHide () {
+			this.isExecute = true;
 		},
 		methods: {
 			...mapMutations([
@@ -375,6 +387,30 @@
 				})
 			},
 			
+			//出库单任务状态转换
+			saleOutOrderStateTransfer (num) {
+				switch(num) {
+						case 10:
+							return '待送货'
+							break;
+						case 20:
+								return '已发货'
+								break;
+						case 30:
+								return '退换货'
+								break;
+						case 40:
+								return '已取消'
+								break;
+						case 50:
+								return '已撤销'
+								break;
+						case 60:
+								return '已确认'
+								break;
+				} 
+			},
+			
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
@@ -420,7 +456,8 @@
 				let transmitParams = encodeURIComponent(
 				 JSON.stringify({
 					 id: item.id,
-					 orderId: this.orderId
+					 orderId: this.orderId,
+					 status: item.status
 				 })
 				);
 				uni.navigateTo({
@@ -690,6 +727,9 @@
 				padding: 0 3px;
 				box-sizing: border-box;
 				margin-bottom: 10px;
+				max-height: 250px;
+				display: flex;
+				flex-direction: column;
 				.delivery-information-text {
 					margin-bottom: 6px;
 					padding: 0 3px;
@@ -699,118 +739,125 @@
 						color: #101010;
 					}
 				};
-				.delivery-information {
-					border-radius: 6px;
-					background-color: rgba(255,255,255,1);
-					box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.07);
-					padding: 6px 3px;
-					box-sizing: border-box;
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					.delivery-information-left {
-						flex: 1;
-						width: 0;
+				.delivery-information-box {
+					flex: 1;
+					overflow: auto;
+					.delivery-information {
+						border-radius: 6px;
+						background-color: rgba(255,255,255,1);
+						box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.07);
+						padding: 6px 3px;
+						box-sizing: border-box;
 						display: flex;
-						flex-direction: column;
-						justify-content: center;
-						.delivery-number-message {
+						justify-content: space-between;
+						align-items: center;
+						.delivery-information-left {
+							flex: 1;
+							width: 0;
 							display: flex;
-							align-items: center;
-							justify-content: space-between;
-							margin-bottom: 10px;
-							.delivery-number {
-								flex: 1;
-								margin-right: 10px;
-								width: 0;
+							flex-direction: column;
+							justify-content: center;
+							.delivery-number-message {
 								display: flex;
 								align-items: center;
-								>text {
-									font-size: 14px;
-									color: #101010;
-									&:nth-child(1) {
-										margin-right: 4px;
-									};
-									&:nth-child(2) {
-										@include no-wrap;
-										flex: 1;
+								justify-content: space-between;
+								margin-bottom: 10px;
+								.delivery-number {
+									flex: 1;
+									margin-right: 10px;
+									width: 0;
+									display: flex;
+									align-items: center;
+									>text {
+										font-size: 14px;
+										color: #101010;
+										&:nth-child(1) {
+											margin-right: 4px;
+										};
+										&:nth-child(2) {
+											@include no-wrap;
+											flex: 1;
+										}
+									}
+								};
+								.harvest-date {
+									flex: 1;
+									width: 0;
+									display: flex;
+									align-items: center;
+									>text {
+										font-size: 12px;
+										color: #777575;
+										&:nth-child(1) {
+											margin-right: 4px;
+										};
+										&:nth-child(2) {
+											@include no-wrap;
+											flex: 1;
+										}
 									}
 								}
 							};
-							.harvest-date {
-								flex: 1;
-								width: 0;
+							.related-order-number-message {
 								display: flex;
 								align-items: center;
-								>text {
-									font-size: 12px;
-									color: #777575;
-									&:nth-child(1) {
-										margin-right: 4px;
-									};
-									&:nth-child(2) {
-										@include no-wrap;
-										flex: 1;
+								justify-content: space-between;
+								.related-order-number {
+									flex: 1;
+									margin-right: 10px;
+									width: 0;
+									display: flex;
+									align-items: center;
+									>text {
+										font-size: 12px;
+										color: #777575;
+										&:nth-child(1) {
+											margin-right: 4px;
+										};
+										&:nth-child(2) {
+											@include no-wrap;
+											flex: 1;
+										}
+									}
+								};
+								.delivery-date {
+									flex: 1;
+									width: 0;
+									display: flex;
+									align-items: center;
+									>text {
+										font-size: 12px;
+										color: #777575;
+										&:nth-child(1) {
+											margin-right: 4px;
+										};
+										&:nth-child(2) {
+											@include no-wrap;
+											flex: 1;
+										}
 									}
 								}
 							}
 						};
-						.related-order-number-message {
+						.delivery-information-right {
 							display: flex;
+							justify-content: center;
 							align-items: center;
-							justify-content: space-between;
-							.related-order-number {
-								flex: 1;
-								margin-right: 10px;
-								width: 0;
-								display: flex;
-								align-items: center;
-								>text {
-									font-size: 12px;
-									color: #777575;
-									&:nth-child(1) {
-										margin-right: 4px;
-									};
-									&:nth-child(2) {
-										@include no-wrap;
-										flex: 1;
-									}
-								}
+							width: 60px;
+							>text {
+								display: inline-block;
+								width: 52px;
+								height: 26px;
+								text-align: center;
+								line-height: 26px;
+								border-radius: 4px;
+								background: #E8CB51;
+								color: #fff;
+								font-size: 12px;
 							};
-							.delivery-date {
-								flex: 1;
-								width: 0;
-								display: flex;
-								align-items: center;
-								>text {
-									font-size: 12px;
-									color: #777575;
-									&:nth-child(1) {
-										margin-right: 4px;
-									};
-									&:nth-child(2) {
-										@include no-wrap;
-										flex: 1;
-									}
-								}
+							.aleradyCompleteStyle {
+								background: #9EA1B6 !important
 							}
-						}
-					};
-					.delivery-information-right {
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						width: 60px;
-						>text {
-							display: inline-block;
-							width: 52px;
-							height: 26px;
-							text-align: center;
-							line-height: 26px;
-							border-radius: 4px;
-							background: #E8CB51;
-							color: #fff;
-							font-size: 12px;
 						}
 					}
 				}

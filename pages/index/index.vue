@@ -147,11 +147,11 @@
 	},
 		
 		onUnload () {
-			if (this.suppliesHomeGlobalTimer) {
-				clearTimeout(this.suppliesHomeGlobalTimer);
-				windowTimer = null;
-				this.changeSuppliesHomeGlobalTimer(null)
-			}
+			this.clearGlobalTimer()
+		},
+		
+		onHide () {
+			this.clearGlobalTimer()
 		},
 		
 		onShow() {
@@ -159,20 +159,20 @@
 			// 获取任务数量
 			if (!this.suppliesHomeGlobalTimer) {
 			    windowTimer = setInterval(() => {
-					if (this.isTimeoutContinue) {
-						setTimeout(() => {
-							this.getTaskCount({
-								pageNo: 1,
-								pageSize: 10,
-								status: 10,
-								orderTime: [`${this.startDate}`,`${this.endDate}`],
-								creator: ''
-							})
-						}, 0);
-						this.changeSuppliesHomeGlobalTimer(windowTimer)
-					} else {
-						this.changeSuppliesHomeGlobalTimer(null)
-					}
+						if (this.isTimeoutContinue) {
+							setTimeout(() => {
+								this.getTaskCount({
+									pageNo: 1,
+									pageSize: 10,
+									status: 10,
+									orderTime: [`${this.startDate}`,`${this.endDate}`],
+									creator: ''
+								})
+							}, 0);
+							this.changeSuppliesHomeGlobalTimer(windowTimer)
+						} else {
+							this.changeSuppliesHomeGlobalTimer(null)
+						}
 			    }, 3000)
 			}
 		},
@@ -185,6 +185,14 @@
 				'changeSuppliesHomeGlobalTimer',
 				'changeMaterialApplicationOrderType'
 			]),
+			
+			clearGlobalTimer() {
+			  if (this.suppliesHomeGlobalTimer) {
+			  	clearTimeout(this.suppliesHomeGlobalTimer);
+			  	windowTimer = null;
+			  	this.changeSuppliesHomeGlobalTimer(null)
+			  }
+			},
 			
 			// 控制服务管理模块显示隐藏
 			controlServiceManageModuleShowEvent () {

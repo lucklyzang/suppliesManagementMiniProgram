@@ -75,7 +75,7 @@
 								</view>
 								<view class="create-delivery-date-right">
 									<text>交货日期:</text>
-									<text>{{ item.deliveryDate }}</text>
+									<text>{{ item.orderTime }}</text>
 								</view>
 							</view>
 							<view class="product-list delivery-address">
@@ -214,6 +214,7 @@
 						text: '售后中'
 					}
 				],
+				needQueryStatusList: [10,20,21,30,31,40,41],
 				orderList: [],
 				fullOrderList: []
 			}
@@ -248,18 +249,26 @@
 		},
 		
 		onShow () {
+			this.resetStatus();
 			this.getDateRange();
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
-			    status: this.currentStatusValue,
+			  status: '',
+				statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 				orderTime: [`${this.startDate}`,`${this.endDate}`],
 				creator: ''
 			},true)
 		},
+		
 		methods: {
 			...mapMutations([
 			]),
+			
+			// 重置状态
+			resetStatus () {
+				this.currentPageNum = 1
+			},
 			
 			// 状态栏以外区域点击
 			handleOutsideClick() {
@@ -294,7 +303,8 @@
 					this.getPlanOrderPageEvent({
 						pageNo: this.currentPageNum,
 						pageSize: this.pageSize,
-						status: this.currentStatusValue,
+						status: '',
+						statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 						orderTime: [`${this.startDate}`,`${this.endDate}`],
 						creator: ''
 					},false)
@@ -357,14 +367,11 @@
 				};
 				getPlanOrderPage(data).then((res) => {
 					if ( res && res.data.code == 0) {
-						// 不显示已完成的订单
-						this.orderList = res.data.data.list.filter((item) => { return item.status != 50});
-						// 已完成订单列表(重新计算总条数)
-						let completeOrderList = res.data.data.list.filter((item) => { return item.status == 50});
+						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
-						// this.totalCount = this.totalCount - completeOrderList.length;
 						this.orderList.forEach((item)=>{
-							item.createTime = SOtime.time3(item.createTime)
+							item.createTime = SOtime.time3(item.createTime);
+							item.orderTime = SOtime.time3(item.orderTime);
 						});
 						this.fullOrderList = this.fullOrderList.concat(this.orderList);
 						if (this.fullOrderList.length == 0) {
@@ -464,7 +471,8 @@
 				this.getPlanOrderPageEvent({
 					pageNo: this.currentPageNum,
 					pageSize: this.pageSize,
-				  status: this.currentStatusValue,
+				  status: '',
+					statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 					orderTime: [`${this.startDate}`,`${this.endDate}`],
 					creator: ''
 				},true)
@@ -507,7 +515,8 @@
 				this.getPlanOrderPageEvent({
 					pageNo: this.currentPageNum,
 					pageSize: this.pageSize,
-					status: this.currentStatusValue,
+					status: '',
+					statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 					orderTime: [`${this.startDate}`,`${this.endDate}`],
 					creator: ''
 				},true)

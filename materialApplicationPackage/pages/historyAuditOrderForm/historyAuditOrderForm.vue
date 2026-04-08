@@ -51,7 +51,7 @@
 								</view>
 								<view class="create-delivery-date-right">
 									<text>交货日期:</text>
-									<text>{{ item.deliveryDate }}</text>
+									<text>{{ item.orderTime }}</text>
 								</view>
 							</view>
 							<view class="product-list delivery-address">
@@ -106,7 +106,7 @@
 			return {
 				infoText: '修改中···',
 				showLoadingHint: false,
-				currentStatusValue: 20,
+				currentStatusValue: '',
 				currentPageNum: 1,
 				pageSize: 20,
 				totalCount: 0,
@@ -117,6 +117,7 @@
 				defaultDateArr: [],
 				startDate: '',
 				endDate: '',
+				needQueryStatusList: [20,21],
 				orderList: [],
 				fullOrderList: []
 			}
@@ -151,11 +152,13 @@
 		},
 		
 		onShow () {
+			this.resetStatus();
 			this.getDateRange();
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
 				status: this.currentStatusValue,
+				statusList: this.needQueryStatusList,
 				orderTime: [`${this.startDate}`,`${this.endDate}`],
 				creator: ''
 			},true)
@@ -163,6 +166,11 @@
 		methods: {
 			...mapMutations([
 			]),
+			
+			// 重置状态
+			resetStatus () {
+				this.currentPageNum = 1
+			},
 			
 			// 查询订单列表
 			getPlanOrderPageEvent(data,flag) {
@@ -182,7 +190,8 @@
 						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
 						this.orderList.forEach((item)=>{
-							item.createTime = SOtime.time3(item.createTime)
+							item.createTime = SOtime.time3(item.createTime);
+							item.orderTime = SOtime.time3(item.orderTime);
 						});
 						this.fullOrderList = this.fullOrderList.concat(this.orderList);
 						if (this.fullOrderList.length == 0) {
@@ -234,7 +243,7 @@
 								return '已审核'
 								break;
 						case 21:
-								return '未通过'
+								return '已审核'
 								break;
 						case 30:
 								return '待发货'
@@ -266,6 +275,7 @@
 						pageNo: this.currentPageNum,
 						pageSize: this.pageSize,
 						status: this.currentStatusValue,
+						statusList: this.needQueryStatusList,
 						orderTime: [`${this.startDate}`,`${this.endDate}`],
 						creator: ''
 					},false)
@@ -281,6 +291,7 @@
 					pageNo: this.currentPageNum,
 					pageSize: this.pageSize,
 				  status: this.currentStatusValue,
+					statusList: this.needQueryStatusList,
 					orderTime: [`${this.startDate}`,`${this.endDate}`],
 					creator: ''
 				},true)

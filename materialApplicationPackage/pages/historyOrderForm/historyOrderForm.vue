@@ -51,7 +51,7 @@
 								</view>
 								<view class="create-delivery-date-right">
 									<text>交货日期:</text>
-									<text>{{ item.deliveryDate }}</text>
+									<text>{{ item.orderTime }}</text>
 								</view>
 							</view>
 							<view class="product-list delivery-address">
@@ -233,6 +233,7 @@
 		},
 		
 		onShow () {
+			this.resetStatus();
 			this.getDateRange();
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
@@ -245,6 +246,11 @@
 		methods: {
 			...mapMutations([
 			]),
+			
+			// 重置状态
+			resetStatus () {
+				this.currentPageNum = 1
+			},
 			
 			// 上拉加载数据
 			scrolltolower () {
@@ -283,7 +289,8 @@
 						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
 						this.orderList.forEach((item)=>{
-							item.createTime = SOtime.time3(item.createTime)
+							item.createTime = SOtime.time3(item.createTime);
+							item.orderTime = SOtime.time3(item.orderTime);
 						});
 						this.fullOrderList = this.fullOrderList.concat(this.orderList);
 						if (this.fullOrderList.length == 0) {
