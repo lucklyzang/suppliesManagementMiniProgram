@@ -19,6 +19,8 @@ export function getDefaultCommonState() {
 		navigationBarHeight: 0,
 		// 胶囊信息
 		capsuleMessage: {},
+		// 科室信息
+		departmentInfo: [],
 		// 生产域名 https://blinktech.cn/nblink
 		// 开发域名 https://blink.blinktech.cn/nblink
 		// 准生产域名 https://ver.blinktech.cn/nblink

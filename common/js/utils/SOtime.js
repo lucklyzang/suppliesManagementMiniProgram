@@ -135,8 +135,8 @@ const time3 = (timer) => {
 	var Edate = Etimer.getDate()< 10 ? '0' + Etimer.getDate() : Etimer.getDate(); //返回日期月份中的天数（1到31）
 	var Ehour = Etimer.getHours() < 10 ? '0' + Etimer.getHours() : Etimer.getHours(); //返回日期中的小时数（0到23）
 	var Eminute = Etimer.getMinutes() < 10 ? '0' + Etimer.getMinutes() : Etimer.getMinutes(); //返回日期中的分钟数（0到59）
-
-	return Eyear + "-" + Emonth + "-" + Edate + " " + Ehour + ":" + Eminute
+  var Eseconds = Etimer.getSeconds() < 10 ? '0' + Etimer.getSeconds() : Etimer.getSeconds();
+	return Eyear + "-" + Emonth + "-" + Edate + " " + Ehour + ":" + Eminute + ":" + Eseconds
 }
 const time8 = (timer) => {
 	var arrTimestamp = (timer + '').split('');

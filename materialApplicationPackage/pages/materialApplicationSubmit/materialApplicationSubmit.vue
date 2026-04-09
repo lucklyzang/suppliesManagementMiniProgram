@@ -141,7 +141,8 @@
 				'statusBarHeight',
 				'navigationBarHeight',
 				'addMaterialApplicationMessage',
-				'materialApplicationOrderType'
+				'materialApplicationOrderType',
+				'departmentInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -178,6 +179,7 @@
 				}
 			} else {
 				this.isEdit = false;
+				this.getDepartmentNameById(this.depId); 
 				this.echoHospitalMessage()
 			}
 		},
@@ -189,6 +191,16 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 根据科室id获取科室名称
+			getDepartmentNameById(value) {
+				if (this.departmentInfo.length > 0) {
+					let temporaryList = this.departmentInfo.filter((item) => {return item['id'] == value });
+					if (temporaryList.length > 0) {
+						this.deliveryAddress = temporaryList[0]['name']
+					}
+				}
 			},
 			
 			// 编辑时回显部分订单信息
@@ -227,9 +239,6 @@
 				// 科室信息
 				if (this.depId || this.depId === 0) {
 					this.deliveryAddressId = this.depId
-				};
-				if (this.depName) {
-					this.deliveryAddress = this.depName
 				}
 			},
 			
@@ -268,6 +277,51 @@
 					this.deliveryDate = SOtime.time8(e.value);
 					this.showDeliveryDate = false
 				},
+				
+				// 格式化时间
+				getNowFormatDate(currentDate,type) {
+					// type:1(只显示小时分钟秒),2(只显示年月日)3(只显示年月)4(显示年月日小时分钟秒)5(显示月日)
+					let currentdate;
+					let strDate = currentDate.getDate();
+					let seperator1 = "-";
+					let seperator2 = ":";
+					let seperator3 = " ";
+					let month = currentDate.getMonth() + 1;
+					let hour = currentDate.getHours();
+					let minutes = currentDate.getMinutes();
+					let seconds = currentDate.getSeconds();
+					if (month >= 1 && month <= 9) {
+						month = "0" + month;
+					};
+					if (hour >= 0 && hour <= 9) {
+						// hour = "0" + hour;
+					};
+					if (minutes >= 0 && minutes <= 9) {
+						minutes = "0" + minutes;
+					};
+					if (seconds >= 0 && seconds <= 9) {
+						seconds = "0" + seconds;
+					};
+					if (strDate >= 0 && strDate <= 9) {
+						strDate = "0" + strDate;
+					};
+					if (type == 1) {
+						currentdate = hour + seperator2 + minutes + seperator2 + seconds
+					};
+					if (type == 2) {
+						currentdate = currentDate.getFullYear() + seperator1 + month + seperator1 + strDate
+					};
+					if (type == 3) {
+						currentdate = currentDate.getFullYear() + seperator1 + month
+					};
+					if (type == 4) {
+						currentdate = currentDate.getFullYear() + seperator1 + month + seperator1 + strDate + seperator3 + hour + seperator2 + minutes + seperator2 + seconds
+					};
+					if (type == 5) {
+						currentdate = month + seperator1 + strDate
+					};
+					return currentdate
+				},
 
 				// 确认事件
 				sureEvent () {
@@ -288,10 +342,10 @@
 						return
 					};
 					let temporaryMessage = {
-							creator: this.userName, //创建者
-						  orderTime: SOtime.time8(new Date().getTime()), //下单时间
+							creator: this.userAccount, //创建者
+						  orderTime: SOtime.time8(new Date(this.deliveryDate).getTime()) + " " + this.getNowFormatDate(new Date(),1), //下单时间
 						  creatorId: this.workerId, //当前用户ID
-						  customerId: this.workerId,  //客户编号
+						  customerId: this.proId,  //客户编号
 							remark: this.taskDescribe, //备注
 							address: this.deliveryAddress, //送货地址
 							departmentId: this.depId, //科室ID
@@ -321,6 +375,7 @@
 					this.showLoadingHint = true;
 					createPlanOrder(data).then((res) => {
 						this.showLoadingHint = false;
+						this.infoText = '';
 						if (res && res.data.code == 0) {
 							this.$refs.alertToast.show({
 								type: 'success',
@@ -343,6 +398,7 @@
 					})
 					.catch((err) => {
 						this.showLoadingHint = false;
+						this.infoText = '';
 						this.$refs.alertToast.show({
 							type: 'error',
 							message: `${err}!`,

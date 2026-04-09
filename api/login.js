@@ -33,3 +33,11 @@ export function modificationPassword(data) {
     data
   })
 };
+
+// 获得所有科室信息
+export function getDepartmentInfo() {
+	return request({
+	    url: '/spd/admin-api/system/department/get-simple-list',
+	    method: 'get'
+	  })
+}

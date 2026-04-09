@@ -71,11 +71,11 @@
 				<view class="create-delivery-date">
 					<view class="create-delivery-date-left">
 						<text>创建时间:</text>
-						<text>{{ orderMessage['orderTime'] }}</text>
+						<text>{{ orderMessage['createTime'] }}</text>
 					</view>
-					<view class="create-delivery-date-left">
+					<view class="create-delivery-date-right">
 						<text>交货日期:</text>
-						<text></text>
+						<text>{{ orderMessage['orderTime'] }}</text>
 					</view>
 				</view>
 				<view class="create-delivery-date">
@@ -83,7 +83,7 @@
 						<text>下单医院:</text>
 						<text></text>
 					</view>
-					<view class="create-delivery-date-left">
+					<view class="create-delivery-date-right">
 						<text>送货地址:</text>
 						<text>{{ orderMessage['address'] ? orderMessage['address'] : '无' }}</text>
 					</view>
@@ -356,7 +356,8 @@
 							this.orderMessage = item1;
 							this.materialList = this.orderMessage['items'];
 							this.allChooseProductPrice = this.orderMessage['totalProductPrice'];
-							this.orderMessage['orderTime'] = SOtime.time3(this.orderMessage['orderTime']);
+							this.orderMessage['createTime'] = SOtime.time3(this.orderMessage['createTime']);
+							this.orderMessage['orderTime'] = SOtime.time8(this.orderMessage['orderTime']);
 						};
 						if (item2) {
 							this.orderStatusRecordList = item2;
@@ -664,13 +665,12 @@
 				box-sizing: border-box;
 				.create-delivery-date {
 					 display: flex;
-					 align-items: center;
 					 margin-top: 10px;
 					 .create-delivery-date-left {
 						 flex: 1;
 						 width: 0;
 						 display: flex;
-						 align-items: center;
+						 margin-right: 4px;
 						 >text {
 							 display: inline-block;
 							 font-size: 12px;
@@ -679,7 +679,7 @@
 								 margin-right: 6px;
 							 };
 							 &:nth-child(2) {
-								 @include no-wrap;
+								 word-break: break-all;
 								 flex: 1;
 								 color: #101010;
 							 }
@@ -689,7 +689,6 @@
 						 flex: 1;
 						 width: 0;
 						 display: flex;
-						 align-items: center;
 						 >text {
 							 display: inline-block;
 							 font-size: 12px;
@@ -698,7 +697,7 @@
 								 margin-right: 6px;
 							 };
 							 &:nth-child(2) {
-								 @include no-wrap;
+								 word-break: break-all;
 								 flex: 1;
 								 color: #101010;
 							 }

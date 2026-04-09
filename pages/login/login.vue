@@ -169,7 +169,7 @@
 
 <script>
 	import { mapGetters, mapMutations } from 'vuex'
-	import { logIn, getUserInfo } from '@/api/login.js'
+	import { logIn, getUserInfo, getDepartmentInfo } from '@/api/login.js'
 	import Qs from 'qs'
 	import { setCache, getCache, removeCache } from '@/common/js/utils'
 	export default {
@@ -224,7 +224,8 @@
 				'changeToken',
 				'changeIsLogin',
 				'storeChooseHospitalArea',
-				'changeIsMedicalMan'
+				'changeIsMedicalMan',
+				'storeDepartmentInfo'
 			]),
       
       // 选中任一checkbox时，由checkbox-group触发
@@ -256,7 +257,7 @@
 			},
 			
 			// 获取用户详情
-			getUserInfoEvent () {
+			getUserInfoEvent () {getDepartmentInfo
 				return new Promise((resolve,reject) => {
 					this.showLoadingHint = true;
 					this.infoText = '获取中···';
@@ -267,6 +268,35 @@
 						if (res && res.data.code == 0) {
 							resolve();
 							this.storeUserInfo(res.data.data);
+						} else {
+							reject(res.data.msg);
+							this.modalShow = true;
+							this.modalContent = res.data.msg;
+						}
+					})
+					.catch((err) => {
+						this.infoText = '';
+						this.showLoadingHint = false;
+						if (err === '') { return };
+						reject(err);
+						this.modalShow = true;
+						this.modalContent = err;
+					})
+				})
+			},
+			
+			// 获取科室信息
+			getDepartmentInfoEvent () {
+				return new Promise((resolve,reject) => {
+					this.showLoadingHint = true;
+					this.infoText = '获取中···';
+					getDepartmentInfo()
+					.then((res) => {
+						this.showLoadingHint = false;
+						this.infoText = '';
+						if (res && res.data.code == 0) {
+							resolve();
+							this.storeDepartmentInfo(res.data.data);
 						} else {
 							reject(res.data.msg);
 							this.modalShow = true;
@@ -350,6 +380,8 @@
 					await this.authLoginEvent();
 					// 获取用户详情事件
 					await this.getUserInfoEvent();
+					// 获取科室信息
+					await this.getDepartmentInfoEvent();
 					this.changeIsLogin(true);
 					this.changeOverDueWay(false);
 					setCache('storeOverDueWay',false); 

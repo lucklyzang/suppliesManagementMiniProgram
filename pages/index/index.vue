@@ -5,11 +5,12 @@
     <!-- 顶部标题 -->
     <view class="topTabbar" :style="{ 'height': navigationBarHeight + 20 + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
 			 <view class="user-photo">
-					<image src="/static/img/default-person-photo.png" mode="widthFix"></image>
+					<image :src="avatar ? avatar : '/static/img/default-person-photo.png'" mode="widthFix"></image>
 				</view>
 				<view class="user-message">
 						<view class="user-name">
-								{{ userName }}
+							<text>{{ userName }}</text>
+							<text>{{`(${userInfo.deptName})`}}</text>
 						</view>
 						<view class="account-name">
 								{{ loginDate }}
@@ -42,17 +43,17 @@
 			<view class="bottom-message">
 				<view class="project-name">
 					<image src="/static/img/home-location-icon.png" mode="widthFix"></image>
-					<text>四川省华西医院</text>
+					<text>{{ userInfo.deptName }}</text>
 				</view>
 				<view class="department-box">
 					<text>
-						{{ depName }}
+						{{ departmentName }}
 					</text>
-					<text v-if="depName != '' && depNum != ''">
+					<text v-if="departmentName != '' && departmentCode != ''">
 						-
 					</text>
 					<text>
-						{{ depNum }}
+						{{ departmentCode }}
 					</text>
 				</view>
 			</view>
@@ -83,6 +84,8 @@
 				isTimeoutContinue: true,
 				startDate: '',
 				endDate: '',
+				departmentName: '',
+				departmentCode: '',
 				backlogList: [
 						{
 								name: '待审核',
@@ -119,6 +122,7 @@
 				'capsuleMessage',
 				'chooseHospitalArea',
 				'suppliesHomeGlobalTimer',
+				'departmentInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -128,6 +132,9 @@
 			},
 			workerId() {
 				return this.userInfo['id']
+			},
+			avatar () {
+					return this.userInfo['avatar']
 			},
 			proName () {
 				return this.userInfo['deptName']
@@ -155,6 +162,7 @@
 		},
 		
 		onShow() {
+			this.getDepartmentNameById(this.depId);
 			this.getDateRange();
 			// 获取任务数量
 			if (!this.suppliesHomeGlobalTimer) {
@@ -301,6 +309,17 @@
 				return Math.floor(rpx)
 			},
 			
+			// 根据科室id获取科室名称	
+			getDepartmentNameById(value) {
+				if (this.departmentInfo.length > 0) {
+					let temporaryList = this.departmentInfo.filter((item) => {return item['id'] == value });
+					if (temporaryList.length > 0) {
+						this.departmentName = temporaryList[0]['name']
+						this.departmentCode = temporaryList[0]['code']
+					}
+				}
+			},
+						
 			// 待办事项点击事件
 			backlogMatterEvent (item,index) {
 				if (item.name == '待审核') {
@@ -367,7 +386,7 @@
 		};
     .topTabbar {
 			width: 100%;
-			padding: 0 0 0 16px;
+			padding: 0 0 0 10px;
 			box-sizing: border-box;
 			overflow: auto;
 			display: flex;
@@ -382,7 +401,6 @@
 				height: 45px;
 				margin-right: 10px;
 				border-radius: 50%;
-				background: #E5E5E5;
 				image {
 					vertical-align: middle;
 					width: 40px;
@@ -394,16 +412,20 @@
 				flex-direction: column;
 				justify-content: center;
 				z-index: 100;
-				color: #fff;
 				height: 60px;
 				flex: 1;
-				font-size: 13px;
 				.user-name {
-					width: 98%;
 					word-break: break-all;
+					>text {
+						color: #fff;
+						font-size: 13px;
+						&:first-child {
+							margin-right: 4px;
+						}
+					}
 				}
 				.account-name {
-					width: 98%;
+					color: #fff;
 					word-break: break-all;
 					font-size: 12px;
 					margin-top: 4px;
@@ -420,7 +442,7 @@
 			margin-top: 6px;
 			.task-board {
 				width: 100%;
-				padding: 0 16px 10px 16px;
+				padding: 0 16px 10px 10px;
 				box-sizing: border-box;
 				display: flex;
 				flex-direction: column;
@@ -518,7 +540,7 @@
 			.bottom-message {
 				display: flex;
 				width: 100%;
-				padding: 0 16px;
+				padding: 0 10px;
 				box-sizing: border-box;
 				position: absolute;
 				bottom: 20px;

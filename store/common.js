@@ -15,6 +15,10 @@ export default {
 			state.capsuleMessage = getCache('capsuleMessage') ? getCache('capsuleMessage') : {};
 			return state.capsuleMessage
 		},
+		departmentInfo:(state) => {
+			state.capsuleMessage = getCache('departmentInfo') ? getCache('departmentInfo') : [];
+			return state.departmentInfo
+		},
 		baseURL:(state) => {
 			return state.baseURL
 		}
@@ -36,6 +40,12 @@ export default {
 			if (playLoad && playLoad != 'null') {
 				setCache('capsuleMessage', playLoad);
 				state.capsuleMessage = playLoad
+			}
+		},
+		storeDepartmentInfo(state, playLoad) {
+			if (playLoad && playLoad != 'null') {
+				setCache('departmentInfo', playLoad);
+				state.departmentInfo = playLoad
 			}
 		},
 		//重置公共信息的状态

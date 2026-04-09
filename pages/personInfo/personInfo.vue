@@ -85,7 +85,8 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				'chooseHospitalArea'
+				'chooseHospitalArea',
+				'departmentInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -106,7 +107,7 @@
 				return this.userInfo['departmentId']
 			},
 			depName() {
-				return ''
+				return this.getDepartmentNameById(this.depId)
 			}
 		},
 		methods: {
@@ -114,6 +115,20 @@
 				'changeUserBasicInfo',
 				'changeOverDueWay'
 			]),
+			
+			// 根据科室id获取科室名称
+			getDepartmentNameById(value) {
+				if (this.departmentInfo.length > 0) {
+					let temporaryList = this.departmentInfo.filter((item) => {return item['id'] == value });
+					if (temporaryList.length > 0) {
+						return temporaryList[0]['name']
+					} else {
+						return ''
+					}
+				} else {
+					return ''
+				}
+			},
 			
 			// 修改密码事件
 			modificationPasswordEvent () {

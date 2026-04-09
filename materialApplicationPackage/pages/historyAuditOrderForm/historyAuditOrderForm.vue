@@ -32,7 +32,7 @@
 					<view class="order-list" v-for="(item,index) in fullOrderList" :key="index" @click="enterOrderDetailsEvent(item,index)">
 						<view class="order-list-top">
 							<view class="order-type">
-								<text>计划订单</text>
+								<text>{{ item.orderTypeName }}</text>
 								<text>{{ item.no }}</text>
 							</view>
 							<view class="order-status">
@@ -160,7 +160,7 @@
 				status: this.currentStatusValue,
 				statusList: this.needQueryStatusList,
 				orderTime: [`${this.startDate}`,`${this.endDate}`],
-				creator: ''
+				creator: '' // this.userAccount
 			},true)
 		},
 		methods: {
@@ -191,7 +191,7 @@
 						this.totalCount = res.data.data.total;
 						this.orderList.forEach((item)=>{
 							item.createTime = SOtime.time3(item.createTime);
-							item.orderTime = SOtime.time3(item.orderTime);
+							item.orderTime = SOtime.time8(item.orderTime);
 						});
 						this.fullOrderList = this.fullOrderList.concat(this.orderList);
 						if (this.fullOrderList.length == 0) {
@@ -277,7 +277,7 @@
 						status: this.currentStatusValue,
 						statusList: this.needQueryStatusList,
 						orderTime: [`${this.startDate}`,`${this.endDate}`],
-						creator: ''
+						creator: '' // this.userAccount
 					},false)
 				}
 			},
@@ -293,7 +293,7 @@
 				  status: this.currentStatusValue,
 					statusList: this.needQueryStatusList,
 					orderTime: [`${this.startDate}`,`${this.endDate}`],
-					creator: ''
+					creator: '' // this.userAccount
 				},true)
 			},
 			
@@ -510,7 +510,7 @@
 								 flex: 1;
 								 width: 0;
 								 display: flex;
-								 align-items: center;
+								 margin-right: 6px;
 								 >text {
 									 display: inline-block;
 									 font-size: 14px;
@@ -519,7 +519,7 @@
 										 margin-right: 6px;
 									 };
 									 &:nth-child(2) {
-										 @include no-wrap;
+										 word-break: break-all;
 										 flex: 1;
 										 color: #101010;
 									 }
@@ -529,7 +529,6 @@
 								 flex: 1;
 								 width: 0;
 								 display: flex;
-								 align-items: center;
 								 >text {
 									 display: inline-block;
 									 font-size: 14px;
@@ -538,7 +537,7 @@
 										 margin-right: 6px;
 									 };
 									 &:nth-child(2) {
-										 @include no-wrap;
+										 word-break: break-all;
 										 flex: 1;
 										 color: #101010;
 									 }
