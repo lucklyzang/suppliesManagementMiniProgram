@@ -661,7 +661,7 @@
 			};
 			.order-message {
 				margin: 10px 0;
-				padding: 0 6px;
+				padding: 0 6px 0 9px;
 				box-sizing: border-box;
 				.create-delivery-date {
 					 display: flex;
@@ -723,7 +723,7 @@
 				}	
 			};
 			.delivery-information-list {
-				padding: 0 3px;
+				padding: 0 6px;
 				box-sizing: border-box;
 				margin-bottom: 10px;
 				max-height: 250px;
@@ -862,7 +862,7 @@
 				}
 			};
 			.order-status-record {
-				padding: 0 3px;
+				padding: 0 6px;
 				box-sizing: border-box;
 				margin-bottom: 6px;
 				.order-status-record-text {
