@@ -202,24 +202,32 @@
 					newPassword: this.newPasswordValue
 				}).then((res) => {
 					this.showLoadingHint = false;
-				  if (res && res.data.code == 200) {
-						this.changeOverDueWay(true);
-						setTimeout(()=>{
-							uni.redirectTo({
-								url: '/pages/login/login'
+				  if (res && res.data.code == 0) {
+						if (res.data.data) {
+							this.changeOverDueWay(true);
+							setTimeout(()=>{
+								uni.redirectTo({
+									url: '/pages/login/login'
+								})
+							},2000);
+							// 清空store和localStorage
+							if(store.getters.suppliesHomeGlobalTimer) {clearInterval(store.getters.suppliesHomeGlobalTimer)};
+							store.dispatch('resetOrderFormAuditState');
+							store.dispatch('resetMaterialApplicationOrderFormState');
+							store.dispatch('resetLoginState');
+							removeAllLocalStorage();
+							this.$refs.alertToast.show({
+								type: 'success',
+								message: '修改成功!',
+								isShow: true
 							})
-						},2000);
-						// 清空store和localStorage
-						if(store.getters.suppliesHomeGlobalTimer) {window.clearInterval(store.getters.suppliesHomeGlobalTimer)};
-						store.dispatch('resetOrderFormAuditState');
-						store.dispatch('resetMaterialApplicationOrderFormState');
-						store.dispatch('resetLoginState');
-						removeAllLocalStorage();
-						this.$refs.alertToast.show({
-							type: 'success',
-							message: '修改成功!',
-							isShow: true
-						});
+						} else {
+							this.$refs.alertToast.show({
+								type: 'error',
+								message: `${res.data.msg}!`,
+								isShow: true
+							})
+						}
 				  } else {
 						this.$refs.alertToast.show({
 							type: 'error',

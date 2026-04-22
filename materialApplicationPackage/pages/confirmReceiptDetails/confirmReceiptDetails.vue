@@ -44,25 +44,25 @@
 							<text>{{ item.productName }}</text>
 						</view>
 						<view class="specification-content">
-							<text>{{ item.model }}</text>
+							<text>{{ item.productStandard ? item.productStandard : '' }}</text>
 						</view>
 						<view class="deliver-number-content">
 							<text>{{ item.count }}</text>
 						</view>
 						<view class="sales-return-content">
 							 <u--input
-									:disabled="saleReturnOrderMessage.status != 20"
+									disabled
 							    border="none"
 									type="digit"
-							    v-model="item.alesReturnCount"
+							    v-model="item.returnCount"
 							  ></u--input>
 						</view>
 						<view class="barter-content">
 							 <u--input
-									:disabled="saleReturnOrderMessage.status != 20"
+									disabled
 							    border="none"
 									type="digit"
-							    v-model="item.barterCount"
+							    v-model="item.exchangeCount"
 							  ></u--input>
 						</view>
 						<view class="unit-content">
@@ -165,10 +165,6 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						this.saleReturnOrderDetailsList = res.data.data;
-						this.saleReturnOrderDetailsList['item'].forEach((item) => {
-							item['alesReturnCount'] = 0;
-							item['barterCount'] = 0;
-						})
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,

@@ -33,7 +33,8 @@ export function getDefaultCommonState() {
 export function getDefaultMaterialApplicationOrderFormState() {
 	return {
 		addMaterialApplicationMessage: [],
-		materialApplicationOrderType: 0
+		materialApplicationOrderType: 0,
+		editOrderMessage: {}
 	}	
 }
 

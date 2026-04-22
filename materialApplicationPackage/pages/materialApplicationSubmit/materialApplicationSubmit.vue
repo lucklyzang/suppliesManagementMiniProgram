@@ -110,23 +110,7 @@
 				deliveryDate: getDate(),
 				deliveryDatevalue: this.normalizeTimestamp(),
 				showDeliveryDate: false,
-				hospitalOption: [
-					{
-						text: '医院1',
-						value: 1,
-						id: 0
-					},
-					{
-						text: '医院2',
-						value: 2,
-						id: 1
-					},
-					{
-						text: '医院3',
-						value: 3,
-						id: 2
-					}
-				],
+				hospitalOption: [],
 				hospitalDefaultIndex: [0],
 				showHospital: false,
 				currentHospital: '请选择',
@@ -185,7 +169,8 @@
 		},
 		methods: {
 			...mapMutations([
-				'changeAddMaterialApplicationMessage'
+				'changeAddMaterialApplicationMessage',
+				'changeEditOrderMessage'
 			]),
 			
 			// 顶部导航返回事件
@@ -206,6 +191,12 @@
 			// 编辑时回显部分订单信息
 			echoOrderMessage () {
 				this.taskDescribe = this.orderMessage['remark']; //备注
+				this.deliveryDate = this.orderMessage['orderTime'] ? SOtime.time8(this.orderMessage['orderTime']) : '';
+				if (this.orderMessage['orderTime']) {
+					const date = new Date(this.orderMessage['orderTime']);
+					date.setHours(0, 0, 0, 0);
+					this.deliveryDatevalue = Number(date);
+				};
 				this.deliveryAddress = this.orderMessage['address'] //送货地址
 			},
 			
@@ -216,6 +207,7 @@
 					 for (let item of this.addMaterialApplicationMessage) {
 							this.chooseMaterialList.push({
 								id: '', /*订单项编号 */
+								productName: item['productName'], /*产品名称 */
 								productId: item['id'], /*产品编号 */
 								productUnitId: item['unitId'], /*单位编号 */
 								productPrice: item['salePrice'], /*产品单价，单位：元 */
@@ -342,9 +334,9 @@
 						return
 					};
 					let temporaryMessage = {
-							creator: this.userAccount, //创建者
-						  orderTime: SOtime.time8(new Date(this.deliveryDate).getTime()) + " " + this.getNowFormatDate(new Date(),1), //下单时间
-						  creatorId: this.workerId, //当前用户ID
+							creator: '', //创建者
+						  orderTime: new Date(this.deliveryDate).getTime(), //下单时间
+						  creatorId: '', //当前用户ID
 						  customerId: this.proId,  //客户编号
 							remark: this.taskDescribe, //备注
 							address: this.deliveryAddress, //送货地址
@@ -413,7 +405,10 @@
 					this.showLoadingHint = true;
 					updatePlanOrder(data).then((res) => {
 						this.showLoadingHint = false;
-						if (res && res.data.code == 0) {
+						if (res && res.data.code == 0 && res.data.data) {
+							let temporaryEditMessage = data;
+							data['editStatus'] = '成功';
+							this.changeEditOrderMessage(temporaryEditMessage);
 							this.$refs.alertToast.show({
 								type: 'success',
 								message: '提交成功!',

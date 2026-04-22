@@ -106,6 +106,7 @@
 			return {
 				infoText: '修改中···',
 				showLoadingHint: false,
+				isShowNoData: false,
 				currentStatusValue: '',
 				currentPageNum: 1,
 				pageSize: 20,
@@ -151,7 +152,7 @@
 			}
 		},
 		
-		onShow () {
+		onLoad() {
 			this.resetStatus();
 			this.getDateRange();
 			this.getPlanOrderPageEvent({
@@ -190,8 +191,8 @@
 						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
 						this.orderList.forEach((item)=>{
-							item.createTime = SOtime.time3(item.createTime);
-							item.orderTime = SOtime.time8(item.orderTime);
+							item.createTime = item.createTime ? SOtime.time3(item.createTime) : '';
+							item.orderTime = item.orderTime ? SOtime.time8(item.orderTime) : '';
 						});
 						this.fullOrderList = this.fullOrderList.concat(this.orderList);
 						if (this.fullOrderList.length == 0) {
@@ -504,7 +505,6 @@
 						 };
 						 .create-delivery-date {
 							 display: flex;
-							 align-items: center;
 							 margin-top: 10px;
 							 .create-delivery-date-left {
 								 flex: 1;

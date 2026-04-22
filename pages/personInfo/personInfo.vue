@@ -165,7 +165,7 @@
 						this.changeOverDueWay(true);
 						// 清空store和localStorage
 						removeAllLocalStorage();
-						if(store.getters.suppliesHomeGlobalTimer) {window.clearInterval(store.getters.suppliesHomeGlobalTimer)};
+						if(store.getters.suppliesHomeGlobalTimer) {clearInterval(store.getters.suppliesHomeGlobalTimer)};
 						store.dispatch('resetOrderFormAuditState');
 						store.dispatch('resetMaterialApplicationOrderFormState');
 						store.dispatch('resetLoginState');

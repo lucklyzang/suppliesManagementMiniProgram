@@ -223,7 +223,8 @@
 			...mapGetters([
 				'userInfo',
 				'statusBarHeight',
-				'navigationBarHeight'
+				'navigationBarHeight',
+				'editOrderMessage'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -248,9 +249,10 @@
 			}
 		},
 		
-		onShow () {
+		onLoad () {
 			this.resetStatus();
 			this.getDateRange();
+			this.changeEditOrderMessage({});
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
@@ -263,11 +265,30 @@
 		
 		methods: {
 			...mapMutations([
+				'changeEditOrderMessage'
 			]),
 			
 			// 重置状态
 			resetStatus () {
 				this.currentPageNum = 1
+			},
+			
+			// 编辑成功后回显编辑订单信息
+			echoEditOrderMessage () {
+				// 更新对应编辑订单信息
+				let currentIndex = this.fullOrderList.findIndex((item) => { return item.id == this.editOrderMessage['id']});
+				if (currentIndex != -1) {
+					this.$set(this.fullOrderList[currentIndex],'items',this.editOrderMessage['items']);
+					this.$set(this.fullOrderList[currentIndex],'orderTime',this.editOrderMessage['orderTime'] ? SOtime.time8(this.editOrderMessage['orderTime']) : '');
+					this.$set(this.fullOrderList[currentIndex],'address',this.editOrderMessage['address']);
+					this.$set(this.fullOrderList[currentIndex],'remark',this.editOrderMessage['remark'])
+				}
+			},
+			
+			// 全部收货成功后，删除该订单
+			allSureConfirmOrderEvent () {
+				console.log('三除了');
+				// this.fullOrderList.splice(this.currentOrderIndex,1);
 			},
 			
 			// 状态栏以外区域点击
@@ -370,8 +391,8 @@
 						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
 						this.orderList.forEach((item)=>{
-							item.createTime = SOtime.time3(item.createTime);
-							item.orderTime = SOtime.time8(item.orderTime);
+							item.createTime = item.createTime ? SOtime.time3(item.createTime) : '';
+							item.orderTime = item.orderTime ? SOtime.time8(item.orderTime) : '';
 						});
 						this.fullOrderList = this.fullOrderList.concat(this.orderList);
 						if (this.fullOrderList.length == 0) {
@@ -552,6 +573,8 @@
 			
 			// 订单确认收货事件
 			sureReceivingEvent(item,index) {
+				this.currentOrderIndex = index;
+				this.currentOrderId = item['id'];
 				uni.navigateTo({
 					url: `/materialApplicationPackage/pages/confirmReceipt/confirmReceipt?id=${item.id}`
 				})

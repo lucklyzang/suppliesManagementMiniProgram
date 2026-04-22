@@ -79,6 +79,7 @@
 				isShowAllConfirmReceipt: true,
 				isShowNoData: false,
 				loadingShow: false,
+				isAllSure: false,
 				currentId: 0,
 				saleReturnOrderList: []
 			}
@@ -136,7 +137,16 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				// 全部确认成功后,删除该订单
+			 	// 获取页面栈
+				if (this.isAllSure) {
+					const pages = getCurrentPages();
+					const prevPage = pages[pages.length - 2];
+					if (prevPage) {
+						prevPage.$vm.allSureConfirmOrderEvent();
+					}
+				};
+			 	uni.navigateBack()
 			},
 			
 			// 判断是否显示全部确认收货按钮
@@ -187,8 +197,8 @@
 							this.isShowNoData = true
 						} else {
 							this.saleReturnOrderList.forEach((item)=>{
-								item.outTime = SOtime.time8(item.outTime);
-								item.checkTime = SOtime.time8(item.checkTime);
+								item.outTime = item.outTime ? SOtime.time8(item.outTime) : '';
+								item.checkTime = item.checkTime ? SOtime.time8(item.checkTime) : '';
 							});
 							this.isShowNoData = false
 						};
@@ -227,6 +237,7 @@
 			
 			// 确认全部收货事件
 			allConfirmReceiptEvent () {
+				this.isAllSure = false;
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
 				confirmSaleReturn({
@@ -236,6 +247,7 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
+							this.isAllSure = true;
 							this.$refs.uToast.show({
 								message: '全部确认收货成功!',
 								type: 'success',

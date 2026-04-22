@@ -12,7 +12,7 @@ export function logIn(data) {
 // 获取用户详情
 export function getUserInfo(userId) {
 	return request({
-	    url: `spd/admin-api/system/user/get?id=${userId}`,
+	    url: `spd/admin-api/system/user/get-profile?id=${userId}`,
 	    method: 'get'
 	  })
 }
@@ -20,7 +20,7 @@ export function getUserInfo(userId) {
 // 用户退出登录
 export function userSignOut() {
   return request({
-    url: 'spd/app-api/system/auth/logout',
+    url: 'spd/admin-api/system/auth/logout',
     method: 'post'
   })
 };

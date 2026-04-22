@@ -9,6 +9,9 @@ export default {
 		},
 		materialApplicationOrderType: (state) => {
 			return state.materialApplicationOrderType
+		},
+		editOrderMessage: (state) => {
+			return state.editOrderMessage
 		}
   },
 
@@ -22,6 +25,10 @@ export default {
 		// 保存物质申领订单类型
 		changeMaterialApplicationOrderType (state, playLoad) {
 			state.materialApplicationOrderType = playLoad
+		},
+		// 保存编辑订单信息
+		changeEditOrderMessage (state, playLoad) {
+			state.editOrderMessage = playLoad
 		},
 		//重置物资申请信息的状态
 		resetMaterialApplicationOrderFormInfoState(state) {

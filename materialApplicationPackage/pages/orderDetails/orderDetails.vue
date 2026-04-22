@@ -35,7 +35,7 @@
 						<view class="product-specification">
 							<view class="product-specification-left">
 								<text>
-									{{ item.specification ? item.specification : '无' }}
+									{{ item.productStandard ? item.productStandard : '无' }}
 								</text>
 							</view>
 							<view class="product-specification-right">
@@ -356,13 +356,13 @@
 							this.orderMessage = item1;
 							this.materialList = this.orderMessage['items'];
 							this.allChooseProductPrice = this.orderMessage['totalProductPrice'];
-							this.orderMessage['createTime'] = SOtime.time3(this.orderMessage['createTime']);
-							this.orderMessage['orderTime'] = SOtime.time8(this.orderMessage['orderTime']);
+							this.orderMessage['createTime'] = this.orderMessage['createTime'] ? SOtime.time3(this.orderMessage['createTime']) : '';
+							this.orderMessage['orderTime'] = this.orderMessage['orderTime'] ? SOtime.time8(this.orderMessage['orderTime']) : '';
 						};
 						if (item2) {
 							this.orderStatusRecordList = item2;
 							this.orderStatusRecordList.forEach((item)=>{
-								item.createTime = SOtime.time3(item.createTime)
+								item.createTime = item.createTime ? SOtime.time3(item.createTime) : ''
 							})
 						};
 						if (item3) {
@@ -371,7 +371,7 @@
 								this.isShowNoData = true
 							} else {
 								this.saleReturnOrderList.forEach((item)=>{
-									item.outTime = SOtime.time8(item.outTime)
+									item.outTime =  item.outTime ? SOtime.time8(item.outTime) : ''
 								});
 								this.isShowNoData = false
 							}

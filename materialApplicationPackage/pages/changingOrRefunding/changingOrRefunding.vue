@@ -172,8 +172,8 @@
 							this.isShowNoData = true
 						} else {
 							this.saleReturnOrderList.forEach((item)=>{
-								item.outTime = SOtime.time8(item.outTime);
-								item.checkTime = SOtime.time8(item.checkTime);
+								item.outTime = item.outTime ? SOtime.time8(item.outTime) : '';
+								item.checkTime = item.checkTime ? SOtime.time8(item.checkTime) : '';
 							});
 							this.isShowNoData = false
 						};

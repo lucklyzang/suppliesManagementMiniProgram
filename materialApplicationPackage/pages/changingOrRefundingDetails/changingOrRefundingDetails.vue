@@ -44,7 +44,7 @@
 							<text>{{ item.productName }}</text>
 						</view>
 						<view class="specification-content">
-							<text>{{ item.model }}</text>
+							<text>{{ item.productStandard ? item.productStandard : '' }}</text>
 						</view>
 						<view class="deliver-number-content">
 							<text>{{ item.count }}</text>

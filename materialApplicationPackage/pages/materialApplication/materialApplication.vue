@@ -39,7 +39,7 @@
 						<view class="product-specification">
 							<view class="product-specification-left">
 								<text>
-									{{ item.specification }}
+									{{ item.standard }}
 								</text>
 							</view>
 							<view class="product-specification-right">
@@ -110,7 +110,7 @@
 										</view>
 										<view>
 											<text>
-												{{ `,${item.specification},` }}
+												{{ `,${item.standard},` }}
 											</text>
 										</view>
 										<view>
@@ -207,7 +207,7 @@ export default {
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo",'statusBarHeight','navigationBarHeight','addMaterialApplicationMessage']),
+    ...mapGetters(["userInfo",'statusBarHeight','navigationBarHeight','addMaterialApplicationMessage','editOrderMessage']),
 		userName() {
 			return this.userInfo['nickname']
 		},
@@ -237,9 +237,18 @@ export default {
 		]),
 
     // 顶部导航返回事件
-     backTo () {
+    backTo () {
+			// 编辑成功后,调取订单列表页的更新所编辑订单信息的方法
+     	// 获取页面栈
+			if (this.isEdit && this.editOrderMessage['editStatus'] == '成功') {
+				const pages = getCurrentPages();
+				const prevPage = pages[pages.length - 2];
+				if (prevPage) {
+					prevPage.$vm.echoEditOrderMessage();
+				}
+			};
      	uni.navigateBack()
-     },
+    },
 		 
 		 // 回显保存的添加产品列表信息
 		 echoAddMaterialListEvent () {
@@ -264,7 +273,7 @@ export default {
 						this.chooseMaterialList.push({
 							id: item['productId'], /*产品编号 */
 							productName: item['productName'], /*产品名称 */
-							specification: item['standard'] ? item['standard'] : '无', /*产品规格 */
+							standard: item['standard'] ? item['standard'] : '无', /*产品规格 */
 							unit: item['productUnitName'], /*单位 */
 							warningCount: item['stockCount'], /*预警数量 */
 							productImage: item['productImage'] ? item['productImage'] : this.productDefaultImage,
@@ -318,10 +327,10 @@ export default {
 							this.originalMaterialList.push({
 								id: item['id'], /*产品编号 */
 								productName: item['name'], /*产品名称 */
-								specification: item['standard'] ? item['standard'] : '无', /*产品规格 */
+								standard: item['standard'] ? item['standard'] : '无', /*产品规格 */
 								unit: item['unitName'], /*单位 */
 								warningCount: item['warningCount'] ? item['warningCount'] : 100, /*预警数量 */
-								productImage: item['images'] ? item['images'] : this.productDefaultImage,
+								productImage: item['images'][0] ? item['images'][0] : this.productDefaultImage,
 								barCode: item['barCode'], /*产品条码 */
 								categoryId: item['categoryId'], /*产品分类编号 */
 								categoryName: item['categoryName'], /*产品分类 */
@@ -452,6 +461,7 @@ export default {
 		 
 		 // 添加确认事件
 		 addSureEvent () {
+			 this.productChooseShow = false;
 			 let count = this.materialList.some((item)=> {return item.checked == true && !item.disabled});
 			 if (!count) {
 				 this.$refs.uToast.show({
@@ -460,13 +470,12 @@ export default {
 				});
 				return;
 			 };
-			 this.productChooseShow = false;
 			 let temporaryMaterialList = this.originalMaterialList.filter((item) => { return item['checked'] === true && !item.disabled });
 			 for (let item of temporaryMaterialList) {
 				this.chooseMaterialList.push({
 					id: item['id'], /*产品编号 */
 					productName: item['productName'], /*产品名称 */
-					specification: item['standard'] ? item['standard'] : '无', /*产品规格 */
+					standard: item['standard'] ? item['standard'] : '无', /*产品规格 */
 					unit: item['unit'], /*单位 */
 					warningCount: item['warningCount'], /*预警数量 */
 					productImage: item['productImage'],
@@ -530,11 +539,6 @@ export default {
 				 return
 			 };
 			 this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
-			 this.$refs.uToast.show({
-			 	message: '保存成功',
-			 	position: 'center',
-			 	type: 'success'
-			 });
 			 if (!this.isEdit) {
 					uni.navigateTo({
 						url: '/materialApplicationPackage/pages/materialApplicationSubmit/materialApplicationSubmit'
