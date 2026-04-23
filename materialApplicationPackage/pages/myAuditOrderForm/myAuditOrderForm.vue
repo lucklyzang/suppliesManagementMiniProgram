@@ -248,7 +248,7 @@
 							this.isShowNoData = true
 						} else {
 							this.isShowNoData = false
-						};
+						}
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,
@@ -341,6 +341,11 @@
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
 							this.fullOrderList.splice(this.currentOrderIndex,1);
+							if (this.fullOrderList.length == 0) {
+								this.isShowNoData = true
+							} else {
+								this.isShowNoData = false
+							};
 							this.$refs.uToast.show({
 								message: '审核成功!',
 								type: 'success',

@@ -550,7 +550,8 @@ export default {
 						 orderType: this.orderMessage['orderType'],
 						 orderTime: this.orderMessage['orderTime'],
 						 remark: this.orderMessage['remark'],
-						 address: this.orderMessage['address']
+						 address: this.orderMessage['address'],
+						 status: this.orderMessage['status']
 					 })
 				 );
 				 uni.navigateTo({

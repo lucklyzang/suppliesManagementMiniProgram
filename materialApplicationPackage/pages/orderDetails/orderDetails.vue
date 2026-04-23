@@ -24,7 +24,7 @@
 				</view>
 				<view class="product-list" v-for="(item,index) in materialList" :key="item.productName">
 					<view class="product-left">
-						<image :src="item['images'] ? item['images'] : productDefaultImage" mode="widthFix"></image>
+						<image :src="item['images'] ? item['images'][0] : productDefaultImage" mode="widthFix"></image>
 					</view>
 					<view class="product-center">
 						<view class="product-name">
@@ -103,17 +103,17 @@
 							<view class="delivery-number-message">
 								<view class="delivery-number">
 									<text>送货单号:</text>
-									<text>{{ item.id }}</text>
+									<text>{{ item.no }}</text>
 								</view>
-								<view class="harvest-date">
+								<view class="harvest-date" v-if="item.status == 60">
 									<text>收货日期:</text>
-									<text></text>
+									<text>{{ item.checkTime }}</text>
 								</view>
 							</view>
 							<view class="related-order-number-message">
 								<view class="related-order-number">
-									<text>关联单号:</text>
-									<text>{{ item.orderId }}</text>
+									<text>关联订单号:</text>
+									<text>{{ item.orderNo }}</text>
 								</view>
 								<view class="delivery-date">
 									<text>送货日期:</text>
@@ -371,7 +371,8 @@
 								this.isShowNoData = true
 							} else {
 								this.saleReturnOrderList.forEach((item)=>{
-									item.outTime =  item.outTime ? SOtime.time8(item.outTime) : ''
+									item.outTime =  item.outTime ? SOtime.time8(item.outTime) : '';
+									item.checkTime =  item.checkTime ? SOtime.time8(item.checkTime) : ''
 								});
 								this.isShowNoData = false
 							}
@@ -396,6 +397,9 @@
 							break;
 						case 20:
 								return '已发货'
+								break;
+						case 21:
+								return '已送达'
 								break;
 						case 30:
 								return '退换货'
@@ -750,6 +754,7 @@
 						display: flex;
 						justify-content: space-between;
 						align-items: center;
+						margin-bottom: 6px;
 						.delivery-information-left {
 							flex: 1;
 							width: 0;
@@ -758,15 +763,12 @@
 							justify-content: center;
 							.delivery-number-message {
 								display: flex;
-								align-items: center;
 								justify-content: space-between;
 								margin-bottom: 10px;
 								.delivery-number {
-									flex: 1;
 									margin-right: 10px;
-									width: 0;
+									width: 55%;
 									display: flex;
-									align-items: center;
 									>text {
 										font-size: 14px;
 										color: #101010;
@@ -774,7 +776,7 @@
 											margin-right: 4px;
 										};
 										&:nth-child(2) {
-											@include no-wrap;
+											word-break: break-all;
 											flex: 1;
 										}
 									}
@@ -783,7 +785,6 @@
 									flex: 1;
 									width: 0;
 									display: flex;
-									align-items: center;
 									>text {
 										font-size: 12px;
 										color: #777575;
@@ -791,7 +792,7 @@
 											margin-right: 4px;
 										};
 										&:nth-child(2) {
-											@include no-wrap;
+											word-break: break-all;
 											flex: 1;
 										}
 									}
@@ -799,14 +800,11 @@
 							};
 							.related-order-number-message {
 								display: flex;
-								align-items: center;
 								justify-content: space-between;
 								.related-order-number {
-									flex: 1;
 									margin-right: 10px;
-									width: 0;
+									width: 55%;
 									display: flex;
-									align-items: center;
 									>text {
 										font-size: 12px;
 										color: #777575;
@@ -814,7 +812,7 @@
 											margin-right: 4px;
 										};
 										&:nth-child(2) {
-											@include no-wrap;
+											word-break: break-all;
 											flex: 1;
 										}
 									}
@@ -823,7 +821,6 @@
 									flex: 1;
 									width: 0;
 									display: flex;
-									align-items: center;
 									>text {
 										font-size: 12px;
 										color: #777575;
@@ -831,7 +828,7 @@
 											margin-right: 4px;
 										};
 										&:nth-child(2) {
-											@include no-wrap;
+											word-break: break-all;
 											flex: 1;
 										}
 									}

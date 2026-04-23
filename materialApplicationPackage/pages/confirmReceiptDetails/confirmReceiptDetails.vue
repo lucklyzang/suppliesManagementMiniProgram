@@ -15,7 +15,7 @@
 		<view class="content">
 			<view class="delivery-number">
 				<text>送货单号:</text>
-				<text>{{ saleReturnOrderDetailsList.id }}</text>
+				<text>{{ saleReturnOrderDetailsList.no }}</text>
 			</view>
 			<view class="delivery-table">
 				<view class="delivery-table-title">
@@ -72,7 +72,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="bottom-btn" v-if="saleReturnOrderMessage.status == 20">
+		<view class="bottom-btn" v-if="saleReturnOrderMessage.status == 21">
 				<view class="back-box" @click="confirmReceiptEvent">
 					<text>确认收货</text>
 				</view>
@@ -189,7 +189,7 @@
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
 				confirmSaleReturn({
-					id: this.currentId
+					id: Number(this.saleReturnOrderMessage.id)
 				}).then((res) => {
 					this.infoText = '';
 					this.showLoadingHint = false;
@@ -199,7 +199,8 @@
 								message: '确认成功',
 								type: 'success',
 								position: 'bottom'
-							})
+							});
+							this.backTo();
 						} else {
 							this.$refs.uToast.show({
 								message: res.data.msg,
@@ -277,11 +278,16 @@
 			.delivery-number {
 				padding: 10px 6px;
 				box-sizing: border-box;
+				display: flex;
 				>text {
 					font-size: 14px;
 					color: #101010;
 					&:nth-child(1) {
 						margin-right: 2px;
+					};
+					&:nth-child(2) {
+						flex: 1;
+						word-break: break-all;
 					}
 				}
 			};
@@ -361,6 +367,8 @@
 								flex: none !important;
 								.u-input__content__field-wrapper__field {
 									text-align: center !important;
+									font-size: 12px !important;
+									color: #101010 !important
 								}
 							}
 						};
@@ -371,6 +379,8 @@
 								flex: none !important;
 								.u-input__content__field-wrapper__field {
 									text-align: center !important;
+									font-size: 12px !important;
+									color: #101010 !important
 								}
 							}
 						}

@@ -15,7 +15,7 @@
 		<view class="content">
 			<view class="delivery-number">
 				<text>送货单号:</text>
-				<text>{{ saleReturnOrderDetailsList.id }}</text>
+				<text>{{ saleReturnOrderDetailsList.no }}</text>
 			</view>
 			<view class="delivery-table">
 				<view class="delivery-table-title">
@@ -51,20 +51,20 @@
 						</view>
 						<view class="sales-return-content">
 							 <u--input
-							 :disabled="saleReturnOrderMessage.status != 20"
+							 :disabled="saleReturnOrderMessage.status != 21"
 							  border="none"
-								type="digit"
+								type="number"
 								@input="salesReturnInput(item, index, $event)"
-							  v-model="item.alesReturnCount"
+							  v-model="item.returnCount"
 							  ></u--input>
 						</view>
 						<view class="barter-content">
 							 <u--input
-							 :disabled="saleReturnOrderMessage.status != 20"
+							 :disabled="saleReturnOrderMessage.status != 21"
 							  border="none"
-								type="digit"
+								type="number"
 								@input="barterInput(item, index, $event)"
-							  v-model="item.barterCount"
+							  v-model="item.exchangeCount"
 							  ></u--input>
 						</view>
 						<view class="unit-content">
@@ -73,7 +73,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="exchange-reason" v-if="saleReturnOrderMessage.status == 20">
+			<view class="exchange-reason" v-if="saleReturnOrderMessage.status == 21">
 				<view class="exchange-reason-left">
 					<text class="exchange-reason-text-one" v-if="isExceedStockQuantity">*</text>
 					<text class="exchange-reason-text-two">退换原因:</text>
@@ -83,7 +83,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="bottom-btn" v-if="saleReturnOrderMessage.status == 20">
+		<view class="bottom-btn" v-if="saleReturnOrderMessage.status == 21">
 				<view class="cancel-box" @click="cancelEvent">
 					<text>取消</text>
 				</view>
@@ -127,7 +127,7 @@
 		    'saleReturnOrderDetailsList.items': {
 					handler(newVal, oldVal) {
 						if (newVal.length > 0) {
-							if (Number(newVal[0]['alesReturnCount']) + Number(newVal[0]['barterCount']) > Number(newVal[0]['count'])) {
+							if (Number(newVal[0]['returnCount']) > 0 || Number(newVal[0]['exchangeCount']) > 0) {
 								this.isExceedStockQuantity = true;
 							} else {
 								this.isExceedStockQuantity = false;
@@ -188,10 +188,15 @@
 			
 			extractNeedArr (notNeedKey,targetArray) {
 				let needArr = [];
-				const newUsers = targetArray.map(({ notNeedKey, ...rest }) => rest );
-				for (let item of newUsers) {
+				// const newUsers = targetArray.map(({ notNeedKey, ...rest }) => rest );
+				const newArray = targetArray.map(obj =>
+				  Object.fromEntries(
+				    Object.entries(obj).filter(([key]) => key !== notNeedKey)
+				  )
+				);
+				for (let item of newArray) {
 					needArr.push({
-						count: item.hasOwnProperty('barterCount') ? item.barterCount : item.alesReturnCount,
+						count: item.hasOwnProperty('exchangeCount') ? Number(item.exchangeCount) : Number(item.returnCount),
 						outItemId: item.id,
 						orderItemId: item.orderItemId,
 						productId: item.productId,
@@ -210,12 +215,22 @@
 			
 			// 退货input框值变化事件
 			salesReturnInput(item,index,val) {
-				this.$set(this.saleReturnOrderDetailsList['items'][index],'alesReturnCount',val);
+				// 退货货总数不能大于发货数
+				if (Number(val) + Number(item.exchangeCount) > Number(item.count)) {
+					this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',Number(item.count) - Number(item.exchangeCount));
+				} else {
+					this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',val)
+				}
 			},
 			
 			// 换货input框值变化事件
 			barterInput(item, index,val) {
-				this.$set(this.saleReturnOrderDetailsList['items'][index],'barterCount',val);
+				// 退货货总数不能大于发货数
+				if (Number(val) + Number(item.returnCount) > Number(item.count)) {
+					this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount',Number(item.count) - Number(item.returnCount));
+				} else {
+					this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount',val);
+				}
 			},
 			
 			// 查询出库单详情
@@ -230,10 +245,6 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						this.saleReturnOrderDetailsList = res.data.data;
-						this.saleReturnOrderDetailsList['items'].forEach((item,index) => {
-							this.$set(this.saleReturnOrderDetailsList['items'][index],'alesReturnCount',0);
-							this.$set(this.saleReturnOrderDetailsList['items'][index],'barterCount',0);
-						})
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,
@@ -279,40 +290,41 @@
 			submitEvent () {
 				let	isAllSaleReturnZero,isAllBarterOrderZero;
 				let questArr = [];
-				isAllSaleReturnZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.alesReturnCount == 0});
-				isAllBarterOrderZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.barterCount == 0});
+				isAllSaleReturnZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.returnCount == 0});
+				isAllBarterOrderZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.exchangeCount == 0});
 				if (isAllSaleReturnZero && isAllBarterOrderZero) {
 					this.$refs.uToast.show({
 						message: '退换货不能全部为0!',
 						type: 'error'
 					});
-					return;
+					return
 				};
 				if (this.isExceedStockQuantity) {
 					if (this.exchangeReason === '') {
 						this.$refs.uToast.show({
 							message: '退换货理由不能为空',
 							type: 'error'
-						})
+						});
+						return
 					}
 				};
 				let baseMessage = {
-					returnTime: SOtime.time3(new Date().getTime()), //退换货时间
+					returnTime: new Date().getTime(), //退换货时间
 					remark: this.exchangeReason, //退换货原因
 					orderId: Number(this.saleReturnOrderMessage.orderId), // 销售订单编号
 					id: Number(this.saleReturnOrderMessage.id) // 编号
 				};
 				// 退货清单列表
-				let saleReturnOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.alesReturnCount) > 0});
+				let saleReturnOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.returnCount) > 0});
 				let alesReturnMessage = Object.assign({},baseMessage,{
 					type: 0,
-					items: this.extractNeedArr('barterCount',saleReturnOrderList)
+					items: this.extractNeedArr('exchangeCount',saleReturnOrderList)
 				});
 				// 换货清单列表
-				let barterOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.barterCount) > 0});
+				let barterOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.exchangeCount) > 0});
 				let barterMessage = Object.assign({},baseMessage,{
 					type: 1,
-					items: this.extractNeedArr('alesReturnCount',barterOrderList)
+					items: this.extractNeedArr('returnCount',barterOrderList)
 				});
 				if (!isAllSaleReturnZero) {
 					questArr.push(this.createSaleReturnEvent(alesReturnMessage))
@@ -322,7 +334,6 @@
 				};
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
-				console.log('fd',alesReturnMessage,alesReturnMessage);
 				Promise.all(questArr)
 				.then((res) => {
 					this.showLoadingHint = false;
@@ -406,11 +417,16 @@
 			.delivery-number {
 				padding: 10px 6px;
 				box-sizing: border-box;
+				display: flex;
 				>text {
 					font-size: 14px;
 					color: #101010;
 					&:nth-child(1) {
 						margin-right: 2px;
+					};
+					&:nth-child(2) {
+						flex: 1;
+						word-break: break-all;
 					}
 				}
 			};

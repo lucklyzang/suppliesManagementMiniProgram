@@ -23,17 +23,17 @@
 						<view class="delivery-number-message">
 							<view class="delivery-number">
 								<text>送货单号:</text>
-								<text>{{ item.id }}</text>
+								<text>{{ item.no }}</text>
 							</view>
-							<view class="harvest-date" v-if="saleReturnOrderMessage.status == 60">
+							<view class="harvest-date" v-if="item.status == 60">
 								<text>收货日期:</text>
 								<text>{{ item.checkTime }}</text>
 							</view>
 						</view>
 						<view class="related-order-number-message">
 							<view class="related-order-number">
-								<text>关联单号:</text>
-								<text>{{ item.orderId }}</text>
+								<text>关联订单号:</text>
+								<text>{{ item.orderNo }}</text>
 							</view>
 							<view class="delivery-date">
 								<text>送货日期:</text>
@@ -62,7 +62,7 @@
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js'
-	import { confirmSaleReturn, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { confirmAllSaleReturn, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
@@ -76,7 +76,7 @@
 				showLoadingHint: false,
 				infoText: '加载中···',
 				isExecute: true,
-				isShowAllConfirmReceipt: true,
+				isShowAllConfirmReceipt: false,
 				isShowNoData: false,
 				loadingShow: false,
 				isAllSure: false,
@@ -151,7 +151,7 @@
 			
 			// 判断是否显示全部确认收货按钮
 			judgeIsShowAllConfirmReceiptEvent() {
-				let flag = this.saleReturnOrderList.some((item,index) => { return ite.status == 20});
+				let flag = this.saleReturnOrderList.some((item,index) => { return item.status == 21});
 				if (flag) {
 					this.isShowAllConfirmReceipt = true
 				} else {
@@ -167,6 +167,9 @@
 							break;
 						case 20:
 								return '已发货'
+								break;
+						case 21:
+								return '已送达'
 								break;
 						case 30:
 								return '退换货'
@@ -200,7 +203,8 @@
 								item.outTime = item.outTime ? SOtime.time8(item.outTime) : '';
 								item.checkTime = item.checkTime ? SOtime.time8(item.checkTime) : '';
 							});
-							this.isShowNoData = false
+							this.isShowNoData = false;
+							this.judgeIsShowAllConfirmReceiptEvent();
 						};
 					} else {
 						this.$refs.uToast.show({
@@ -240,7 +244,7 @@
 				this.isAllSure = false;
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
-				confirmSaleReturn({
+				confirmAllSaleReturn({
 					id: this.currentId
 				}).then((res) => {
 					this.infoText = '';
@@ -356,6 +360,7 @@
 					display: flex;
 					justify-content: space-between;
 					align-items: center;
+					margin-bottom: 6px;
 					.delivery-information-left {
 						flex: 1;
 						width: 0;
@@ -364,15 +369,12 @@
 						justify-content: center;
 						.delivery-number-message {
 							display: flex;
-							align-items: center;
 							justify-content: space-between;
 							margin-bottom: 10px;
 							.delivery-number {
-								flex: 1;
 								margin-right: 10px;
-								width: 0;
+								width: 55%;
 								display: flex;
-								align-items: center;
 								>text {
 									font-size: 14px;
 									color: #101010;
@@ -380,7 +382,7 @@
 										margin-right: 4px;
 									};
 									&:nth-child(2) {
-										@include no-wrap;
+										word-break: break-all;
 										flex: 1;
 									}
 								}
@@ -389,7 +391,6 @@
 								flex: 1;
 								width: 0;
 								display: flex;
-								align-items: center;
 								>text {
 									font-size: 12px;
 									color: #777575;
@@ -397,7 +398,7 @@
 										margin-right: 4px;
 									};
 									&:nth-child(2) {
-										@include no-wrap;
+										word-break: break-all;
 										flex: 1;
 									}
 								}
@@ -405,14 +406,11 @@
 						};
 						.related-order-number-message {
 							display: flex;
-							align-items: center;
 							justify-content: space-between;
 							.related-order-number {
-								flex: 1;
 								margin-right: 10px;
-								width: 0;
+								width: 55%;
 								display: flex;
-								align-items: center;
 								>text {
 									font-size: 12px;
 									color: #777575;
@@ -420,7 +418,7 @@
 										margin-right: 4px;
 									};
 									&:nth-child(2) {
-										@include no-wrap;
+										word-break: break-all;
 										flex: 1;
 									}
 								}
@@ -429,7 +427,6 @@
 								flex: 1;
 								width: 0;
 								display: flex;
-								align-items: center;
 								>text {
 									font-size: 12px;
 									color: #777575;
@@ -437,7 +434,7 @@
 										margin-right: 4px;
 									};
 									&:nth-child(2) {
-										@include no-wrap;
+										word-break: break-all;
 										flex: 1;
 									}
 								}

@@ -88,10 +88,19 @@ export function createSaleReturn(data) {
 	  })
 }
 
-// 确认收货
+// 确认收货(单个)
 export function confirmSaleReturn(data) {
 	return request({
 	    url: '/spd/admin-api/erp/sale-out/confirm',
+	    method: 'put',
+			params: data
+	  })
+}
+
+// 确认收货(批量)
+export function confirmAllSaleReturn(data) {
+	return request({
+	    url: '/spd/admin-api/erp/sale-out/confirm-all',
 	    method: 'put',
 			params: data
 	  })

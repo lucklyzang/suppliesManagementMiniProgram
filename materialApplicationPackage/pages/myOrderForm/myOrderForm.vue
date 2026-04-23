@@ -252,7 +252,6 @@
 		onLoad () {
 			this.resetStatus();
 			this.getDateRange();
-			this.changeEditOrderMessage({});
 			this.getPlanOrderPageEvent({
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
@@ -281,8 +280,15 @@
 					this.$set(this.fullOrderList[currentIndex],'items',this.editOrderMessage['items']);
 					this.$set(this.fullOrderList[currentIndex],'orderTime',this.editOrderMessage['orderTime'] ? SOtime.time8(this.editOrderMessage['orderTime']) : '');
 					this.$set(this.fullOrderList[currentIndex],'address',this.editOrderMessage['address']);
-					this.$set(this.fullOrderList[currentIndex],'remark',this.editOrderMessage['remark'])
-				}
+					this.$set(this.fullOrderList[currentIndex],'remark',this.editOrderMessage['remark']);
+					// 如果编辑前任务状态为21-未通过或31-已拒绝,编辑成功后，修改任务状态为10-待审核
+					if (this.editOrderMessage['status'] == 21 || this.editOrderMessage['status'] == 31) {
+						this.$set(this.fullOrderList[currentIndex],'status',10);
+						console.log('sa',this.fullOrderList[currentIndex]);
+					}
+				};
+				// 更新成功后清除暂存的编辑信息
+				this.changeEditOrderMessage({})
 			},
 			
 			// 全部收货成功后，删除该订单
