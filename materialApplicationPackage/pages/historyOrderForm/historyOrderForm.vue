@@ -128,7 +128,7 @@
 								<text>评分:</text>
 							</view>
 							<view class="score-content">
-								<u-rate v-if="viewEvaluateModalShow" gutter="10" :count="viewScoreCount" size="26" readonly active-color="#F2A15F" v-model="viewScoreValue"></u-rate>
+								<u-rate v-if="viewEvaluateModalShow" gutter="10" :count="viewScoreCount" size="26" readonly active-color="#F2A15F" v-model="viewScoreCount"></u-rate>
 							</view>
 						</view>
 						<view class="evaluate-box">
@@ -343,7 +343,7 @@
 				this.createOrderEvaluateEvent({
 					orderId: this.currentOrderId, //销售订单编号
 					content: this.evaluateValue, // 评分内容
-					score: this.scoreCount // 评分
+					score: this.scoreValue // 评分
 				})
 			},
 			
@@ -503,9 +503,9 @@
 				getOrderEvaluate(data).then((res) => {
 					this.infoText = '';
 					this.showLoadingHint = false;
-					if ( res && res.data.code == 0) {
-						this.viewScoreCount = rea.data.data['score'];
-						this.viewScoreValue = rea.data.data['content'];
+					if (res && res.data.code == 0) {
+						this.viewScoreValue = res.data.data['content'];
+						this.viewScoreCount = res.data.data['score'];
 						this.viewEvaluateModalShow = true;
 					} else {
 						this.$refs.uToast.show({

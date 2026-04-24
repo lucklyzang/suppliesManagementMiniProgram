@@ -436,7 +436,7 @@
 			margin-top: 6px;
 			.task-board {
 				width: 100%;
-				padding: 0 16px 10px 10px;
+				padding: 0 16px 16px 10px;
 				box-sizing: border-box;
 				display: flex;
 				flex-direction: column;
@@ -466,9 +466,8 @@
 						justify-content: center;
 						align-items: center;
 						>text {
-							&:nth-child(2){
-								margin-top: 14px;
-								font-size: 16px;
+							&:nth-child(1){
+								font-size: 12px;
 								color: #101010;
 								text-align: center
 							}
@@ -504,13 +503,14 @@
 				display: flex;
 				flex-wrap: wrap;
 				width: 100%;
-				margin-top: 20px;
+				margin-left: -10px;
 				.service-list {
 					width: 25%;
 					display: flex;
 					flex-direction: column;
 					justify-content: center;
 					align-items: center;
+					margin-bottom: 20px;
 					.list-top {
 						width: 50px;
 						height: 50px;

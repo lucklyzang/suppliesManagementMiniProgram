@@ -5,7 +5,7 @@
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
-		<u-modal :show="modalShow" title="确定退出登录?" :showCancelButton="true" @confirm="sureCancel" @cancel="cancelSure"></u-modal>
+		<u-modal :show="modalShow" confirmColor="#44CC72" title="确定退出登录?" :showCancelButton="true" @confirm="sureCancel" @cancel="cancelSure"></u-modal>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
 		<view class="nav">

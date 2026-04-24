@@ -132,6 +132,7 @@
 									<text>请输入数量:</text>
 									<u--input 
 									   v-model="item.quantity"
+										 type="number"
 										 :disabled="item.disabled"
 										 placeholder="请输入数量"
 									   border="none"
