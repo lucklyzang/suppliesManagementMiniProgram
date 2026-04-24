@@ -62,7 +62,7 @@
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js'
-	import { confirmAllSaleReturn, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getPlanOrder,confirmAllSaleReturn, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
@@ -225,6 +225,39 @@
 				})
 			},
 			
+			// 查询订单详情
+			getPlanOrderEvent() {
+				this.isAllSure = false;
+				this.showLoadingHint = true;
+				this.infoText = '查询中···';
+				getPlanOrder(this.currentId).then((res) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					if ( res && res.data.code == 0) {
+						// 判断当前订单是否全部收货完成
+						if (res.data.data['status'] == 50) {
+							this.isAllSure = true;
+						};
+						this.backTo();
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
+			},
+			
 			// 进入确认货详情事件
 			enterChangingOrRefundingDetailsEvent (item,index) {
 				let transmitParams = encodeURIComponent(
@@ -241,7 +274,6 @@
 			
 			// 确认全部收货事件
 			allConfirmReceiptEvent () {
-				this.isAllSure = false;
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
 				confirmAllSaleReturn({
@@ -251,13 +283,12 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
-							this.isAllSure = true;
 							this.$refs.uToast.show({
 								message: '全部确认收货成功!',
 								type: 'success',
 								position: 'bottom'
 							});
-							this.backTo()
+							this.getPlanOrderEvent()
 						} else {
 							this.$refs.uToast.show({
 								message: res.data.msg,

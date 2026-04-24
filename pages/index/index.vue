@@ -26,8 +26,8 @@
 									@click="backlogMatterEvent(item,index)"
 							>
 									<text>{{ item.name }}</text>
-									<view class="message-number">
-											<text>{{ item.value }}</text>
+									<view class="message-number" v-if="item.count !== null && item.count !== ''">
+											<text>{{ item.count }}</text>
 									</view>
 							</view> 
 					</view>
@@ -72,7 +72,7 @@
 	} from 'vuex'
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js'
-	import { getPlanOrderPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getSaleStatisticsPendingReview } from '@/api/suppliesManagement/orderFormAudit.js'
 	let windowTimer;
 	export default{
 		data() {
@@ -89,8 +89,8 @@
 				backlogList: [
 						{
 								name: '待审核',
-								state: 0,
-								value: 0
+								value: 'pendingReview',
+								count: 0
 						}
 				],
 				functionalZoneList: [
@@ -169,19 +169,13 @@
 			    windowTimer = setInterval(() => {
 						if (this.isTimeoutContinue) {
 							setTimeout(() => {
-								this.getTaskCount({
-									pageNo: 1,
-									pageSize: 10,
-									status: 10,
-									orderTime: [`${this.startDate}`,`${this.endDate}`],
-									creator: ''
-								})
+								this.getSaleStatisticsPendingReviewEvent()
 							}, 0);
 							this.changeSuppliesHomeGlobalTimer(windowTimer)
 						} else {
 							this.changeSuppliesHomeGlobalTimer(null)
 						}
-			    }, 3000)
+			    }, 2000)
 			}
 		},
 		
@@ -231,30 +225,30 @@
 			  return `${y}-${m}-${d}`;
 			},
 			
-			// 查询任务数量
-			getTaskCount (data) {
-				this.isTimeoutContinue = false;
-				getPlanOrderPage(data).then((res) => {
-					if (res && res.data.code == 0) {
-						this.isTimeoutContinue = true;
-						this.backlogList.forEach((item,index) => {
-							if (item.name == '待审核') {
-								item.value = res.data.data.total;
+			// 查询待审核任务数量
+			getSaleStatisticsPendingReviewEvent () {
+					this.isTimeoutContinue = false;
+					getSaleStatisticsPendingReview().then((res) => {
+							if (res && res.data.code == 0) {
+									this.isTimeoutContinue = true;
+									this.backlogList.forEach((item,index) => {
+										if (item.value == 'pendingReview') {
+											item.count = res.data.data;
+										}
+									})
+							} else {
+								this.$refs.uToast.show({
+									message: res.data.msg,
+									type: 'error'
+								})
 							}
-						})
-					} else {
+					})
+					.catch((err) => {
 						this.$refs.uToast.show({
-							message: res.data.msg,
+							message: err,
 							type: 'error'
 						})
-					}
-				})
-				.catch((err) => {
-					this.$refs.uToast.show({
-						message: err,
-						type: 'error'
 					})
-				})
 			},
 			
 			// 格式化时间
@@ -403,8 +397,8 @@
 				border-radius: 50%;
 				image {
 					vertical-align: middle;
-					width: 40px;
-					height: 40px;
+					width: 45px;
+					height: 45px;
 				}
 			};
 			.user-message {

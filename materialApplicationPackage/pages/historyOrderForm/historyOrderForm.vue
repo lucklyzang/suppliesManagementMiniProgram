@@ -54,11 +54,11 @@
 									<text>{{ item.orderTime }}</text>
 								</view>
 							</view>
-							<view class="product-list delivery-address">
+							<view class="delivery-address">
 								<text>送货地址:</text>
 								<text>{{ item.address }}</text>
 							</view>
-							<view class="product-list remark-box">
+							<view class="remark-box">
 								<text>备注:</text>
 								<text>{{ item.remark ? item.remark : '无' }}</text>
 							</view>
@@ -151,7 +151,7 @@
 			</u-modal>
 		</view>
 		<!-- 日历 -->
-		<u-calendar minDate="2026-03-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
+		<u-calendar color="#11D183" monthNum="12" minDate="2026-01-01" maxDate="2028-01-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
 	</view>
 </template>
 
@@ -794,7 +794,7 @@
 									 margin-right: 6px;
 								 };
 								 &:nth-child(2) {
-									 word-break: break-all;
+									 @include no-wrap;
 									 flex: 1;
 									 color: #101010;
 								 }
@@ -842,15 +842,38 @@
 							 }
 						 };
 						 .delivery-address {
-							 margin-top: 10px;
-						 };
-						 .remark-box {
+							 display: flex;
 							 margin-top: 10px;
 							 >text {
+								 display: inline-block;
+								 font-size: 14px;
+								 &:nth-child(1) {
+										 color: #9E9E9A;
+										 margin-right: 6px;
+								 };
 								 &:nth-child(2) {
-									 color: #9E9E9A !important;
+										 flex: 1;
+										 word-break: break-all;
+										 color: #9E9E9A;
 								 }
 							 }
+						 };
+						 .remark-box {
+								 display: flex;
+								 margin-top: 10px;
+								 >text {
+										 display: inline-block;
+										 font-size: 14px;
+										 &:nth-child(1) {
+												 color: #9E9E9A;
+												 margin-right: 6px;
+										 };
+										 &:nth-child(2) {
+												 flex: 1;
+												 word-break: break-all;
+												 color: #9E9E9A;
+										 }
+								 }
 						 }
 					 };
 					 .order-list-bottom {

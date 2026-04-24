@@ -311,8 +311,8 @@
 				let baseMessage = {
 					returnTime: new Date().getTime(), //退换货时间
 					remark: this.exchangeReason, //退换货原因
-					orderId: Number(this.saleReturnOrderMessage.orderId), // 销售订单编号
-					id: Number(this.saleReturnOrderMessage.id) // 编号
+					orderId: Number(this.saleReturnOrderMessage.id), // 运送单编号
+					id: ''
 				};
 				// 退货清单列表
 				let saleReturnOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.returnCount) > 0});
