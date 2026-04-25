@@ -268,12 +268,12 @@
 				transform: translate(-50%,-50%)
 			};
 			.delivery-information-list {
-				padding: 0 3px;
+				padding: 0 8px;
 				box-sizing: border-box;
 				margin-bottom: 10px;
 				.delivery-information-text {
 					margin: 6px 0;
-					padding: 0 3px;
+					padding: 0 6px;
 					box-sizing: border-box;
 					>text {
 						font-size: 14px;
@@ -284,7 +284,7 @@
 					border-radius: 6px;
 					background-color: rgba(255,255,255,1);
 					box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.07);
-					padding: 6px 3px;
+					padding: 6px 3px 6px 6px;
 					box-sizing: border-box;
 					display: flex;
 					justify-content: space-between;
