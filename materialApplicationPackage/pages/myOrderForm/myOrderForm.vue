@@ -812,7 +812,7 @@
 					 padding: 0 6px 20px 6px;
 					 box-sizing: border-box;
 					 background-color: rgba(255,255,255,1);
-					 box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.23);
+					 filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2));
 					 border-radius: 7px;
 					 margin-bottom: 10px;
 					 &:nth-child(1) {
