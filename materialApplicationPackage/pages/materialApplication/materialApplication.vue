@@ -512,14 +512,6 @@ export default {
 		 
 		 // 添加物资保存事件
 		 materialApplicationSaveEvent () {
-			 if (this.chooseMaterialList.length == 0) {
-				 this.$refs.uToast.show({
-				 	message: '请先添加产品',
-				 	position: 'center',
-				 	type: 'warning'
-				 });
-				 return
-			 };
 			 this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
 			 this.$refs.uToast.show({
 			 	message: '保存成功',
@@ -539,6 +531,11 @@ export default {
 				 });
 				 return
 			 };
+			 this.$refs.uToast.show({
+			 	message: '保存成功',
+			 	position: 'center',
+			 	type: 'success'
+			 });
 			 this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
 			 if (!this.isEdit) {
 					uni.navigateTo({

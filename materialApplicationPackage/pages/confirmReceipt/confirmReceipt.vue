@@ -404,7 +404,7 @@
 							margin-bottom: 10px;
 							.delivery-number {
 								margin-right: 10px;
-								width: 55%;
+								flex: 1;
 								display: flex;
 								>text {
 									font-size: 14px;
@@ -419,8 +419,7 @@
 								}
 							};
 							.harvest-date {
-								flex: 1;
-								width: 0;
+								width: 42%;
 								display: flex;
 								>text {
 									font-size: 12px;
@@ -440,7 +439,7 @@
 							justify-content: space-between;
 							.related-order-number {
 								margin-right: 10px;
-								width: 55%;
+								flex: 1;
 								display: flex;
 								>text {
 									font-size: 12px;
@@ -455,8 +454,7 @@
 								}
 							};
 							.delivery-date {
-								flex: 1;
-								width: 0;
+								width: 42%;
 								display: flex;
 								>text {
 									font-size: 12px;

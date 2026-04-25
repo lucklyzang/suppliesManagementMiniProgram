@@ -960,7 +960,7 @@
 								 &:nth-child(2) {
 										 flex: 1;
 										 word-break: break-all;
-										 color: #9E9E9A;
+										 color: #101010;
 								 }
 							 }
 						 };

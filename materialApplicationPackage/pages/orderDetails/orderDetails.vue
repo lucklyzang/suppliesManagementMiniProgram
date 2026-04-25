@@ -24,7 +24,7 @@
 				</view>
 				<view class="product-list" v-for="(item,index) in materialList" :key="item.productName">
 					<view class="product-left">
-						<image :src="item['images'] ? item['images'][0] : productDefaultImage" mode="widthFix"></image>
+						<image :src="item['images'].length > 0 ? item['images'][0] : productDefaultImage" mode="widthFix"></image>
 					</view>
 					<view class="product-center">
 						<view class="product-name">
@@ -615,29 +615,37 @@
 					 }
 				 };
 				 .product-right {
+					 width: 110px;
 					 display: flex;
 					 flex-direction: column;
 					 justify-content: center;
 					 .product-number-box {
-						 margin-bottom: 4px;
+						 margin-bottom: 6px;
+						 display: flex;
 						 >text {
 							 font-size: 12px;
 							 color: #101010;
 							 &:nth-child(1) {
 								 margin-right: 10px;
+							 };
+							 &:nth-child(2) {
+							 		flex: 1;
+									word-break: break-all
 							 }
 						 }
 					 };
 					 .product-total-price {
-						 text-align: center;
+						 display: flex;
 						 >text {
 							 font-size: 12px;
 							 color: #101010;
 							 &:nth-child(1) {
-							 		margin-right: 10px;
+							 	margin-right: 10px;
 							 };
 							 &:nth-child(2) {
-							 	 color: #F44E23;							
+							 	color: #F44E23;
+								flex: 1;
+								word-break: break-all
 							 }
 						 }
 					 }
@@ -754,7 +762,7 @@
 						display: flex;
 						justify-content: space-between;
 						align-items: center;
-						margin-bottom: 6px;
+						margin-bottom: 8px;
 						.delivery-information-left {
 							flex: 1;
 							width: 0;
@@ -767,7 +775,7 @@
 								margin-bottom: 10px;
 								.delivery-number {
 									margin-right: 10px;
-									width: 55%;
+									flex: 1;
 									display: flex;
 									>text {
 										font-size: 14px;
@@ -782,8 +790,7 @@
 									}
 								};
 								.harvest-date {
-									flex: 1;
-									width: 0;
+									width: 42%;
 									display: flex;
 									>text {
 										font-size: 12px;
@@ -803,7 +810,7 @@
 								justify-content: space-between;
 								.related-order-number {
 									margin-right: 10px;
-									width: 55%;
+									flex: 1;
 									display: flex;
 									>text {
 										font-size: 12px;
@@ -818,8 +825,7 @@
 									}
 								};
 								.delivery-date {
-									flex: 1;
-									width: 0;
+									width: 42%;
 									display: flex;
 									>text {
 										font-size: 12px;
