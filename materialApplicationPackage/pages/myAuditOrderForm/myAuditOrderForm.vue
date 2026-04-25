@@ -628,7 +628,7 @@
 			 flex: 1;
 			 height: 0;
 			 overflow: auto;
-			 padding: 0px 10px 10px 10px;
+			 padding: 0px 6px 10px 6px;
 			 box-sizing: border-box;
 			 position: relative;
 			 background: #fff;
@@ -639,6 +639,8 @@
 				 align-items: center;
 				 justify-content: space-between;
 				 margin-top: 10px;
+				 padding: 0 4px;
+				 box-sizing: border-box;
 				 .data-box {
 					 width: 70%;
 					 display: flex;
@@ -667,6 +669,8 @@
 				 flex: 1;
 				 overflow: auto;
 				 padding-bottom: 10px;
+				 padding-left: 1px;
+				 padding-right: 1px;
 				 box-sizing: border-box;
 				 position: relative;
 				 ::v-deep .u-empty {

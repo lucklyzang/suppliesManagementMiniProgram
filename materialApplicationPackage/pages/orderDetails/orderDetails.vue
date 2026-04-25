@@ -753,6 +753,8 @@
 				.delivery-information-box {
 					flex: 1;
 					overflow: auto;
+					padding: 0 1px;
+					box-sizing: border-box;
 					.delivery-information {
 						border-radius: 6px;
 						background-color: rgba(255,255,255,1);
