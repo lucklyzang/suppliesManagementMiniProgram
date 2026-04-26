@@ -132,9 +132,9 @@
 									<text>请输入数量:</text>
 									<u--input 
 									   v-model="item.quantity"
-										 type="number"
-										 :disabled="item.disabled"
-										 placeholder="请输入数量"
+										type="number"
+										:disabled="item.disabled"
+										placeholder="请输入数量"
 									   border="none"
 									 ></u--input>
 								</view>
@@ -462,8 +462,10 @@ export default {
 		 
 		 // 添加确认事件
 		 addSureEvent () {
-			 this.productChooseShow = false;
+			 const regex = /^(0|[1-9]\d*)$/;
 			 let count = this.materialList.some((item)=> {return item.checked == true && !item.disabled});
+			 let isSomeZero = this.materialList.some((item)=> {return item.quantity === ''});
+			 let is‌NoValid = this.materialList.some((item)=> {return regex.test(item.quantity) === false });
 			 if (!count) {
 				 this.$refs.uToast.show({
 				 	message: '至少要选择一种产品',
@@ -471,6 +473,21 @@ export default {
 				});
 				return;
 			 };
+			 if (isSomeZero) {
+				this.$refs.uToast.show({
+					message: '请输入产品数量',
+					position: 'center'
+				});
+				return;
+			 };
+			 if (is‌NoValid) {
+				this.$refs.uToast.show({
+					message: '请输入正确的产品数量(正整数和0)',
+					position: 'center'
+				});
+				return;
+			 };
+			this.productChooseShow = false;
 			 let temporaryMaterialList = this.originalMaterialList.filter((item) => { return item['checked'] === true && !item.disabled });
 			 for (let item of temporaryMaterialList) {
 				this.chooseMaterialList.push({
@@ -512,6 +529,16 @@ export default {
 		 
 		 // 添加物资保存事件
 		 materialApplicationSaveEvent () {
+			if (this.chooseMaterialList.length == 0) {
+				if (this.addMaterialApplicationMessage.length == 0) {
+					this.$refs.uToast.show({
+						message: '请先添加产品',
+						position: 'center',
+						type: 'warning'
+					});
+					return	
+				}
+			};
 			 this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
 			 this.$refs.uToast.show({
 			 	message: '保存成功',
