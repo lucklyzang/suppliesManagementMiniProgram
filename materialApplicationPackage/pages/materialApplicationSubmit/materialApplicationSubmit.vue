@@ -86,12 +86,12 @@
 		mapMutations
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
-	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
+	import { setCache,removeAllLocalStorage, getDate, deepClone} from '@/common/js/utils'
 	import { createPlanOrder,updatePlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import SOtime from '@/common/js/utils/SOtime.js';
-	import _ from 'lodash'
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
 	import LightHint from "@/components/light-hint/light-hint.vue";
+	import _ from 'lodash'
 	export default {
 		components: {
 			navBar,
@@ -125,6 +125,7 @@
 				'statusBarHeight',
 				'navigationBarHeight',
 				'addMaterialApplicationMessage',
+				'editMaterialApplicationMessage',
 				'materialApplicationOrderType',
 				'departmentInfo'
 			]),
@@ -151,7 +152,6 @@
 			}
 		},
 		 onLoad(options) {
-			this.disposeAddMaterialListEvent();
 			if (options.transmitParams) {
 				this.isEdit = true;
 				try {
@@ -165,7 +165,8 @@
 				this.isEdit = false;
 				this.getDepartmentNameById(this.depId); 
 				this.echoHospitalMessage()
-			}
+			};
+			this.disposeAddMaterialListEvent();
 		},
 		methods: {
 			...mapMutations([
@@ -203,7 +204,8 @@
 			// 处理添加产品列表信息
 			disposeAddMaterialListEvent () {
 				this.chooseMaterialList = [];
-				 if (this.addMaterialApplicationMessage.length > 0) {
+				if (!this.isEdit) {
+					if (this.addMaterialApplicationMessage.length > 0) {
 					 for (let item of this.addMaterialApplicationMessage) {
 							this.chooseMaterialList.push({
 								id: '', /*订单项编号 */
@@ -216,7 +218,28 @@
 								remark: item['remark'] === '无' ? '' : item['remark'] /*产品备注 */
 							}) 
 					 }
-				 }
+					}
+				} else {
+					// 保存的编辑订单产品列表信息
+					if (this.editMaterialApplicationMessage.length > 0) {
+						let temporaryIndex = this.editMaterialApplicationMessage.findIndex((item) => {return item['id'] == this.orderMessage['id']});
+						if (temporaryIndex != -1) {
+							let temporaryChooseMaterialList = _.cloneDeep(this.editMaterialApplicationMessage[temporaryIndex]['chooseMaterialList']);
+							for (let item of temporaryChooseMaterialList) {
+								this.chooseMaterialList.push({
+									id: '', /*订单项编号 */
+									productName: item['productName'], /*产品名称 */
+									productId: item['id'], /*产品编号 */
+									productUnitId: item['unitId'], /*单位编号 */
+									productPrice: item['salePrice'], /*产品单价，单位：元 */
+									count: item['quantity'], /*数量*/
+									taxPercen: '', /*产品税率*/
+									remark: item['remark'] === '无' ? '' : item['remark'] /*产品备注 */
+								}) 
+							}
+						}
+					}
+				}
 			},
 			
 			// 回显医院和科室信息

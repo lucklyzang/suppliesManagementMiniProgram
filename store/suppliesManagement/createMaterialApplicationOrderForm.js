@@ -7,6 +7,9 @@ export default {
 		addMaterialApplicationMessage: (state) => {
 			return state.addMaterialApplicationMessage
 		},
+		editMaterialApplicationMessage: (state) => {
+			return state.editMaterialApplicationMessage
+		},
 		materialApplicationOrderType: (state) => {
 			return state.materialApplicationOrderType
 		},
@@ -20,6 +23,12 @@ export default {
 		changeAddMaterialApplicationMessage (state, playLoad) {
 			if (playLoad && playLoad != 'null') {
 				state.addMaterialApplicationMessage = playLoad
+			}
+		},
+		// 保存编辑的物资申领信息
+		changeEditMaterialApplicationMessage (state, playLoad) {
+			if (playLoad && playLoad != 'null') {
+				state.editMaterialApplicationMessage = playLoad
 			}
 		},
 		// 保存物质申领订单类型

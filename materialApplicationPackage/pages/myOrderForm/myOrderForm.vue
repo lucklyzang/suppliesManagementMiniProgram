@@ -743,14 +743,16 @@
 							}
 					 };
 					 .status-list-box {
-						 width: 70px;
+						 width: 74px;
 						 background: #fff;
 						 position: absolute;
 						 z-index: 100;
-						 left: 0;
+						 left: -4px;
 						 top: 20px;
 						 max-height: 160px;
 						 overflow: auto;
+						 padding-left: 4px;
+						 box-sizing: border-box;
 						 .status-list {
 							 height: 30px;
 							 width: 70px;
@@ -795,8 +797,6 @@
 				 flex: 1;
 				 overflow: auto;
 				 padding-bottom: 10px;
-				 padding-left: 1px;
-				 padding-right: 1px;
 				 box-sizing: border-box;
 				 position: relative;
 				 ::v-deep .u-empty {
@@ -806,13 +806,20 @@
 				 	transform: translate(-50%,-50%)
 				 };
 				 .scroll-view {
-				 		height: 100%
+						width: 100%;
+				 		height: 100%;
+						padding-left: 1px;
+						padding-right: 1px;
+						box-sizing: border-box;
 				 };
 				 .order-list {
 					 padding: 0 6px 20px 6px;
 					 box-sizing: border-box;
 					 background-color: rgba(255,255,255,1);
-					 filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2));
+					 box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.23);
+					 border-left: 1px solid #e9e9e9;
+					 border-right: 1px solid #e9e9e9;
+					 transform: translateZ(0);
 					 border-radius: 7px;
 					 margin-bottom: 10px;
 					 &:nth-child(1) {
