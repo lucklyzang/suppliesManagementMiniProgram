@@ -124,7 +124,7 @@
 			</u-modal>
 		</view>
 		<!-- 日历 -->
-		<u-calendar color="#11D183" monthNum="12" minDate="2026-01-01" maxDate="2028-01-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
+		<u-calendar color="#11D183" :allowSameDay="true" monthNum="12" minDate="2026-01-01" maxDate="2028-01-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
 	</view>
 </template>
 
@@ -142,7 +142,7 @@
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import { modificationPassword } from '@/api/login.js'
-	import { getPlanOrderPage, checkOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getCheckOrderPage, checkOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
@@ -235,7 +235,7 @@
 					this.infoText = '';
 					this.status = 'loading';
 				};
-				getPlanOrderPage(data).then((res) => {
+				getCheckOrderPage(data).then((res) => {
 					if ( res && res.data.code == 0) {
 						this.orderList = res.data.data.list;
 						this.totalCount = res.data.data.total;
@@ -326,7 +326,7 @@
 						pageSize: this.pageSize,
 						status: this.currentStatusValue,
 						orderTime: [`${this.startDate}`,`${this.endDate}`],
-						creator: '' // this.userAccount
+						creator: '' ,// this.userAccount
 					},false)
 				}
 			},

@@ -134,7 +134,7 @@
 			</u-modal>
 		</view>
 		<!-- 日历 -->
-		<u-calendar color="#11D183" monthNum="12" minDate="2026-01-01" maxDate="2028-01-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
+		<u-calendar color="#11D183" :allowSameDay="true" monthNum="12" minDate="2026-01-01" maxDate="2028-01-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
 	</view>
 </template>
 
@@ -258,7 +258,8 @@
 			  status: '',
 				statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 				orderTime: [`${this.startDate}`,`${this.endDate}`],
-				creator: ''// this.userAccount
+				creator: '',// this.userAccount,
+				departmentId: this.depId
 			},true)
 		},
 		
@@ -331,7 +332,8 @@
 						status: '',
 						statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 						orderTime: [`${this.startDate}`,`${this.endDate}`],
-						creator: '' // this.userAccount
+						creator: '' ,// this.userAccount,
+						departmentId: this.depId
 					},false)
 				}
 			},
@@ -499,7 +501,8 @@
 				  status: '',
 					statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 					orderTime: [`${this.startDate}`,`${this.endDate}`],
-					creator: '' // this.userAccount
+					creator: '' ,// this.userAccount,
+					departmentId: this.depId
 				},true)
 			},
 			
@@ -543,7 +546,8 @@
 					status: '',
 					statusList: this.currentStatusValue === '' ? this.needQueryStatusList : [this.currentStatusValue],
 					orderTime: [`${this.startDate}`,`${this.endDate}`],
-					creator: '' // this.userAccount
+					creator: '' ,// this.userAccount,
+					departmentId: this.depId
 				},true)
 			},
 			

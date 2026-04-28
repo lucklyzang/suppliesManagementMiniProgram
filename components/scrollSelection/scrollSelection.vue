@@ -317,18 +317,17 @@
 					border-radius: 30px;
 					justify-content: space-between;
 					&:nth-child(1) {
-						color: #1864FF;
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+						color: #11D183;
+						box-shadow: 0px 2px 6px 0px rgba(123,233,160,0.38);;
 					};
 					&:nth-child(2) {
-						color: #1864FF;
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+						color: #11D183;
+						box-shadow: 0px 2px 6px 0px rgba(123,233,160,0.38);;
 						margin-left: 40px;
 					};
 					&:last-child {
 						color: #fff;
-						background: linear-gradient(to right, #6cd2f8, #2390fe);
-						box-shadow: 0px 2px 6px 0 rgba(36, 149, 213, 1);
+						background: #11D183;
 					}
 				}
 			}

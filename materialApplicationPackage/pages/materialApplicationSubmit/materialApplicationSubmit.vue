@@ -127,7 +127,8 @@
 				'addMaterialApplicationMessage',
 				'editMaterialApplicationMessage',
 				'materialApplicationOrderType',
-				'departmentInfo'
+				'departmentInfo',
+				'editOrderMessage'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -171,6 +172,7 @@
 		methods: {
 			...mapMutations([
 				'changeAddMaterialApplicationMessage',
+				'changeEditMaterialApplicationMessage',
 				'changeEditOrderMessage'
 			]),
 			
@@ -206,7 +208,10 @@
 				this.chooseMaterialList = [];
 				if (!this.isEdit) {
 					if (this.addMaterialApplicationMessage.length > 0) {
-					 for (let item of this.addMaterialApplicationMessage) {
+					 let temporaryIndex = this.addMaterialApplicationMessage.findIndex((item) => {return item['type'] == this.materialApplicationOrderType});
+					 if (temporaryIndex != -1) {
+					 	let temporaryChooseMaterialList = _.cloneDeep(this.addMaterialApplicationMessage[temporaryIndex]['chooseMaterialList']);
+						for (let item of temporaryChooseMaterialList) {
 							this.chooseMaterialList.push({
 								id: '', /*订单项编号 */
 								productName: item['productName'], /*产品名称 */
@@ -217,6 +222,7 @@
 								taxPercen: '', /*产品税率*/
 								remark: item['remark'] === '无' ? '' : item['remark'] /*产品备注 */
 							}) 
+						}
 					 }
 					}
 				} else {
@@ -254,7 +260,12 @@
 				// 科室信息
 				if (this.depId || this.depId === 0) {
 					this.deliveryAddressId = this.depId
-				}
+				};
+				this.hospitalOption.push({
+					id: 0,
+					text: this.currentHospital,
+					value: this.currentHospitalId
+				})
 			},
 			
 			// 将时间戳转换为当天的 00:00:00
@@ -399,10 +410,15 @@
 								supplementMessage: '请在“订单”里面查看申领进度',
 								isShowSupplement: true
 							});
+							// 清空暂存的产品列表信息
+							let temporaryAddMaterialApplicationMessage = _.cloneDeep(this.addMaterialApplicationMessage);
+							let temporaryProductList = temporaryAddMaterialApplicationMessage.filter((item) => { return item.type != this.materialApplicationOrderType});
+							this.changeAddMaterialApplicationMessage(temporaryProductList);
 							setTimeout(() => {
-								this.backTo();
+								uni.navigateBack({
+								  delta: 2
+								})
 							},2000);
-							this.changeAddMaterialApplicationMessage([]);
 						} else {
 							this.$refs.alertToast.show({
 								type: 'error',
@@ -440,10 +456,24 @@
 								supplementMessage: '请在“订单”里面查看申领进度',
 								isShowSupplement: true
 							});
+							// 编辑成功后,调取订单列表页的更新所编辑订单信息的方法
+							// 获取页面栈
+							if (this.isEdit && this.editOrderMessage['editStatus'] == '成功') {
+								// 清空暂存的编辑产品列表信息
+								let temporaryEditMaterialApplicationMessage = _.cloneDeep(this.editMaterialApplicationMessage);
+								let temporaryProductList = temporaryEditMaterialApplicationMessage.filter((item) => { return item.id != this.orderId});
+								this.changeEditMaterialApplicationMessage(temporaryProductList);
+								const pages = getCurrentPages();
+								const prevPage = pages[pages.length - 3];
+								if (prevPage) {
+									prevPage.$vm.echoEditOrderMessage();
+								}
+							};
 							setTimeout(() => {
-								this.backTo();
+								uni.navigateBack({
+								  delta: 2
+								})
 							},2000);
-							this.changeAddMaterialApplicationMessage([]);
 						} else {
 							this.$refs.alertToast.show({
 								type: 'error',

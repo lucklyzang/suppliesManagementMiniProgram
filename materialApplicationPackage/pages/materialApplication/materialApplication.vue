@@ -216,6 +216,7 @@ export default {
 			'statusBarHeight',
 		  'navigationBarHeight',
 			'addMaterialApplicationMessage',
+			'materialApplicationOrderType',
 			'editOrderMessage',
 			'editMaterialApplicationMessage'
 			]),
@@ -250,27 +251,19 @@ export default {
 
     // 顶部导航返回事件
     backTo () {
-			// 编辑成功后,调取订单列表页的更新所编辑订单信息的方法
-     	// 获取页面栈
-			if (this.isEdit && this.editOrderMessage['editStatus'] == '成功') {
-				// 清空暂存的编辑产品列表信息
-				let temporaryEditMaterialApplicationMessage = _.cloneDeep(this.editMaterialApplicationMessage);
-				let temporaryProductList = temporaryEditMaterialApplicationMessage.filter((item) => { return item.id != this.orderId});
-				this.changeEditMaterialApplicationMessage(temporaryProductList);
-				const pages = getCurrentPages();
-				const prevPage = pages[pages.length - 2];
-				if (prevPage) {
-					prevPage.$vm.echoEditOrderMessage();
-				}
-			};
      	uni.navigateBack()
     },
 		 
 		 // 回显保存的添加产品列表信息
 		 echoAddMaterialListEvent () {
 			 if (this.addMaterialApplicationMessage.length > 0) {
-				 this.chooseMaterialList = _.cloneDeep(this.addMaterialApplicationMessage);
-				 this.reduceTotal();
+			 	let temporaryIndex = this.addMaterialApplicationMessage.findIndex((item) => {return item['type'] == this.materialApplicationOrderType});
+			 	if (temporaryIndex != -1) {
+			 		if (this.addMaterialApplicationMessage[temporaryIndex]['chooseMaterialList'].length > 0) {
+			 			this.chooseMaterialList = _.cloneDeep(this.addMaterialApplicationMessage[temporaryIndex]['chooseMaterialList']);
+						this.reduceTotal();
+			 		}
+			 	}
 			 }
 		 },
 		 
@@ -280,7 +273,7 @@ export default {
 				 let temporaryIndex = this.editMaterialApplicationMessage.findIndex((item) => {return item['id'] == this.orderId});
 				 if (temporaryIndex != -1) {
 					  this.chooseMaterialList = _.cloneDeep(this.editMaterialApplicationMessage[temporaryIndex]['chooseMaterialList']);
-						this.reduceTotal();
+						this.reduceTotal()
 				 }
 			 }
 		 },
@@ -566,16 +559,44 @@ export default {
 		 materialApplicationSaveEvent () {
 			 if (!this.isEdit) {
 				if (this.chooseMaterialList.length == 0) {
-					if (this.addMaterialApplicationMessage.length == 0) {
-						this.$refs.uToast.show({
-							message: '请先添加产品',
-							position: 'center',
-							type: 'warning'
-						});
-						return	
+					// 判断该订单类型是否保存过添加产品信息
+					if (this.addMaterialApplicationMessage.length > 0) {
+						let temporaryIndex = this.addMaterialApplicationMessage.findIndex((item) => {return item['type'] == this.materialApplicationOrderType});
+						if (temporaryIndex != -1) {
+							if (this.addMaterialApplicationMessage[temporaryIndex]['chooseMaterialList'].length == 0) {
+								this.$refs.uToast.show({
+									message: '请先添加产品',
+									position: 'center',
+									type: 'warning'
+								});
+								return	
+							}
+						}
 					}
 				};
-				this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
+				let temporaryAddMaterialApplicationMessage = _.cloneDeep(this.addMaterialApplicationMessage);
+				// 保存添加产品信息
+				if (this.addMaterialApplicationMessage.length > 0 ) {
+				 let temporaryIndex = this.addMaterialApplicationMessage.findIndex((item) => {return item['type'] == this.materialApplicationOrderType});
+				 if (temporaryIndex != -1) {
+					 temporaryAddMaterialApplicationMessage[temporaryIndex]['chooseMaterialList'] = this.chooseMaterialList;
+				 } else {
+					 temporaryAddMaterialApplicationMessage.push(
+						 {
+							 type: this.materialApplicationOrderType,
+							 chooseMaterialList: this.chooseMaterialList
+						 }
+					 )
+				 };
+				} else {
+				 temporaryAddMaterialApplicationMessage.push(
+						 {
+							type: this.materialApplicationOrderType,
+							chooseMaterialList: this.chooseMaterialList
+						 }
+					 )
+				};
+				this.changeAddMaterialApplicationMessage(temporaryAddMaterialApplicationMessage);
 			 } else {
 				if (this.chooseMaterialList.length == 0) {
 				 	this.$refs.uToast.show({
@@ -586,7 +607,7 @@ export default {
 				 	return
 				 };
 				 let temporaryEditMaterialApplicationMessage = _.cloneDeep(this.editMaterialApplicationMessage);
-				 // 存储保存的编辑盘点信息
+				 // 存储保存的编辑订单产品信息
 				 if (this.editMaterialApplicationMessage.length > 0 ) {
 					 let temporaryIndex = this.editMaterialApplicationMessage.findIndex((item) => {return item['id'] == this.orderId});
 					 if (temporaryIndex != -1) {
@@ -633,7 +654,29 @@ export default {
 			 	position: 'center',
 			 	type: 'success'
 			 });
-			 this.changeAddMaterialApplicationMessage(this.chooseMaterialList);
+			 let temporaryAddMaterialApplicationMessage = _.cloneDeep(this.addMaterialApplicationMessage);
+			 // 保存添加产品信息
+			 if (this.addMaterialApplicationMessage.length > 0 ) {
+			  let temporaryIndex = this.addMaterialApplicationMessage.findIndex((item) => {return item['type'] == this.materialApplicationOrderType});
+			  if (temporaryIndex != -1) {
+			 	 temporaryAddMaterialApplicationMessage[temporaryIndex]['chooseMaterialList'] = this.chooseMaterialList;
+			  } else {
+			 	 temporaryAddMaterialApplicationMessage.push(
+			 		 {
+			 			 type: this.materialApplicationOrderType,
+			 			 chooseMaterialList: this.chooseMaterialList
+			 		 }
+			 	 )
+			  };
+			 } else {
+			  temporaryAddMaterialApplicationMessage.push(
+			 		 {
+			 			type: this.materialApplicationOrderType,
+			 			chooseMaterialList: this.chooseMaterialList
+			 		 }
+			 	 )
+			 };
+			 this.changeAddMaterialApplicationMessage(temporaryAddMaterialApplicationMessage);
 			 uni.navigateTo({
 			 	url: '/materialApplicationPackage/pages/materialApplicationSubmit/materialApplicationSubmit'
 			 })

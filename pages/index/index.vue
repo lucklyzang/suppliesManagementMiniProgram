@@ -37,7 +37,7 @@
 							<view class="list-top">
 									<image :src="item.url" mode="widthFix"></image>
 							</view>
-							<view class="list-bottom">{{ item.text }}</view>
+							<view class="list-bototm">{{ item.text }}</view>
 					</view>
 			</view>
 			<view class="bottom-message">
@@ -519,6 +519,7 @@
 						justify-content: center;
 						background: #44CC72;
 						border-radius: 12px;
+						margin-bottom: 10px;
 						>image {
 							width: 25px;
 							height: 25px;
