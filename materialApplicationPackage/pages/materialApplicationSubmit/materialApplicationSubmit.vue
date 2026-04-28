@@ -71,6 +71,7 @@
 		</view>
 		<!-- 送货时间选择框 -->
 		 <u-datetime-picker
+			confirmColor="#11D183"
 			@cancel="showDeliveryDate = false" 
 			@confirm="deliveryDateSure"
 			:show="showDeliveryDate"
