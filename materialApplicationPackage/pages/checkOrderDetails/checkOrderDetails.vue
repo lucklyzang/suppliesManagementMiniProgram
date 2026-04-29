@@ -24,7 +24,7 @@
 				</view>
 				<view class="product-list" v-for="(item,index) in materialList" :key="item.productName">
 					<view class="product-left">
-						<image :src="item['images'] && item['images'].length > 0 ? item['images'][0] : productDefaultImage" mode="widthFix"></image>
+						<image :src="item['images'] && item['images'].length > 0 ? item['images'][0] : productDefaultImage"></image>
 					</view>
 					<view class="product-center">
 						<view class="product-name">
