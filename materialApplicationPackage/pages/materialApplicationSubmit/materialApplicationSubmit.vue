@@ -89,6 +89,7 @@
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage, getDate, deepClone} from '@/common/js/utils'
 	import { createPlanOrder,updatePlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getDepartment } from '@/api/login.js'
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
 	import LightHint from "@/components/light-hint/light-hint.vue";
@@ -182,6 +183,34 @@
 				uni.navigateBack()
 			},
 			
+			// 获取科室具体信息
+			getDepartmentEvent (id) {
+				this.infoText = '获取中···';
+				this.showLoadingHint = true;
+				getDepartment(id).then((res) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					if (res && res.data.code == 0) {
+						this.deliveryAddress = `${this.deliveryAddress}-${res.data.data['address']}`
+					} else {
+						this.$refs.alertToast.show({
+							type: 'error',
+							message: `${res.data.msg}!`,
+							isShow: true
+						})
+					}
+				})
+				.catch((err) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					this.$refs.alertToast.show({
+						type: 'error',
+						message: `${err}!`,
+						isShow: true
+					})
+				})
+			},
+			
 			// 根据科室id获取科室名称
 			getDepartmentNameById(value) {
 				if (this.departmentInfo.length > 0) {
@@ -195,7 +224,7 @@
 			// 编辑时回显部分订单信息
 			echoOrderMessage () {
 				this.taskDescribe = this.orderMessage['remark']; //备注
-				this.deliveryDate = this.orderMessage['orderTime'] ? SOtime.time8(this.orderMessage['orderTime']) : '';
+				this.deliveryDate = this.orderMessage['orderTime'] ? SOtime.time8(this.orderMessage['orderTime'],true) : '';
 				if (this.orderMessage['orderTime']) {
 					const date = new Date(this.orderMessage['orderTime']);
 					date.setHours(0, 0, 0, 0);
@@ -262,6 +291,7 @@
 				if (this.depId || this.depId === 0) {
 					this.deliveryAddressId = this.depId
 				};
+				this.getDepartmentEvent(this.depId);
 				this.hospitalOption.push({
 					id: 0,
 					text: this.currentHospital,
@@ -301,7 +331,7 @@
 				
 				// 送货时间选择框确认事件
 				deliveryDateSure (e) {
-					this.deliveryDate = SOtime.time8(e.value);
+					this.deliveryDate = SOtime.time8(e.value,true);
 					this.showDeliveryDate = false
 				},
 				

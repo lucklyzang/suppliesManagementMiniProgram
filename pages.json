@@ -97,6 +97,16 @@
 					}
 				},
 				{
+					"path": "pages/checkOrderDetails/checkOrderDetails",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
 					"path": "pages/changingOrRefunding/changingOrRefunding",
 					"style": {
 						"navigationBarTitleText": "",

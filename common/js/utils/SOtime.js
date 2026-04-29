@@ -120,7 +120,7 @@ const time2 = (timer) => {
 	// 更早的时间
 	return Eyear + '-' + Emonth + '-' + Edate
 }
-const time3 = (timer) => {
+const time3 = (timer,full = false) => {
 	var arrTimestamp = (timer + '').split('');
 	for (var start = 0; start < 13; start++) {
 		if (!arrTimestamp[start]) {
@@ -136,9 +136,16 @@ const time3 = (timer) => {
 	var Ehour = Etimer.getHours() < 10 ? '0' + Etimer.getHours() : Etimer.getHours(); //返回日期中的小时数（0到23）
 	var Eminute = Etimer.getMinutes() < 10 ? '0' + Etimer.getMinutes() : Etimer.getMinutes(); //返回日期中的分钟数（0到59）
   var Eseconds = Etimer.getSeconds() < 10 ? '0' + Etimer.getSeconds() : Etimer.getSeconds();
-	return Eyear + "-" + Emonth + "-" + Edate + " " + Ehour + ":" + Eminute + ":" + Eseconds
+	if (Eyear == new Date().getFullYear()) {
+		if (full) {
+			return Eyear + "-" + Emonth + "-" + Edate + " " + Ehour + ":" + Eminute + ":" + Eseconds;
+		};
+		return Emonth + "-" + Edate + " " + Ehour + ":" + Eminute + ":" + Eseconds;
+	} else {
+		return Eyear + "-" + Emonth + "-" + Edate + " " + Ehour + ":" + Eminute + ":" + Eseconds;
+	}
 }
-const time8 = (timer) => {
+const time8 = (timer,full = false) => {
 	var arrTimestamp = (timer + '').split('');
 	for (var start = 0; start < 13; start++) {
 		if (!arrTimestamp[start]) {
@@ -151,7 +158,14 @@ const time8 = (timer) => {
 	var Eyear = Etimer.getFullYear(); //取得4位数的年份
 	var Emonth = Etimer.getMonth() + 1 < 10 ? '0' + (Etimer.getMonth() + 1) : Etimer.getMonth() + 1; //取得日期中的月份，其中0表示1月，11表示12月
 	var Edate = Etimer.getDate()< 10 ? '0' + Etimer.getDate() : Etimer.getDate(); //返回日期月份中的天数（1到31）
-	return Eyear + "-" + Emonth + "-" + Edate
+	if (Eyear == new Date().getFullYear()) {
+		if (full) {
+			return Eyear + "-" + Emonth + "-" + Edate
+		};
+		return Emonth + "-" + Edate
+	} else {
+		return Eyear + "-" + Emonth + "-" + Edate
+	}
 }
 const time4 = (timer) => {
 	var date = timer.replace(/\//g, '-')

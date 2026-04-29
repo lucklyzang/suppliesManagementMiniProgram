@@ -55,27 +55,6 @@ export function getPlanOrderPage(data) {
 	  })
 }
 
-// 获取审核订单分页
-export function getCheckOrderPage(data) {
-	if (data.orderTime && Array.isArray(data.orderTime)) {
-	  data.orderTime = data.orderTime.map(function(date,index,array){
-			if (index == 0) {
-				return date + ' 00:00:00'
-			} else if (index == 1) {
-				return date + ' 23:59:59'
-			}
-		})
-	};
-	return request({
-	    url: '/spd/admin-api/erp/check-order/page',
-	    method: 'get',
-			params: data,
-			paramsSerializer: function (params) {
-				return qs.stringify(params, { arrayFormat: 'repeat' })
-			}
-	  })
-}
-
 // 获得计划订单详情
 export function getPlanOrder(id) {
 	return request({
@@ -141,15 +120,6 @@ export function getOrderEvaluate(data) {
 	return request({
 	    url: '/spd/admin-api/erp/order-evaluate/get-by-order-id',
 	    method: 'get',
-			params: data
-	  })
-}
-
-// 更新订单状态
-export function checkOrder(data) {
-	return request({
-	    url: '/spd/admin-api/erp/check-order/update-status',
-	    method: 'put',
 			params: data
 	  })
 }

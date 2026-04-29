@@ -142,7 +142,7 @@
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import { modificationPassword } from '@/api/login.js'
-	import { getCheckOrderPage, checkOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getCheckOrderPage, checkOrder } from '@/api/suppliesManagement/orderFormAudit.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
@@ -204,7 +204,7 @@
 		onLoad () {
 			this.resetStatus();
 			this.getDateRange();
-			this.getPlanOrderPageEvent({
+			this.getCheckOrderPageEvent({
 				pageNo: this.currentPageNum,
 				pageSize: this.pageSize,
 			  status: this.currentStatusValue,
@@ -223,7 +223,7 @@
 			},
 			
 			// 查询订单列表
-			getPlanOrderPageEvent(data,flag) {
+			getCheckOrderPageEvent(data,flag) {
 				this.orderList = [];
 				this.isShowNoData = false;
 				if (flag) {
@@ -321,7 +321,7 @@
 				} else {
 					this.status = 'loadmore';
 					this.currentPageNum = this.currentPageNum + 1;
-					this.getPlanOrderPageEvent({
+					this.getCheckOrderPageEvent({
 						pageNo: this.currentPageNum,
 						pageSize: this.pageSize,
 						status: this.currentStatusValue,
@@ -417,7 +417,7 @@
 				this.startDate = e[0];
 				this.endDate = e[e.length - 1];
 				this.currentPageNum = 1;
-				this.getPlanOrderPageEvent({
+				this.getCheckOrderPageEvent({
 					pageNo: this.currentPageNum,
 					pageSize: this.pageSize,
 				  status: this.currentStatusValue,
@@ -468,7 +468,7 @@
 			//进入订单详情事件
 			enterOrderDetailsEvent(item,index) {
 				uni.navigateTo({
-					url: `/materialApplicationPackage/pages/orderDetails/orderDetails?id=${item.id}`
+					url: `/materialApplicationPackage/pages/checkOrderDetails/checkOrderDetails?id=${item.id}`
 				})
 			},
 			

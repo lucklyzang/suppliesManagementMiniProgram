@@ -197,7 +197,8 @@
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
-	import { getPlanOrder, queryorderOperationLog, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { queryorderOperationLog, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getCheckOrder } from '@/api/suppliesManagement/orderFormAudit.js'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
@@ -271,9 +272,9 @@
 			},
 			
 			// 查询订单详情
-			getPlanOrderEvent() {
+			getCheckOrderEvent() {
 				return new Promise((resolve,reject) => {
-					getPlanOrder(this.orderId).then((res) => {
+					getCheckOrder(this.orderId).then((res) => {
 						this.showLoadingHint = false;
 						this.infoText = '';
 						if ( res && res.data.code == 0) {
@@ -343,7 +344,7 @@
 		parallelFunction () {
 				this.showLoadingHint = true;
 				this.infoText = '加载中···';
-				Promise.all([this.getPlanOrderEvent(),this.queryorderOperationLogEvent(),this.getSaleReturnPageEvent()])
+				Promise.all([this.getCheckOrderEvent(),this.queryorderOperationLogEvent(),this.getSaleReturnPageEvent()])
 				.then((res) => {
 					this.showLoadingHint = false;
 					this.infoText = '';
@@ -582,8 +583,8 @@
 				 .product-center {
 					 flex: 1;
 					 margin-right: 10px;
-					  overflow-x: auto;
-					  white-space: nowrap;
+					 overflow-x: auto;
+					 white-space: nowrap;
 					 .product-name {
 						 overflow-x: auto;
 						 white-space: nowrap;
@@ -596,9 +597,9 @@
 						 }
 					 };
 					 .product-specification {
-							display: flex;
-						  overflow-x: auto;
-						 	white-space: nowrap;
+						 display: flex;
+						 overflow-x: auto;
+						 white-space: nowrap;
 						 .product-specification-left {
 							 margin-right: 10px;
 							 >text {

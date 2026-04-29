@@ -149,7 +149,7 @@
 				return ''
 			},
 			loginDate() {
-					return SOtime.time8(this.userInfo['loginDate'])
+					return SOtime.time8(this.userInfo['loginDate'],true)
 			}
 	},
 		

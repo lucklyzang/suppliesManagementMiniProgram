@@ -41,3 +41,12 @@ export function getDepartmentInfo() {
 	    method: 'get'
 	  })
 }
+
+
+// 获得科室信息(某个科室)
+export function getDepartment(id) {
+	return request({
+		url: `/spd/admin-api/system/department/get?id=${id}`,
+		method: 'get'
+	})
+}
