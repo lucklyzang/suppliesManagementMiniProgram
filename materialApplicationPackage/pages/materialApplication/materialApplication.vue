@@ -18,7 +18,7 @@
 					<text>已添加产品</text>
 				</view>
 				<view class="content-top-right" @click="addProductEvent">
-					<u-icon name="plus-circle" color="#fff" size="18"></u-icon>
+					<u-icon name="plus-circle" color="#fff" size="16"></u-icon>
 					<text>{{ productChooseShow ? '添加物资' : '添加产品' }}</text>
 				</view>
 			</view>
@@ -805,7 +805,7 @@ page {
 			};
 			.product-popup-center {
 				flex: 1;
-				padding: 6px 4px;
+				padding: 10px 4px 6px 4px;
 				box-sizing: border-box;
 				overflow: auto;
 				position: relative;
