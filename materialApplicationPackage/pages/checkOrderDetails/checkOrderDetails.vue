@@ -588,7 +588,7 @@
 					 .product-name {
 						 overflow-x: auto;
 						 white-space: nowrap;
-						 margin-bottom: 4px;
+						 margin-bottom: 6px;
 						 >text {
 							 width: 100%;
 							 display: inline-block;
@@ -622,7 +622,7 @@
 					 flex-direction: column;
 					 justify-content: center;
 					 .product-number-box {
-						 margin-bottom: 6px;
+						 margin-bottom: 10px;
 						 display: flex;
 						 >text {
 							 font-size: 12px;

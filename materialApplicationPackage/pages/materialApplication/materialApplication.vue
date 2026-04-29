@@ -28,7 +28,7 @@
 				</view>
 				<view class="product-list" v-for="(item,index) in chooseMaterialList" :key="item.productName">
 					<view class="product-left">
-						<image :src="item.productImage" mode="widthFix"></image>
+						<image :src="item.productImage"></image>
 					</view>
 					<view class="product-center">
 						<view class="product-name">
@@ -102,7 +102,7 @@
 							<view class="add-product-popup-list" v-for="(item,index) in materialList" :key="item.id" @click="addProductItemEvent(item,index)">
 								<view class="add-product-popup-top">
 									<view class="add-product-popup-top-left">
-										<image :src="item.productImage" mode="widthFix"></image>
+										<image :src="item.productImage"></image>
 										<view>
 											<text>
 												{{ item.productName }}
@@ -1086,6 +1086,7 @@ page {
 					 }
 				 };
 				 .product-right {
+					 width: 130px;
 					 display: flex;
 					 flex-direction: column;
 					 justify-content: center;

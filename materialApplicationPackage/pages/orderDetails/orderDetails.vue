@@ -24,7 +24,7 @@
 				</view>
 				<view class="product-list" v-for="(item,index) in materialList" :key="item.productName">
 					<view class="product-left">
-						<image :src="item['images'] && item['images'].length > 0 ? item['images'][0] : productDefaultImage" mode="widthFix"></image>
+						<image :src="item['images'] && item['images'].length > 0 ? item['images'][0] : productDefaultImage"></image>
 					</view>
 					<view class="product-center">
 						<view class="product-name">
@@ -587,7 +587,7 @@
 					 .product-name {
 						 overflow-x: auto;
 						 white-space: nowrap;
-						 margin-bottom: 4px;
+						 margin-bottom: 6px;
 						 >text {
 							 width: 100%;
 							 display: inline-block;
@@ -621,7 +621,7 @@
 					 flex-direction: column;
 					 justify-content: center;
 					 .product-number-box {
-						 margin-bottom: 6px;
+						 margin-bottom: 10px;
 						 display: flex;
 						 >text {
 							 font-size: 12px;
