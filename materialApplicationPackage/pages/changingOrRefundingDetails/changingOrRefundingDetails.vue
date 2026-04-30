@@ -341,8 +341,8 @@
 					if (res && res.length > 0) {
 						let transmitParams = encodeURIComponent(
 						JSON.stringify({
-							 orderId: this.saleReturnOrderMessage.id,
-							 path: 'changingOrRefundingDetails'
+							orderId: this.saleReturnOrderMessage['orderId'],
+							path: 'changingOrRefundingDetails'
 						 })
 						);
 						if (!isAllSaleReturnZero && !isAllBarterOrderZero) { 

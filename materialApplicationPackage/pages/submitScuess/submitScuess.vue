@@ -78,10 +78,6 @@
 			backTo () {
 				const pages = getCurrentPages();
 				if (this.path == 'changingOrRefundingDetails') {
-					const prevPage = pages[pages.length - 3];
-					if (prevPage) {
-						prevPage.$vm.getData();
-					};
 					uni.navigateBack({
 					  delta: 2
 					})
@@ -90,11 +86,11 @@
 						const prevPage = pages[pages.length - 3];
 						if (prevPage) {
 							prevPage.$vm.allSureConfirmOrderEvent();
-						};
-						uni.navigateBack({
-						  delta: 2
-						})
-					}
+						}
+					};
+					uni.navigateBack({
+					  delta: 2
+					})
 				} else if (this.path == 'confirmReceiptDetails') {
 					const prevPage = pages[pages.length - 3];
 					if (prevPage) {

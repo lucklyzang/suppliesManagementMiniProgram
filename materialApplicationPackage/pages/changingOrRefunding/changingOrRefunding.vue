@@ -133,10 +133,6 @@
 				uni.navigateBack()
 			},
 			
-			getData () {
-				this.getSaleReturnPageEvent(this.currentId)
-			},
-			
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {

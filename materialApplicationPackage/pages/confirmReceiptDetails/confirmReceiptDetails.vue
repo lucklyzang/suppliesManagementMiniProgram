@@ -150,8 +150,6 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				const eventChannel = this.getOpenerEventChannel();
-				eventChannel.emit('backFrom', { isSure: this.isSure });
 				uni.navigateBack()
 			},
 			
@@ -202,7 +200,7 @@
 							this.isSure = true;
 							let transmitParams = encodeURIComponent(
 							JSON.stringify({
-								 orderId: this.saleReturnOrderMessage.id,
+								 orderId: this.saleReturnOrderMessage['orderId'],
 								 path: 'confirmReceiptDetails'
 							 })
 							);

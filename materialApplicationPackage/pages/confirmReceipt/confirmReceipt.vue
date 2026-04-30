@@ -186,11 +186,13 @@
 				} 
 			},
 			
+			// 单个送货单确认收货成功后，从提交成功页面返回后调用
 			getData () {
-				this.getSaleReturnPageEvent(this.currentId)
+				this.getSaleReturnPageEvent(this.currentId,true)
 			},
 			
-			getSaleReturnPageEvent(id) {
+			// 查询当前订单下的送货单
+			getSaleReturnPageEvent(id,isNeedQuest = false) {
 				this.saleReturnOrderList = [];
 				this.isShowNoData = false;
 				this.showLoadingHint = true;
@@ -210,6 +212,9 @@
 							this.isShowNoData = false;
 							this.judgeIsShowAllConfirmReceiptEvent();
 						};
+						if (isNeedQuest) {
+							this.getPlanOrderEvent()
+						}
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,
@@ -229,8 +234,8 @@
 				})
 			},
 			
-			// 查询订单详情
-			getPlanOrderEvent(isNeedBack) {
+			// 查询订单详情(查询当前关联订单是否全部收货完成)
+			getPlanOrderEvent() {
 				this.isAllSure = false;
 				this.showLoadingHint = true;
 				this.infoText = '查询中···';
@@ -238,12 +243,8 @@
 					this.showLoadingHint = false;
 					this.infoText = '';
 					if ( res && res.data.code == 0) {
-						// 判断当前订单是否全部收货完成
 						if (res.data.data['status'] == 50) {
 							this.isAllSure = true;
-						};
-						if (isNeedBack) {
-							this.backTo()
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -274,19 +275,7 @@
 				 })
 				);
 				uni.navigateTo({
-					url: `/materialApplicationPackage/pages/confirmReceiptDetails/confirmReceiptDetails?transmitParams=${transmitParams}`,
-					events: {
-						backFrom: (data) => {
-							// 单个送货单确认收货成功
-							if (data.isSure) {
-								let flag = this.saleReturnOrderList.every((item,index) => { return item.status == 60});
-								// 查询当前关联订单状态
-								if (flag) {
-									this.getPlanOrderEvent(false);
-								}
-							}
-						}
-					}
+					url: `/materialApplicationPackage/pages/confirmReceiptDetails/confirmReceiptDetails?transmitParams=${transmitParams}`
 				})
 			},
 			
