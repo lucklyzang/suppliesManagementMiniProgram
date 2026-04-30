@@ -8,7 +8,7 @@
 		<u-modal :show="modalShow" confirmColor="#44CC72" title="确定退出登录?" :showCancelButton="true" @confirm="sureCancel" @cancel="cancelSure"></u-modal>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
-		<view class="nav">
+		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" backState='2000' fontColor="#FFF" bgColor="none" title="我的">
 			</nav-bar> 
 		</view>

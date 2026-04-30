@@ -12,7 +12,7 @@
 		<view class="transport-rice-box" v-if="showHospital">
 			<ScrollSelection v-model="showHospital" :pickerValues="hospitalDefaultIndex" :isShowSearch="true" :columns="hospitalOption" title="医院" @sure="hospitalSureEvent" @cancel="hospitalCancelEvent" @close="hospitalCloseEvent" />
 		</view>
-		<view class="nav">
+		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="产品申领" @backClick="backTo">
 			</nav-bar>
 		</view>

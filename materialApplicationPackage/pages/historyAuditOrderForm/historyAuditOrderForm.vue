@@ -8,7 +8,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<light-hint ref="alertToast"></light-hint>
 		<u-toast ref="uToast" />
-		<view class="nav">
+		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="历史" @backClick="backTo">
 			</nav-bar> 
 		</view>

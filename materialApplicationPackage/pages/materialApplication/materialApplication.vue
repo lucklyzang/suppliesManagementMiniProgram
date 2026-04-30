@@ -8,7 +8,7 @@
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
-		<view class="nav">
+		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" backState='3000' :isShowBackText="true" fontColor="#FFF" bgColor="none" title="物资申领" @backClick="backTo">
 			</nav-bar> 
 		</view>

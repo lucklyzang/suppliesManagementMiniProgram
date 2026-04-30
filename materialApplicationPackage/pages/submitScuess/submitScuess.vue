@@ -1,7 +1,7 @@
 <template>
 	<view class="content-box">
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
-		<view class="nav">
+		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" @backClick="backTo">
 			</nav-bar>
 		</view>

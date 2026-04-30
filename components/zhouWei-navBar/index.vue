@@ -4,8 +4,8 @@
 			:class="[{ header_fixed: navFixed, header_absolute: type == 'transparent', header_shadow: navShadow, header_colorWhite: isWhite }, themeBgColorName]"
 			:style="[navBgColor ? { backgroundImage: navBgColor } : {}, { paddingTop: statusBarHeight + 'px', color: navFontColor, opacity: transparentValue }]"
 		>
-			<view class="header_content">
-				<view class="header_left_box">
+			<view class="header_content" :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
+				<view class="header_left_box" :style="{'width': capsuleMessage.width + 'px' }">
 					<slot name="left">
 						<view class="header_left_info" :class="{ header_btnMongol: isTwoBtn, header_colorWhite_btnMongol: isWhite && isTwoBtn }" v-if="back || $slots.left || home">
 							<view class="header_left_back" :class="{ header_btnMongol_left_back: isTwoBtn }" v-if="back && !firstPage" @click="onBackPage">
@@ -39,8 +39,8 @@
 			v-if="type == 'transparentFixed'"
 			:style="{ paddingTop: statusBarHeight + 'px', color: navTransparentFixedFontColor, opacity: 1 - transparentValue, zIndex: transparentValue < 0.3 ? 100 : 90 }"
 		>
-			<view class="header_content">
-				<view class="header_left_box">
+			<view class="header_content" :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
+				<view class="header_left_box" :style="{'width': capsuleMessage.width + 'px' }">
 					<slot name="transparentFixedLeft">
 						<view
 							class="header_left_info header_transparentFixed_left_info"
@@ -72,10 +72,13 @@
 				<view class="header_right_info"><slot name="transparentFixedRight"></slot></view>
 			</view>
 		</view>
-		<view v-if="type == 'fixed'" :style="{ paddingTop: statusBarHeight + 'px' }"><view class="header_station"></view></view>
+		<view v-if="type == 'fixed'" :style="{ paddingTop: statusBarHeight + 'px' }"><view :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }"></view></view>
 	</view>
 </template>
 <script>
+import {
+	mapGetters,
+} from 'vuex'
 // 主页页面的页面路径
 // 关联功能：打开的页面只有一个的时候右上角自动显示返回首页按钮，下面这个数组是排除显示返回首页的页面。
 // 主页使用场景：小程序分享出去的页面，用户点击开是分享页面，很多情况下是没有返回首页按钮的
@@ -199,14 +202,17 @@ export default {
 			navTransparentFixedFontColor: '#000000',
 			// 是否使用
 			themeBgColor: false,
-			// 导航栏高度
-			statusBarHeight: 0,
 			// 上次显示的导航栏颜色
 			lastFrontColor: '',
 			themeBgColorName: ''
 		};
 	},
 	computed: {
+		...mapGetters([
+			'statusBarHeight',
+			'navigationBarHeight',
+			'capsuleMessage'
+		]),
 		back() {
 			return this.backState == 1000 || this.backState == 3000;
 		},
@@ -261,8 +267,6 @@ export default {
 		this.navFontColor = this.fontColor;
 		this.getNavBgColor(this.bgColor);
 		this.navTransparentFixedFontColor = this.transparentFixedFontColor;
-		//获取手机状态栏高度
-		this.statusBarHeight = uni.getSystemInfoSync()['statusBarHeight'];
 		const _this = this;
 		this.pageScroll({
 			scrollTop: this.scrollTop
@@ -366,15 +370,13 @@ export default {
 	box-sizing: border-box;
 	/* #endif */
 	width: 750rpx;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: space-between;
 	flex-direction: row;
-	height: 88rpx;
 	position: relative;
 }
 
 .header_station {
-	height: 88rpx;
 }
 
 .header_shadow {
@@ -407,8 +409,6 @@ export default {
 	/* #endif */
 	flex-direction: row;
 	align-items: center;
-	height: 88rpx;
-	flex: 1;
 }
 
 .header_left_line {
@@ -457,7 +457,6 @@ export default {
 }
 
 .header_title {
-	height: 88rpx;
 	font-size: 32rpx;
 	padding-left: 30rpx;
 	padding-right: 30rpx;
@@ -480,14 +479,18 @@ export default {
 }
 
 .header_title_center {
-	position: absolute;
-	bottom: 0rpx;
-	left: 375rpx;
-	transform: translateX(-50%);
+	flex: 1;
+	text-align: center;
+	>text {
+		width: 100%;
+		display: inline-block;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
 }
 
 .header_right_info {
-	height: 88rpx;
 	/* #ifndef APP-PLUS-NVUE */
 	display: flex;
 	flex-shrink: 0;
