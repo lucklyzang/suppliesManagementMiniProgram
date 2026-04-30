@@ -163,11 +163,12 @@
 					this.echoOrderMessage();
 				} catch (e) {
 					console.error('参数解析失败', e);
-				}
+				};
+				this.echoHospitalMessage()
 			} else {
 				this.isEdit = false;
 				this.getDepartmentNameById(this.depId); 
-				this.echoHospitalMessage()
+				this.echoMessage()
 			};
 			this.disposeAddMaterialListEvent();
 		},
@@ -278,8 +279,24 @@
 				}
 			},
 			
-			// 回显医院和科室信息
+			// 回显医院信息
 			echoHospitalMessage () {
+				// 医院信息
+				if (this.proId || this.proId === 0) {
+					this.currentHospitalId = this.proId
+				};
+				if (this.proName) {
+					this.currentHospital = this.proName
+				};
+				this.hospitalOption.push({
+					id: 0,
+					text: this.currentHospital,
+					value: this.currentHospitalId
+				})
+			},
+			
+			// 回显医院和科室信息
+			echoMessage () {
 				// 医院信息
 				if (this.proId || this.proId === 0) {
 					this.currentHospitalId = this.proId
