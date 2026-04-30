@@ -126,7 +126,6 @@
 			if (this.isExecute) {
 				if (this.isCanRequest) {
 					this.getSaleReturnPageEvent(this.currentId);
-					this.changeIsCanRequest(true)
 				}
 			}
 		},
@@ -193,6 +192,7 @@
 			
 			// 单个送货单确认收货成功后，从提交成功页面返回后调用
 			getData () {
+				this.changeIsCanRequest(true);
 				this.getSaleReturnPageEvent(this.currentId,true)
 			},
 			
@@ -218,7 +218,11 @@
 							this.judgeIsShowAllConfirmReceiptEvent();
 						};
 						if (isNeedQuest) {
-							this.getPlanOrderEvent()
+							// 判断该订单下的所有送货单是否全部确认收货完毕
+							let flag = this.saleReturnOrderList.every((item) => { retuen item.status == 60 });
+							if (flag) {
+								this.getPlanOrderEvent()
+							}
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -239,7 +243,7 @@
 				})
 			},
 			
-			// 查询订单详情(查询当前关联订单是否全部收货完成)
+			// 查询订单详情(查询当前送货单所关联的订单是否完成)
 			getPlanOrderEvent() {
 				this.isAllSure = false;
 				this.showLoadingHint = true;
