@@ -15,7 +15,10 @@ export default {
 		},
 		editOrderMessage: (state) => {
 			return state.editOrderMessage
-		}
+		},
+		isCanRequest: (state) => {
+			return state.isCanRequest
+		},
   },
 
   mutations:{
@@ -38,6 +41,10 @@ export default {
 		// 保存编辑订单信息
 		changeEditOrderMessage (state, playLoad) {
 			state.editOrderMessage = playLoad
+		},
+		// 保存是否可以继续请求
+		changeIsCanRequest (state, playLoad) {
+			state.isCanRequest = playLoad
 		},
 		//重置物资申请信息的状态
 		resetMaterialApplicationOrderFormInfoState(state) {

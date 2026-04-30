@@ -88,7 +88,8 @@
 			...mapGetters([
 				'userInfo',
 				'statusBarHeight',
-				'navigationBarHeight'
+				'navigationBarHeight',
+				'isCanRequest'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -123,7 +124,10 @@
 		
 		onShow () {
 			if (this.isExecute) {
-				this.getSaleReturnPageEvent(this.currentId)
+				if (this.isCanRequest) {
+					this.getSaleReturnPageEvent(this.currentId);
+					this.changeIsCanRequest(true)
+				}
 			}
 		},
 		
@@ -133,6 +137,7 @@
 		
 		methods: {
 			...mapMutations([
+				'changeIsCanRequest'
 			]),
 			
 			// 顶部导航返回事件

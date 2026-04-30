@@ -35,7 +35,8 @@ export function getDefaultMaterialApplicationOrderFormState() {
 		addMaterialApplicationMessage: [],
 		editMaterialApplicationMessage: [],
 		materialApplicationOrderType: 0,
-		editOrderMessage: {}
+		editOrderMessage: {},
+		isCanRequest: true
 	}	
 }
 

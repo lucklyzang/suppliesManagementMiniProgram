@@ -72,6 +72,7 @@
 		},
 		methods: {
 			...mapMutations([
+				'changeIsCanRequest'
 			]),
 			
 			// 顶部导航返回事件
@@ -95,6 +96,7 @@
 					const prevPage = pages[pages.length - 3];
 					if (prevPage) {
 						prevPage.$vm.getData();
+						this.changeIsCanRequest(false)
 					};
 					uni.navigateBack({
 					  delta: 2
