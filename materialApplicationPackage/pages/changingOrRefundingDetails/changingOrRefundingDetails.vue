@@ -339,18 +339,24 @@
 					this.showLoadingHint = false;
 					this.infoText = '';
 					if (res && res.length > 0) {
+						let transmitParams = encodeURIComponent(
+						JSON.stringify({
+							 orderId: this.saleReturnOrderMessage.id,
+							 path: 'changingOrRefundingDetails'
+						 })
+						);
 						if (!isAllSaleReturnZero && !isAllBarterOrderZero) { 
 							let [item1,item2] = res;
 							if (item1 && item2) {
 								uni.navigateTo({
-									url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
+									url: `/materialApplicationPackage/pages/submitScuess/submitScuess?transmitParams=${transmitParams}`
 								})
 							}
 						} else if (!isAllSaleReturnZero || !isAllBarterOrderZero) {
 							let [item1] = res;
 							if (item1) {
 								uni.navigateTo({
-									url: '/materialApplicationPackage/pages/submitScuess/submitScuess'
+									url: `/materialApplicationPackage/pages/submitScuess/submitScuess?transmitParams=${transmitParams}`
 								})
 							}
 						}

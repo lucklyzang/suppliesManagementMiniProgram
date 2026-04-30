@@ -80,7 +80,7 @@
 				isShowNoData: false,
 				loadingShow: false,
 				isAllSure: false,
-				currentId: 0,
+				currentId: '',
 				saleReturnOrderList: []
 			}
 		},
@@ -186,6 +186,10 @@
 				} 
 			},
 			
+			getData () {
+				this.getSaleReturnPageEvent(this.currentId)
+			},
+			
 			getSaleReturnPageEvent(id) {
 				this.saleReturnOrderList = [];
 				this.isShowNoData = false;
@@ -226,7 +230,7 @@
 			},
 			
 			// 查询订单详情
-			getPlanOrderEvent() {
+			getPlanOrderEvent(isNeedBack) {
 				this.isAllSure = false;
 				this.showLoadingHint = true;
 				this.infoText = '查询中···';
@@ -238,7 +242,9 @@
 						if (res.data.data['status'] == 50) {
 							this.isAllSure = true;
 						};
-						this.backTo();
+						if (isNeedBack) {
+							this.backTo()
+						}
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,
@@ -268,7 +274,19 @@
 				 })
 				);
 				uni.navigateTo({
-					url: `/materialApplicationPackage/pages/confirmReceiptDetails/confirmReceiptDetails?transmitParams=${transmitParams}`
+					url: `/materialApplicationPackage/pages/confirmReceiptDetails/confirmReceiptDetails?transmitParams=${transmitParams}`,
+					events: {
+						backFrom: (data) => {
+							// 单个送货单确认收货成功
+							if (data.isSure) {
+								let flag = this.saleReturnOrderList.every((item,index) => { return item.status == 60});
+								// 查询当前关联订单状态
+								if (flag) {
+									this.getPlanOrderEvent(false);
+								}
+							}
+						}
+					}
 				})
 			},
 			
@@ -283,12 +301,15 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
-							this.$refs.uToast.show({
-								message: '全部确认收货成功!',
-								type: 'success',
-								position: 'bottom'
-							});
-							this.getPlanOrderEvent()
+							let transmitParams = encodeURIComponent(
+							JSON.stringify({
+								 orderId: this.currentId,
+								 path: 'confirmReceipt'
+							 })
+							);
+							uni.navigateTo({
+								url: `/materialApplicationPackage/pages/submitScuess/submitScuess?transmitParams=${transmitParams}`
+							})
 						} else {
 							this.$refs.uToast.show({
 								message: res.data.msg,

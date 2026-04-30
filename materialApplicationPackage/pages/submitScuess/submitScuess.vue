@@ -1,5 +1,11 @@
 <template>
 	<view class="content-box">
+		<u-transition :show="showLoadingHint" mode="fade-down">
+			<view class="loading-box" v-if="showLoadingHint">
+				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
+			</view>
+		</u-transition>
+		<light-hint ref="alertToast"></light-hint>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" @backClick="backTo">
@@ -30,12 +36,33 @@
 		mapMutations
 	} from 'vuex'
 	import navBar from "@/components/zhouWei-navBar"
+	import { getPlanOrder } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	export default {
 		components: {
 			navBar
 		},
 		data() {
-			return {}
+			return {
+				path: '',
+				showLoadingHint: false,
+				infoText: '加载中···',
+				isAllSure: false,
+				message: {}
+			}
+		},
+		onLoad (options) {
+			if (options.transmitParams) {
+				try {
+					const rawData = decodeURIComponent(options.transmitParams);
+					this.message = JSON.parse(rawData);
+					this.path = message['path'];
+					if (this.path == 'confirmReceipt') {
+						this.getPlanOrderEvent()
+					}
+				} catch (e) {
+					console.error('参数解析失败', e);
+				}
+			}
 		},
 		computed: {
 			...mapGetters([
@@ -49,7 +76,66 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				const pages = getCurrentPages();
+				if (this.path == 'changingOrRefundingDetails') {
+					const prevPage = pages[pages.length - 3];
+					if (prevPage) {
+						prevPage.$vm.getData();
+					};
+					uni.navigateBack({
+					  delta: 2
+					})
+				} else if (this.path == 'confirmReceipt') {
+					if (this.isAllSure) {
+						const prevPage = pages[pages.length - 3];
+						if (prevPage) {
+							prevPage.$vm.allSureConfirmOrderEvent();
+						};
+						uni.navigateBack({
+						  delta: 2
+						})
+					}
+				} else if (this.path == 'confirmReceiptDetails') {
+					const prevPage = pages[pages.length - 3];
+					if (prevPage) {
+						prevPage.$vm.getData();
+					};
+					uni.navigateBack({
+					  delta: 2
+					})
+				}
+			},
+			
+			// 查询订单详情
+			getPlanOrderEvent() {
+				this.isAllSure = false;
+				this.showLoadingHint = true;
+				this.infoText = '查询中···';
+				getPlanOrder(this.message['orderId']).then((res) => {
+					this.showLoadingHint = false;
+					this.infoText = '';
+					if ( res && res.data.code == 0) {
+						// 判断当前订单是否全部收货完成
+						if (res.data.data['status'] == 50) {
+							this.isAllSure = true;
+						}
+					} else {
+						this.$refs.uToast.show({
+							message: res.data.msg,
+							type: 'error',
+							position: 'bottom'
+						})
+					}
+				})
+				.catch((err) => {
+					this.infoText = '';
+					this.showLoadingHint = false;
+					this.$refs.uToast.show({
+						message: err,
+						type: 'error',
+						position: 'bottom'
+					})
+				})
 			}
 		}
 	}

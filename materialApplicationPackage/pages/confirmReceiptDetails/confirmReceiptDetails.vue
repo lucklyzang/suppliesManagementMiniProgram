@@ -98,6 +98,7 @@
 		data() {
 			return {
 				showLoadingHint: false,
+				isSure: false,
 				infoText: '加载中···',
 				loadingShow: false,
 				saleReturnOrderDetailsList: [],
@@ -149,6 +150,8 @@
 			
 			// 顶部导航返回事件
 			backTo () {
+				const eventChannel = this.getOpenerEventChannel();
+				eventChannel.emit('backFrom', { isSure: this.isSure });
 				uni.navigateBack()
 			},
 			
@@ -188,6 +191,7 @@
 			confirmReceiptEvent () {
 				this.showLoadingHint = true;
 				this.infoText = '提交中···';
+				this.isSure = false;
 				confirmSaleReturn({
 					id: Number(this.saleReturnOrderMessage.id)
 				}).then((res) => {
@@ -195,12 +199,16 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
-							this.$refs.uToast.show({
-								message: '确认成功',
-								type: 'success',
-								position: 'bottom'
-							});
-							this.backTo();
+							this.isSure = true;
+							let transmitParams = encodeURIComponent(
+							JSON.stringify({
+								 orderId: this.saleReturnOrderMessage.id,
+								 path: 'confirmReceiptDetails'
+							 })
+							);
+							uni.navigateTo({
+								url: `/materialApplicationPackage/pages/submitScuess/submitScuess?transmitParams=${transmitParams}`
+							})
 						} else {
 							this.$refs.uToast.show({
 								message: res.data.msg,
