@@ -3,7 +3,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 20 + 'px' }"></view>
 		<u-toast ref="uToast" />
     <!-- 顶部标题 -->
-    <view class="topTabbar" :style="{ 'height': navigationBarHeight + 20 + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
+    <view class="topTabbar" :style="{ 'height': navigationBarHeight + 20 + 'px', 'paddingRight': capsuleMessage['rightSafeArea'] + 'px' }">
 			 <view class="user-photo">
 					<image :src="avatar ? avatar : '/static/img/default-person-photo.png'" mode="widthFix"></image>
 				</view>

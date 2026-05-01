@@ -219,7 +219,7 @@
 						};
 						if (isNeedQuest) {
 							// 判断该订单下的所有送货单是否全部确认收货完毕
-							let flag = this.saleReturnOrderList.every((item) => { retuen item.status == 60 });
+							let flag = this.saleReturnOrderList.every((item) => { return item.status == 60 });
 							if (flag) {
 								this.getPlanOrderEvent()
 							}

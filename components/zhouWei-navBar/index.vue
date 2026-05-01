@@ -4,8 +4,8 @@
 			:class="[{ header_fixed: navFixed, header_absolute: type == 'transparent', header_shadow: navShadow, header_colorWhite: isWhite }, themeBgColorName]"
 			:style="[navBgColor ? { backgroundImage: navBgColor } : {}, { paddingTop: statusBarHeight + 'px', color: navFontColor, opacity: transparentValue }]"
 		>
-			<view class="header_content" :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
-				<view class="header_left_box" :style="{'width': capsuleMessage.width + 'px' }">
+			<view class="header_content" :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage['rightSafeArea'] + 'px' }">
+				<view class="header_left_box" :style="{'width': 80 + 'px' }">
 					<slot name="left">
 						<view class="header_left_info" :class="{ header_btnMongol: isTwoBtn, header_colorWhite_btnMongol: isWhite && isTwoBtn }" v-if="back || $slots.left || home">
 							<view class="header_left_back" :class="{ header_btnMongol_left_back: isTwoBtn }" v-if="back && !firstPage" @click="onBackPage">
@@ -39,8 +39,8 @@
 			v-if="type == 'transparentFixed'"
 			:style="{ paddingTop: statusBarHeight + 'px', color: navTransparentFixedFontColor, opacity: 1 - transparentValue, zIndex: transparentValue < 0.3 ? 100 : 90 }"
 		>
-			<view class="header_content" :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }">
-				<view class="header_left_box" :style="{'width': capsuleMessage.width + 'px' }">
+			<view class="header_content" :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage['rightSafeArea'] + 'px' }">
+				<view class="header_left_box" :style="{'width': 80 + 'px' }">
 					<slot name="transparentFixedLeft">
 						<view
 							class="header_left_info header_transparentFixed_left_info"
@@ -72,7 +72,7 @@
 				<view class="header_right_info"><slot name="transparentFixedRight"></slot></view>
 			</view>
 		</view>
-		<view v-if="type == 'fixed'" :style="{ paddingTop: statusBarHeight + 'px' }"><view :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage.width + 10 + 'px' }"></view></view>
+		<view v-if="type == 'fixed'" :style="{ paddingTop: statusBarHeight + 'px' }"><view :style="{ 'height': navigationBarHeight + 'px', 'paddingRight': capsuleMessage['rightSafeArea '] + 'px' }"></view></view>
 	</view>
 </template>
 <script>
@@ -362,14 +362,9 @@ export default {
 </script>
 <style lang="scss">
 .header_content {
-	/* #ifndef APP-NVUE */
 	display: flex;
-	/* #endif */
-	/* #ifdef MP */
-	padding-right: 190rpx;
 	box-sizing: border-box;
-	/* #endif */
-	width: 750rpx;
+	width: 100%;
 	align-items: center;
 	justify-content: space-between;
 	flex-direction: row;
@@ -407,8 +402,10 @@ export default {
 	/* #ifndef APP-PLUS-NVUE */
 	display: flex;
 	/* #endif */
+	display: flex;
 	flex-direction: row;
 	align-items: center;
+	z-index: 2;       
 }
 
 .header_left_line {
@@ -419,10 +416,11 @@ export default {
 
 .header_left_back {
 	height: 100%;
-	width: 80px;
+	width: 100%;
 	/* #ifndef APP-PLUS-NVUE */
 	display: flex;
 	/* #endif */
+	display: flex;
 	align-items: center;
 	>text {
 		font-size: 14px;
@@ -442,6 +440,7 @@ export default {
 	/* #ifndef APP-PLUS-NVUE */
 	display: flex;
 	/* #endif */
+	display: flex;
 	align-items: center;
 	justify-content: center;
 }
@@ -450,6 +449,7 @@ export default {
 	/* #ifndef APP-PLUS-NVUE */
 	display: flex;
 	/* #endif */
+	display: flex;
 	flex-direction: row;
 	align-items: center;
 	height: 56rpx;
@@ -479,8 +479,14 @@ export default {
 }
 
 .header_title_center {
-	flex: 1;
+	position: absolute;
+	left: 50%;        
+	top: 50%;
+	width: 120px;
+	transform: translate(-50%, -50%);
 	text-align: center;
+	z-index: 1;
+	box-sizing: border-box;
 	>text {
 		width: 100%;
 		display: inline-block;
@@ -491,12 +497,14 @@ export default {
 }
 
 .header_right_info {
-	/* #ifndef APP-PLUS-NVUE */
 	display: flex;
 	flex-shrink: 0;
-	/* #endif */
+	width: 80px;
 	flex-direction: row;
+	margin-right: 8px;
+	justify-content: flex-end;
 	align-items: center;
+	z-index: 2;       
 }
 
 .header_btnMongol {
@@ -505,6 +513,7 @@ export default {
 	border-width: 2rpx;
 	border-color: rgba(0, 0, 0, 0.1);
 	background-color: rgba(255, 255, 255, 0.7);
+	box-sizing: border-box;
 	/* #ifndef APP-PLUS-NVUE */
 	box-sizing: border-box;
 	/* #endif */
@@ -527,6 +536,7 @@ export default {
 	border-color: rgba(0, 0, 0, 0.1);
 	background-color: rgba(255, 255, 255, 0.7);
 	border-radius: 33rpx;
+	box-sizing: border-box;
 	/* #ifndef APP-PLUS-NVUE */
 	box-sizing: border-box;
 	/* #endif */
