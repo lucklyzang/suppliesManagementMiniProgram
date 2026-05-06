@@ -504,7 +504,25 @@ export default {
 	margin-right: 8px;
 	justify-content: flex-end;
 	align-items: center;
-	z-index: 2;       
+	z-index: 2;
+	>view {
+		width: 100%;
+		display: flex;
+		flex-shrink: 0;
+		flex-direction: row;
+		align-items: center;
+		z-index: 2;
+		text {
+			width: 100%;
+			display: inline-block;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
+			text-align: right;
+			padding-left: 8px;
+			box-sizing: border-box;
+		}
+	}
 }
 
 .header_btnMongol {

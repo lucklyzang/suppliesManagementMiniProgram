@@ -919,7 +919,7 @@ page {
 						font-size: 12px;
 						color: #333;
 						&:nth-child(1) {
-							color: #3B9DF9
+							color: #11D183
 						}
 					}
 				};

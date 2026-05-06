@@ -26,7 +26,7 @@
 									@click="backlogMatterEvent(item,index)"
 							>
 									<text>{{ item.name }}</text>
-									<view class="message-number" v-if="item.count !== null && item.count !== ''">
+									<view class="message-number" :class="{'message-number-long-num' : item.count >= 10}" v-if="item.count !== null && item.count !== ''">
 											<text>{{ item.count }}</text>
 									</view>
 							</view> 
@@ -473,25 +473,28 @@
 							}
 						};
 						 .message-number {
-								position: absolute;
-								top: -10px;
-								right: 0;
-								display: inline-flex;
-								justify-content: center;
-								align-items: center;
-								vertical-align: middle;
-								background-color: #E86F50;
-								color: #ffffff;              
-								font-size: 12px;              
-								min-width: 17px;
-								max-width: 24px;
-								aspect-ratio: 1;
-								border-radius: 50%;
-								padding: 0 4px;
-								box-sizing: border-box;
-								>text {
-										@include no-wrap();
-								}                      
+							position: absolute;
+							top: -10px;
+							right: 0;
+							display: inline-flex;
+							justify-content: center;
+							align-items: center;
+							vertical-align: middle;
+							background-color: #E86F50;
+							color: #ffffff;              
+							font-size: 12px;              
+							width: 17px;
+							height: 17px;
+							border-radius: 50%;
+							padding: 0 4px;
+							box-sizing: border-box;
+							>text {
+									@include no-wrap();
+							}                      
+						};
+						.message-number-long-num {
+							width: 24px !important;
+							height: 24px !important;
 						}
 					};
 					>view:nth-child(5) {
