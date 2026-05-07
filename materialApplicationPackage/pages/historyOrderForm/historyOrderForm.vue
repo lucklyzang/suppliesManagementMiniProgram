@@ -65,8 +65,11 @@
 						</view>
 						<view class="order-list-bottom">
 							<view class="order-list-btn">
-								<view class="edit-right" @click.stop="evaluateEvent(item,index)">
-									<text>{{ item.evaluate ? '查看评价' : '评价'}}</text>
+								<view class="edit-right" v-if="item.evaluate" @click.stop="evaluateEvent(item,index)">
+									<text>查看评价</text>
+								</view>
+								<view class="edit-right" v-if="!item.evaluate && userPermissionInfo['permissions'].indexOf('erp:plan-order:evaluate') != -1" @click.stop="evaluateEvent(item,index)">
+									<text>评价</text>
 								</view>
 							</view>
 						</view>
@@ -207,7 +210,8 @@
 			...mapGetters([
 				'userInfo',
 				'statusBarHeight',
-				'navigationBarHeight'
+				'navigationBarHeight',
+				'userPermissionInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']

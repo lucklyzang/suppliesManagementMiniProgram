@@ -73,7 +73,7 @@
 			</view>
 		</view>
 		<view class="bottom-btn" v-if="saleReturnOrderMessage.status == 21">
-				<view class="back-box" @click="confirmReceiptEvent">
+				<view class="back-box" @click="$noMultipleClicks(confirmReceiptEvent)">
 					<text>确认收货</text>
 				</view>
 		</view>
@@ -97,6 +97,7 @@
 		},
 		data() {
 			return {
+				noClick: true,
 				showLoadingHint: false,
 				isSure: false,
 				infoText: '加载中···',

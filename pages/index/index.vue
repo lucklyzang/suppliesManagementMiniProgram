@@ -33,7 +33,7 @@
 					</view>
 			</view>
 			<view class="functional-zone">
-					<view class="service-list" v-for="(item,index) in functionalZoneList" :key="index" @click="functionalZoneEvent(item,index)">
+					<view class="service-list" v-for="(item,index) in hasAuthSystemsList" :key="index" @click="functionalZoneEvent(item,index)">
 							<view class="list-top">
 									<image :src="item.url" mode="widthFix"></image>
 							</view>
@@ -93,24 +93,29 @@
 								count: 0
 						}
 				],
-				functionalZoneList: [
+				serviceList: [
 					{
 						text: '临时申领',
+						value: 'erp:plan-order:create',
 						url: require('@/static/img/home-apply-icon.png')
 					},
 					{
 						text: '计划申领',
+						value: 'erp:plan-order:create',
 						url: require('@/static/img/home-apply-icon.png')
 					},
 					{
 						text: '我的订单',
+						value: 'erp:plan-order:query',
 						url: require('@/static/img/home-order-icon.png')
 					},
 					{
 						text: '审核',
+						value: 'erp:check-order:check',
 						url: require('@/static/img/home-check-icon.png')
 					}
-				]
+				],
+				hasAuthSystemsList: []
 			}
 		},
 		updated() {},
@@ -122,7 +127,8 @@
 				'capsuleMessage',
 				'chooseHospitalArea',
 				'suppliesHomeGlobalTimer',
-				'departmentInfo'
+				'departmentInfo',
+				'userPermissionInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -162,6 +168,7 @@
 		},
 		
 		onShow() {
+			this.controlServiceManageModuleShowEvent();
 			this.getDepartmentNameById(this.depId);
 			this.getDateRange();
 			// 获取任务数量
@@ -199,9 +206,9 @@
 			// 控制服务管理模块显示隐藏
 			controlServiceManageModuleShowEvent () {
 				this.hasAuthSystemsList = [];
-				if (this.userInfo['extendData'].hasOwnProperty('systems')) {
+				if (this.userPermissionInfo.hasOwnProperty('permissions')) {
 					this.serviceList.map((value,index,arr) => {
-						if (this.userInfo['extendData']['systems'].indexOf(value['value']) != -1) {
+						if (this.userPermissionInfo['permissions'].indexOf(value['value']) != -1) {
 							this.hasAuthSystemsList.push(value)
 						}
 					})
@@ -317,6 +324,16 @@
 			// 待办事项点击事件
 			backlogMatterEvent (item,index) {
 				if (item.name == '待审核') {
+					if (this.userPermissionInfo.hasOwnProperty('permissions')) {
+						if (this.userPermissionInfo['permissions'].indexOf('erp:check-order:check') == -1) {
+							this.$refs.uToast.show({
+								message: '你没有对应权限!',
+								position: 'center',
+								type: 'warning'
+							});
+							return
+						}
+					};
 					uni.navigateTo({
 						url: '/materialApplicationPackage/pages/myAuditOrderForm/myAuditOrderForm'
 					})

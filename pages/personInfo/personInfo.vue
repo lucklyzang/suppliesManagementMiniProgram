@@ -49,7 +49,7 @@
 			</view>
 		</view>
 		<view class="bottom-area">
-			<view class="quit-area" @click="signOutEvent">退出登录</view>
+			<view class="quit-area" @click="$noMultipleClicks(signOutEvent)">退出登录</view>
 			<view class="version-area">当前版本 1.0.0</view>
 		</view>
 	</view>
@@ -75,7 +75,8 @@
 		},
 		data() {
 			return {
-				infoText: '开启中···',
+				noClick: true,
+				infoText: '退出登录中···',
 				showLoadingHint: false,
 				modalShow: false
 			}

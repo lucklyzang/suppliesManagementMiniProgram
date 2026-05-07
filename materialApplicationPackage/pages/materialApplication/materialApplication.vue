@@ -71,10 +71,10 @@
 				</view>
 			</view>
 			<view class="content-bottom">
-				<view class="content-bottom-left" @click="materialApplicationSaveEvent">
+				<view class="content-bottom-left" @click="$noMultipleClicks(materialApplicationSaveEvent)">
 					<text>保存</text>
 				</view>
-				<view class="content-bottom-right" @click="materialApplicationSubmitEvent">
+				<view class="content-bottom-right" @click="$noMultipleClicks(materialApplicationSubmitEvent)">
 					<text>保存并继续</text>
 				</view>
 			</view>
@@ -153,7 +153,7 @@
 							<view class="cancel-box" @click="productChoosePopupCloseEvent">
 								<text>取消</text>
 							</view>
-							<view class="add-box" @click="addSureEvent">
+							<view class="add-box" @click="$noMultipleClicks(addSureEvent)">
 								<text>添加</text>
 							</view>
 					</view>
@@ -174,6 +174,7 @@ export default {
   },
   data() {
     return {
+			noClick: true,
 			infoText: '加载中···',
 			isEdit: false,
 			showLoadingHint: false,

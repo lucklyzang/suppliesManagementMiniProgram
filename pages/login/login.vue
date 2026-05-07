@@ -80,7 +80,7 @@
          </view>
       </view>
 			<view class="form-btn">
-				<button type="primary" @click="loginHandle">登 录</button>
+				<button type="primary" @click="$noMultipleClicks(loginHandle)">登 录</button>
 			</view>
 			<view class="have-read-box">
 				<u-checkbox-group @change="userAgreementCheckboxGroupChange">
@@ -169,7 +169,7 @@
 
 <script>
 	import { mapGetters, mapMutations } from 'vuex'
-	import { logIn, getUserInfo, getDepartmentInfo } from '@/api/login.js'
+	import { logIn, getUserInfo, getDepartmentInfo, getPermissionInfo } from '@/api/login.js'
 	import Qs from 'qs'
 	import { setCache, getCache, removeCache } from '@/common/js/utils'
 	export default {
@@ -177,6 +177,7 @@
 	},
 		data() {
 			return {
+				noClick: true,
 				showLoadingHint: false,
 				infoText: '登录中···',
 				userAgreemenShow: false,
@@ -225,7 +226,8 @@
 				'changeIsLogin',
 				'storeChooseHospitalArea',
 				'changeIsMedicalMan',
-				'storeDepartmentInfo'
+				'storeDepartmentInfo',
+				'storeUserPermissionInfo'
 			]),
       
       // 选中任一checkbox时，由checkbox-group触发
@@ -257,7 +259,7 @@
 			},
 			
 			// 获取用户详情
-			getUserInfoEvent () {getDepartmentInfo
+			getUserInfoEvent () {
 				return new Promise((resolve,reject) => {
 					this.showLoadingHint = true;
 					this.infoText = '获取中···';
@@ -268,6 +270,35 @@
 						if (res && res.data.code == 0) {
 							resolve();
 							this.storeUserInfo(res.data.data);
+						} else {
+							reject(res.data.msg);
+							this.modalShow = true;
+							this.modalContent = res.data.msg;
+						}
+					})
+					.catch((err) => {
+						this.infoText = '';
+						this.showLoadingHint = false;
+						if (err === '') { return };
+						reject(err);
+						this.modalShow = true;
+						this.modalContent = err;
+					})
+				})
+			},
+			
+			// 获取用户权限信息
+			getUserPermissionInfoEvent () {
+				return new Promise((resolve,reject) => {
+					this.showLoadingHint = true;
+					this.infoText = '获取中···';
+					getPermissionInfo()
+					.then((res) => {
+						this.showLoadingHint = false;
+						this.infoText = '';
+						if (res && res.data.code == 0) {
+							resolve();
+							this.storeUserPermissionInfo(res.data.data);
 						} else {
 							reject(res.data.msg);
 							this.modalShow = true;
@@ -382,6 +413,8 @@
 					await this.getUserInfoEvent();
 					// 获取科室信息
 					await this.getDepartmentInfoEvent();
+					// 获取用户权限信息
+					await this.getUserPermissionInfoEvent();
 					this.changeIsLogin(true);
 					this.changeOverDueWay(false);
 					setCache('storeOverDueWay',false); 

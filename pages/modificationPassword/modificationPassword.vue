@@ -60,7 +60,7 @@
 			</view>
 		</view>
 		<view class="bottom-area">
-			<view class="quit-area" @click="submitModificationEvent">提交修改</view>
+			<view class="quit-area" @click="$noMultipleClicks(submitModificationEvent)">提交修改</view>
 		</view>
 	</view>
 </template>
@@ -86,6 +86,7 @@
 		},
 		data() {
 			return {
+				noClick: true,
 				infoText: '修改中···',
 				showLoadingHint: false,
 				formerPasswordValue: '',

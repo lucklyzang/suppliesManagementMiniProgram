@@ -11,6 +11,10 @@ export default {
 			state.userTokenInfo = getCache('userTokenInfo') ? getCache('userTokenInfo') : null;
 			return state.userTokenInfo
 		},
+		userPermissionInfo:(state) => {
+			state.userPermissionInfo = getCache('userPermissionInfo') ? getCache('userPermissionInfo') : null;
+			return state.userPermissionInfo
+		},
 		chooseHospitalArea:(state) => {
 			state.chooseHospitalArea = getCache('chooseHospitalArea') ? getCache('chooseHospitalArea') : {};
 			return state.chooseHospitalArea
@@ -36,6 +40,12 @@ export default {
 			if (playLoad && playLoad != 'null') {
 				setCache('userTokenInfo', playLoad);
 				state.userTokenInfo = playLoad
+			}
+		},
+		storeUserPermissionInfo(state, playLoad) {
+			if (playLoad && playLoad != 'null') {
+				setCache('userPermissionInfo', playLoad);
+				state.userPermissionInfo = playLoad
 			}
 		},
 		storeChooseHospitalArea(state, playLoad) {

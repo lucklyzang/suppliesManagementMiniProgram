@@ -67,7 +67,7 @@
 			</view>
 		</view>
 		<view class="btn-box">
-			<text class="operate-two" @click="sureEvent">提交</text>
+			<text class="operate-two" @click="$noMultipleClicks(sureEvent)">提交</text>
 		</view>
 		<!-- 送货时间选择框 -->
 		 <u-datetime-picker
@@ -102,6 +102,7 @@
 		},
 		data() {
 			return {
+				noClick: true,
 				showLoadingHint: false,
 				infoText: '加载中···',
 				loadingShow: false,
@@ -154,6 +155,28 @@
 				return ''
 			}
 		},
+		watch: {
+			deliveryAddress: {
+				handler(newVal) {
+					this.$nextTick(() => {
+						// 如果新值包含空格，则重新赋值为去除空格后的字符串
+						if (/\s/g.test(newVal)) {
+							this.deliveryAddress = newVal.replace(/\s/g, '')
+						}
+					})
+				}
+			},
+			taskDescribe: {
+				handler(newVal) {
+					this.$nextTick(() => {
+						// 如果新值包含空格，则重新赋值为去除空格后的字符串
+						if (/\s/g.test(newVal)) {
+							this.taskDescribe = newVal.replace(/\s/g, '')
+						}
+					})
+				}
+			}
+		},	
 		 onLoad(options) {
 			if (options.transmitParams) {
 				this.isEdit = true;

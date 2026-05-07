@@ -89,16 +89,16 @@
 						</view>
 						<view class="order-list-bottom">
 							<view class="order-list-btn">
-								<view class="delete-left" v-if="item.status == 10 || item.status == 21 || item.status == 31" @click.stop="deleteEvent(item,index)">
+								<view class="delete-left" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && userPermissionInfo['permissions'].indexOf('erp:plan-order:delete') != -1" @click.stop="deleteEvent(item,index)">
 									<text>删除</text>
 								</view>
-								<view class="delete-left" v-if="item.status == 40" @click.stop="changingOrRefundingEvent(item,index)">
+								<view class="delete-left" v-if="item.status == 40 && userPermissionInfo['permissions'].indexOf('erp:plan-order:return') != -1" @click.stop="changingOrRefundingEvent(item,index)">
 									<text>退换货</text>
 								</view>
-								<view class="edit-right" v-if="item.status == 10 || item.status == 21 || item.status == 31" @click.stop="editEvent(item,index)">
+								<view class="edit-right" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && userPermissionInfo['permissions'].indexOf('erp:plan-order:update') != -1" @click.stop="editEvent(item,index)">
 									<text>编辑</text>
 								</view>
-								<view class="edit-right" v-if="item.status == 40" @click.stop="sureReceivingEvent(item,index)">
+								<view class="edit-right" v-if="item.status == 40 && userPermissionInfo['permissions'].indexOf('erp:plan-order:confirm') != -1" @click.stop="sureReceivingEvent(item,index)">
 									<text>确认收货</text>
 								</view>
 							</view>
@@ -224,7 +224,8 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				'editOrderMessage'
+				'editOrderMessage',
+				'userPermissionInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']

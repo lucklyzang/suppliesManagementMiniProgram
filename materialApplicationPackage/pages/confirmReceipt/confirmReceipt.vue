@@ -48,7 +48,7 @@
 			</view>
 		</view>
 		<view class="bottom-btn">
-				<view class="back-box" @click="allConfirmReceiptEvent" v-if="isShowAllConfirmReceipt">
+				<view class="back-box" @click="$noMultipleClicks(allConfirmReceiptEvent)" v-if="isShowAllConfirmReceipt">
 					<text>全部确认收货</text>
 				</view>
 		</view>
@@ -73,6 +73,7 @@
 		},
 		data() {
 			return {
+				noClick: true,
 				showLoadingHint: false,
 				infoText: '加载中···',
 				isExecute: true,

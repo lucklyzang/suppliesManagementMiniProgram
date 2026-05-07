@@ -87,7 +87,7 @@
 				<view class="cancel-box" @click="cancelEvent">
 					<text>取消</text>
 				</view>
-				<view class="submit-box" @click="submitEvent">
+				<view class="submit-box" @click="$noMultipleClicks(submitEvent)">
 					<text>提交</text>
 				</view>
 		</view>
@@ -112,6 +112,7 @@
 		},
 		data() {
 			return {
+				noClick: true,
 				showLoadingHint: false,
 				infoText: '加载中···',
 				loadingShow: false,

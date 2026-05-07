@@ -50,3 +50,11 @@ export function getDepartment(id) {
 		method: 'get'
 	})
 }
+
+// 获取登录用户的权限信息
+export function getPermissionInfo() {
+	return request({
+	    url: '/spd/admin-api/system/auth/get-permission-info',
+	    method: 'get'
+	  })
+}
