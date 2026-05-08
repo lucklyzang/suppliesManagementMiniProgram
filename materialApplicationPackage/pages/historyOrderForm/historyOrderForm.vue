@@ -68,7 +68,7 @@
 								<view class="edit-right" v-if="item.evaluate" @click.stop="evaluateEvent(item,index)">
 									<text>查看评价</text>
 								</view>
-								<view class="edit-right" v-if="!item.evaluate && userPermissionInfo['permissions'].indexOf('erp:plan-order:evaluate') != -1" @click.stop="evaluateEvent(item,index)">
+								<view class="edit-right" v-if="!item.evaluate && hasIntersection(['erp:plan-order:evaluate'],userPermissionInfo['permissions'])" @click.stop="evaluateEvent(item,index)">
 									<text>评价</text>
 								</view>
 							</view>
@@ -167,7 +167,8 @@
 	import {
 		setCache,
 		removeAllLocalStorage,
-		getDate
+		getDate,
+		hasIntersection
 	} from '@/common/js/utils'
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
@@ -251,6 +252,8 @@
 		methods: {
 			...mapMutations([
 			]),
+			
+			hasIntersection,
 			
 			// 重置状态
 			resetStatus () {

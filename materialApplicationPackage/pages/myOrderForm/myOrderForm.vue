@@ -89,16 +89,16 @@
 						</view>
 						<view class="order-list-bottom">
 							<view class="order-list-btn">
-								<view class="delete-left" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && userPermissionInfo['permissions'].indexOf('erp:plan-order:delete') != -1" @click.stop="deleteEvent(item,index)">
+								<view class="delete-left" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && hasIntersection(['erp:plan-order:delete','erp:temporary-order:delete'],userPermissionInfo['permissions'])" @click.stop="deleteEvent(item,index)">
 									<text>删除</text>
 								</view>
-								<view class="delete-left" v-if="item.status == 40 && userPermissionInfo['permissions'].indexOf('erp:plan-order:return') != -1" @click.stop="changingOrRefundingEvent(item,index)">
+								<view class="delete-left" v-if="item.status == 40 && hasIntersection(['erp:plan-order:return'],userPermissionInfo['permissions'])" @click.stop="changingOrRefundingEvent(item,index)">
 									<text>退换货</text>
 								</view>
-								<view class="edit-right" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && userPermissionInfo['permissions'].indexOf('erp:plan-order:update') != -1" @click.stop="editEvent(item,index)">
+								<view class="edit-right" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && hasIntersection(['erp:plan-order:update','erp:temporary-order:update'],userPermissionInfo['permissions'])" @click.stop="editEvent(item,index)">
 									<text>编辑</text>
 								</view>
-								<view class="edit-right" v-if="item.status == 40 && userPermissionInfo['permissions'].indexOf('erp:plan-order:confirm') != -1" @click.stop="sureReceivingEvent(item,index)">
+								<view class="edit-right" v-if="item.status == 40 && hasIntersection(['erp:plan-order:confirm','erp:temporary-order:confirm','erp:sale-out:confirm'],userPermissionInfo['permissions'])" @click.stop="sureReceivingEvent(item,index)">
 									<text>确认收货</text>
 								</view>
 							</view>
@@ -147,7 +147,8 @@
 	import {
 		setCache,
 		removeAllLocalStorage,
-		getDate
+		getDate,
+		hasIntersection
 	} from '@/common/js/utils'
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
@@ -268,6 +269,8 @@
 			...mapMutations([
 				'changeEditOrderMessage'
 			]),
+			
+			hasIntersection,
 			
 			// 重置状态
 			resetStatus () {

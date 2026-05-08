@@ -516,9 +516,9 @@
 					updatePlanOrder(data).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 0 && res.data.data) {
-							let temporaryEditMessage = data;
-							data['editStatus'] = '成功';
-							data['status'] = this.orderMessage['status'];
+							let temporaryEditMessage = _.cloneDeep(data);
+							temporaryEditMessage['editStatus'] = '成功';
+							temporaryEditMessage['status'] = this.orderMessage['status'];
 							this.changeEditOrderMessage(temporaryEditMessage);
 							this.$refs.alertToast.show({
 								type: 'success',

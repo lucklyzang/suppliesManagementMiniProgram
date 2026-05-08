@@ -78,10 +78,10 @@
 						</view>
 						<view class="order-list-bottom">
 							<view class="order-list-btn">
-								<view class="delete-left" @click.stop="auditNoPassEvent(item,index)">
+								<view class="delete-left" v-if="hasIntersection(['erp:check-order:update-status'],userPermissionInfo['permissions'])" @click.stop="auditNoPassEvent(item,index)">
 									<text>不通过</text>
 								</view>
-								<view class="edit-right" @click.stop="auditPassEvent(item,index)">
+								<view class="edit-right" v-if="hasIntersection(['erp:check-order:update-status'],userPermissionInfo['permissions'])" @click.stop="auditPassEvent(item,index)">
 									<text>通过</text>
 								</view>
 							</view>
@@ -137,7 +137,8 @@
 	import {
 		setCache,
 		removeAllLocalStorage,
-		getDate
+		getDate,
+		hasIntersection
 	} from '@/common/js/utils'
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js';
@@ -176,7 +177,8 @@
 			...mapGetters([
 				'userInfo',
 				'statusBarHeight',
-				'navigationBarHeight'
+				'navigationBarHeight',
+				'userPermissionInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -216,6 +218,8 @@
 		methods: {
 			...mapMutations([
 			]),
+			
+			hasIntersection,
 			
 			// 重置状态
 			resetStatus () {

@@ -353,6 +353,22 @@ export const IdCard = (IdCard, type) => {
 		}
 }
 
+/**
+ * 判断数组 A 中是否至少有一项存在于数组 B 中
+ * @param {Array} arrA - 第一个数组
+ * @param {Array} arrB - 第二个数组
+ * @returns {Boolean} - 只要有交集返回 true，否则返回 false
+ */
+export const hasIntersection = (arrA, arrB) => {
+  // 边界检查：如果任一数组为空或不是数组，直接返回 false
+  if (!Array.isArray(arrA) || !Array.isArray(arrB) || arrA.length === 0 || arrB.length === 0) {
+    return false;
+  }
+  //将数组 B 转换为 Set，利用哈希表查找特性，将查找复杂度从 O(N) 降为 O(1)
+  const setB = new Set(arrB);
+  return arrA.some(item => setB.has(item))
+}
+
 export const removeAllLocalStorage = () => {
   // removeStore('userName');
   // removeStore('userPassword');

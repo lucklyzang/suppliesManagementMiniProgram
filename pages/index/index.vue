@@ -72,6 +72,7 @@
 	} from 'vuex'
 	import store from '@/store'
 	import SOtime from '@/common/js/utils/SOtime.js'
+	import { hasIntersection } from '@/common/js/utils'
 	import { getSaleStatisticsPendingReview } from '@/api/suppliesManagement/orderFormAudit.js'
 	let windowTimer;
 	export default{
@@ -96,22 +97,22 @@
 				serviceList: [
 					{
 						text: '临时申领',
-						value: 'erp:plan-order:create',
+						value: ['erp:plan-order:create','erp:temporary-order:create'],
 						url: require('@/static/img/home-apply-icon.png')
 					},
 					{
 						text: '计划申领',
-						value: 'erp:plan-order:create',
+						value: ['erp:plan-order:create','erp:temporary-order:create'],
 						url: require('@/static/img/home-apply-icon.png')
 					},
 					{
 						text: '我的订单',
-						value: 'erp:plan-order:query',
+						value: ['erp:plan-order:query','erp:temporary-order:query','erp:plan-history-order:query','erp:temporary-his-order:query'],
 						url: require('@/static/img/home-order-icon.png')
 					},
 					{
 						text: '审核',
-						value: 'erp:check-order:check',
+						value: ['erp:check-order:query'],
 						url: require('@/static/img/home-check-icon.png')
 					}
 				],
@@ -140,7 +141,7 @@
 				return this.userInfo['id']
 			},
 			avatar () {
-					return this.userInfo['avatar']
+				return this.userInfo['avatar']
 			},
 			proName () {
 				return this.userInfo['deptName']
@@ -208,7 +209,7 @@
 				this.hasAuthSystemsList = [];
 				if (this.userPermissionInfo.hasOwnProperty('permissions')) {
 					this.serviceList.map((value,index,arr) => {
-						if (this.userPermissionInfo['permissions'].indexOf(value['value']) != -1) {
+						if (hasIntersection(value['value'],this.userPermissionInfo['permissions'])) {
 							this.hasAuthSystemsList.push(value)
 						}
 					})
@@ -325,7 +326,7 @@
 			backlogMatterEvent (item,index) {
 				if (item.name == '待审核') {
 					if (this.userPermissionInfo.hasOwnProperty('permissions')) {
-						if (this.userPermissionInfo['permissions'].indexOf('erp:check-order:check') == -1) {
+						if (!hasIntersection(['erp:check-order:query'],this.userPermissionInfo['permissions'])) {
 							this.$refs.uToast.show({
 								message: '你没有对应权限!',
 								position: 'center',

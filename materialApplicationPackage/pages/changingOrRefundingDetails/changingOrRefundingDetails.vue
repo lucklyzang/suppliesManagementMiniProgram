@@ -87,7 +87,7 @@
 				<view class="cancel-box" @click="cancelEvent">
 					<text>取消</text>
 				</view>
-				<view class="submit-box" @click="$noMultipleClicks(submitEvent)">
+				<view class="submit-box" v-if="hasIntersection(['erp:plan-order:return'],userPermissionInfo['permissions'])" @click="$noMultipleClicks(submitEvent)">
 					<text>提交</text>
 				</view>
 		</view>
@@ -99,6 +99,9 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
+	import {
+		hasIntersection
+	} from '@/common/js/utils'
 	import navBar from "@/components/zhouWei-navBar"
 	import { getSaleReturn, createSaleReturn } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
@@ -143,7 +146,8 @@
 			...mapGetters([
 				'userInfo',
 				'statusBarHeight',
-				'navigationBarHeight'
+				'navigationBarHeight',
+				'userPermissionInfo'
 			]),
 			userName() {
 				return this.userInfo['nickname']
@@ -181,6 +185,8 @@
 		methods: {
 			...mapMutations([
 			]),
+			
+			hasIntersection,
 			
 			// 顶部导航返回事件
 			backTo () {
