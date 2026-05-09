@@ -140,6 +140,16 @@
 					},
 					deep: true,
 					immediate: true
+			},
+			exchangeReason: {
+				handler(newVal) {
+					this.$nextTick(() => {
+						// 如果新值包含空格，则重新赋值为去除空格后的字符串
+						if (/\s/g.test(newVal)) {
+							this.exchangeReason = newVal.replace(/\s/g, '')
+						}
+					})
+				}
 			}
 		},
 		computed: {

@@ -59,4 +59,7 @@
 page { 
   min-height: 100%; /* 防止页面高度塌陷 */
 }
+.u-toast {
+  z-index: 1000001 !important;
+}
 </style>

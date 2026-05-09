@@ -492,9 +492,10 @@ export default {
 		 // 添加确认事件
 		 addSureEvent () {
 			 const regex = /^(0|[1-9]\d*)$/;
-			 let count = this.materialList.some((item)=> {return item.checked == true && !item.disabled});
-			 let isSomeZero = this.materialList.some((item)=> {return item.quantity === ''});
-			 let is‌NoValid = this.materialList.some((item)=> {return regex.test(item.quantity) === false });
+			 let temporaryMaterialList = this.originalMaterialList.filter((item) => { return item['checked'] === true && !item.disabled });
+			 let count = temporaryMaterialList.some((item)=> {return item.checked == true && !item.disabled});
+			 let isSomeZero = temporaryMaterialList.some((item)=> {return item.quantity === ''});
+			 let is‌NoValid = temporaryMaterialList.some((item)=> {return regex.test(item.quantity) === false });
 			 if (!count) {
 				 this.$refs.uToast.show({
 				 	message: '至少要选择一种产品',
@@ -517,7 +518,6 @@ export default {
 				return;
 			 };
 			 this.productChooseShow = false;
-			 let temporaryMaterialList = this.originalMaterialList.filter((item) => { return item['checked'] === true && !item.disabled });
 			 for (let item of temporaryMaterialList) {
 				this.chooseMaterialList.push({
 					id: item['id'], /*产品编号 */

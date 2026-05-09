@@ -237,6 +237,19 @@
 			}
 		},
 		
+		watch: {
+			evaluateValue: {
+				handler(newVal) {
+					this.$nextTick(() => {
+						// 如果新值包含空格，则重新赋值为去除空格后的字符串
+						if (/\s/g.test(newVal)) {
+							this.evaluateValue = newVal.replace(/\s/g, '')
+						}
+					})
+				}
+			}
+		},
+			
 		onLoad () {
 			this.resetStatus();
 			this.getDateRange();

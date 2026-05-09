@@ -78,10 +78,10 @@
 						</view>
 						<view class="order-list-bottom">
 							<view class="order-list-btn">
-								<view class="delete-left" v-if="hasIntersection(['erp:check-order:update-status'],userPermissionInfo['permissions'])" @click.stop="auditNoPassEvent(item,index)">
+								<view class="delete-left" v-if="hasIntersection(['erp:check-order:check'],userPermissionInfo['permissions'])" @click.stop="auditNoPassEvent(item,index)">
 									<text>不通过</text>
 								</view>
-								<view class="edit-right" v-if="hasIntersection(['erp:check-order:update-status'],userPermissionInfo['permissions'])" @click.stop="auditPassEvent(item,index)">
+								<view class="edit-right" v-if="hasIntersection(['erp:check-order:check'],userPermissionInfo['permissions'])" @click.stop="auditPassEvent(item,index)">
 									<text>通过</text>
 								</view>
 							</view>
@@ -173,6 +173,18 @@
 				fullOrderList: []
 			}
 		},
+		watch: {
+			auditOpinionValue: {
+				handler(newVal) {
+					this.$nextTick(() => {
+						// 如果新值包含空格，则重新赋值为去除空格后的字符串
+						if (/\s/g.test(newVal)) {
+							this.auditOpinionValue = newVal.replace(/\s/g, '')
+						}
+					})
+				}
+			}
+		},	
 		computed: {
 			...mapGetters([
 				'userInfo',
@@ -393,7 +405,6 @@
 			
 			// 不通过弹提交事件
 			noPassModalSubmitEvent () {
-				this.noPassModalShow = false;
 				if (this.auditOpinionValue === '') {
 					this.$refs.uToast.show({
 						message: '审核意见不能为空',
@@ -401,6 +412,7 @@
 					});
 					return;
 				};
+				this.noPassModalShow = false;
 				this.checkOrderEvent({
 					id: this.currentOrderId ,
 					status: 21,
