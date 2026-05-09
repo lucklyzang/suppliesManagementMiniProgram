@@ -101,6 +101,7 @@ instance.interceptors.request.use(function (config) {
 						store.dispatch('resetOrderFormAuditState');
 						store.dispatch('resetMaterialApplicationOrderFormState');
 						store.dispatch('resetLoginState');
+						store.dispatch('resetCommitState');
 					}
 				}).catch((err) => {
 					uni.redirectTo({
@@ -112,6 +113,7 @@ instance.interceptors.request.use(function (config) {
 					store.dispatch('resetOrderFormAuditState');
 					store.dispatch('resetMaterialApplicationOrderFormState');
 					store.dispatch('resetLoginState');
+					store.dispatch('resetCommitState');
 					isRefreshing = true
 				})
 		};
@@ -164,6 +166,7 @@ instance.interceptors.response.use(function (response) {
 		store.dispatch('resetOrderFormAuditState');
 		store.dispatch('resetMaterialApplicationOrderFormState');
 		store.dispatch('resetLoginState');
+		store.dispatch('resetCommitState');
 	};
 	return response
 }, function (error) {
@@ -192,6 +195,7 @@ instance.interceptors.response.use(function (response) {
 					store.dispatch('resetOrderFormAuditState');
 					store.dispatch('resetMaterialApplicationOrderFormState');
 					store.dispatch('resetLoginState');
+					store.dispatch('resetCommitState');
 				}
 			}
 		}	

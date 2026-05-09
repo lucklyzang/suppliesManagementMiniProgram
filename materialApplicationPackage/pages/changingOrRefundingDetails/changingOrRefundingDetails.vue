@@ -87,7 +87,7 @@
 				<view class="cancel-box" @click="cancelEvent">
 					<text>取消</text>
 				</view>
-				<view class="submit-box" v-if="hasIntersection(['erp:plan-order:return'],userPermissionInfo['permissions'])" @click="$noMultipleClicks(submitEvent)">
+				<view class="submit-box" v-if="hasIntersection(['erp:plan-order:return','erp:temporary-order:return'],userPermissionInfo['permissions'])" @click="$noMultipleClicks(submitEvent)">
 					<text>提交</text>
 				</view>
 		</view>

@@ -55,10 +55,10 @@
 				try {
 					const rawData = decodeURIComponent(options.transmitParams);
 					this.message = JSON.parse(rawData);
-					this.path = message['path'];
+					this.path = this.message['path'];
 					if (this.path == 'confirmReceipt') {
 						this.getPlanOrderEvent()
-					}
+					};
 				} catch (e) {
 					console.error('参数解析失败', e);
 				}

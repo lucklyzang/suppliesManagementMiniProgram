@@ -216,6 +216,7 @@
 							store.dispatch('resetOrderFormAuditState');
 							store.dispatch('resetMaterialApplicationOrderFormState');
 							store.dispatch('resetLoginState');
+							store.dispatch('resetCommitState');
 							removeAllLocalStorage();
 							this.$refs.alertToast.show({
 								type: 'success',

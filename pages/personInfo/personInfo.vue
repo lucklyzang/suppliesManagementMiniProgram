@@ -170,6 +170,7 @@
 						store.dispatch('resetOrderFormAuditState');
 						store.dispatch('resetMaterialApplicationOrderFormState');
 						store.dispatch('resetLoginState');
+						store.dispatch('resetCommitState');
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,

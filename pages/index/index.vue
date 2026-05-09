@@ -97,7 +97,7 @@
 				serviceList: [
 					{
 						text: '临时申领',
-						value: ['erp:plan-order:create','erp:temporary-order:create'],
+						value: ['erp:temporary-order:create','erp:plan-order:create'],
 						url: require('@/static/img/home-apply-icon.png')
 					},
 					{
@@ -245,17 +245,17 @@
 										}
 									})
 							} else {
-								this.$refs.uToast.show({
-									message: res.data.msg,
-									type: 'error'
-								})
+								// this.$refs.uToast.show({
+								// 	message: res.data.msg,
+								// 	type: 'error'
+								// })
 							}
 					})
 					.catch((err) => {
-						this.$refs.uToast.show({
-							message: err,
-							type: 'error'
-						})
+						// this.$refs.uToast.show({
+						// 	message: err,
+						// 	type: 'error'
+						// })
 					})
 			},
 			
