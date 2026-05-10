@@ -376,12 +376,9 @@ export const removeAllLocalStorage = () => {
   removeCache('isLogin');
   removeCache('token');
   removeCache('storeOverDueWay');
-	removeCache('socketOpen');
-	removeCache('userTokenInfo');
-	removeCache('userPermissionInfo');
-	removeCache('chooseHospitalArea');
-	removeCache('statusBarHeight');
-	removeCache('navigationBarHeight');
-	removeCache('capsuleMessage');
-	removeCache('departmentInfo');
+removeCache('socketOpen');
+removeCache('userTokenInfo');
+removeCache('userPermissionInfo');
+removeCache('chooseHospitalArea');
+removeCache('departmentInfo');
 }
