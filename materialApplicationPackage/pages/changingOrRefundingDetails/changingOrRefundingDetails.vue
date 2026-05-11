@@ -136,7 +136,7 @@
 							} else {
 								this.isExceedStockQuantity = false;
 							}
-						}	
+						}
 					},
 					deep: true,
 					immediate: true
@@ -232,21 +232,43 @@
 			
 			// 退货input框值变化事件
 			salesReturnInput(item,index,val) {
-				// 退货货总数不能大于发货数
+				const regex = /^(0|[1-9]\d*)$/;
+				if (!regex.test(val)) {
+					this.$nextTick(() => {
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',0);
+					})
+				};
+				// 退货总数不能大于发货数-换货数
 				if (Number(val) + Number(item.exchangeCount) > Number(item.count)) {
-					this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',Number(item.count) - Number(item.exchangeCount));
+					this.$nextTick(() => {
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',0);
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',Number(item.count) - Number(item.exchangeCount));
+					})
 				} else {
-					this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',val)
+					this.$nextTick(() => {
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'returnCount',val)
+					})
 				}
 			},
 			
 			// 换货input框值变化事件
-			barterInput(item, index,val) {
-				// 退货货总数不能大于发货数
+			barterInput(item,index,val) {
+				const regex = /^(0|[1-9]\d*)$/;
+				if (!regex.test(val)) {
+					this.$nextTick(() => {
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount','');
+					})
+				};
+				// 换货总数不能大于发货数-退货数
 				if (Number(val) + Number(item.returnCount) > Number(item.count)) {
-					this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount',Number(item.count) - Number(item.returnCount));
+					this.$nextTick(() => {
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount',0);
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount',Number(item.count) - Number(item.returnCount));
+					})
 				} else {
-					this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount',val);
+					this.$nextTick(() => {
+						this.$set(this.saleReturnOrderDetailsList['items'][index],'exchangeCount',val);
+					})
 				}
 			},
 			
@@ -305,10 +327,20 @@
 			
 			// 提交事件
 			submitEvent () {
-				let	isAllSaleReturnZero,isAllBarterOrderZero;
+				const regex = /^(0|[1-9]\d*)$/;
+				let	isAllSaleReturnZero,isAllBarterOrderZero,is‌ExchangeCountNoValid,isReturnCountNoValid;
 				let questArr = [];
 				isAllSaleReturnZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.returnCount == 0});
 				isAllBarterOrderZero = this.saleReturnOrderDetailsList['items'].every((item) => { return item.exchangeCount == 0});
+				is‌ExchangeCountNoValid = this.saleReturnOrderDetailsList['items'].some((item)=> {return regex.test(item.exchangeCount) === false });
+				isReturnCountNoValid = this.saleReturnOrderDetailsList['items'].some((item)=> {return regex.test(item.returnCount) === false });
+				if (is‌ExchangeCountNoValid || isReturnCountNoValid) {
+					this.$refs.uToast.show({
+						message: '请输入正确的退换货数量(正整数和0)',
+						position: 'center'
+					});
+					return;
+				};
 				if (isAllSaleReturnZero && isAllBarterOrderZero) {
 					this.$refs.uToast.show({
 						message: '退换货不能全部为0!',
@@ -329,7 +361,8 @@
 					returnTime: new Date().getTime(), //退换货时间
 					remark: this.exchangeReason, //退换货原因
 					orderId: Number(this.saleReturnOrderMessage.id), // 运送单编号
-					id: ''
+					id: '',
+					otherPrice: 0
 				};
 				// 退货清单列表
 				let saleReturnOrderList = this.saleReturnOrderDetailsList['items'].filter((item) => { return Number(item.returnCount) > 0});
