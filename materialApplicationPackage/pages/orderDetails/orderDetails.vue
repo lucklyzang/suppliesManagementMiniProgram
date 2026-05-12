@@ -169,7 +169,7 @@
 								<text>拒绝理由:</text>
 								<text>{{ item.content }}</text>
 							</view>
-							<view class="commom-view sales-return-reason" v-if="item.status == 41 || item.status == 50">
+							<view class="commom-view sales-return-reason" v-if="(item.status == 41 || item.status == 50) && item.content !== ''">
 								<text>退货原因:</text>
 								<text>{{ item.content }}</text>
 							</view>

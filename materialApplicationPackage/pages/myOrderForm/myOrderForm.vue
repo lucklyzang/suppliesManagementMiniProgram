@@ -297,7 +297,7 @@
 			
 			// 全部收货成功后，删除该订单
 			allSureConfirmOrderEvent () {
-				this.fullOrderList.splice(this.currentOrderIndex,1)
+				this.fullOrderList.splice(this.currentOrderIndex,1);
 			},
 			
 			// 状态栏以外区域点击
