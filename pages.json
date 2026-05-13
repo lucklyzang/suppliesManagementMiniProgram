@@ -157,6 +157,16 @@
 					}
 				},
 				{
+					"path": "pages/deliveryNoteMessage/deliveryNoteMessage",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
 					"path": "pages/myAuditOrderForm/myAuditOrderForm",
 					"style": {
 						"navigationBarTitleText": "",

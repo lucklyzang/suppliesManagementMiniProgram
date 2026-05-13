@@ -148,7 +148,7 @@
 								'alreadyDeliverStyle' : item.status == 40,
 								'afterSaleIngStyle' : item.status == 41,
 								'alreadyCompletedStyle' : item.status == 50,
-								'alreadyevaluatedStyle' : item.status == 51
+								'alreadyevaluatedStyle' : item.status == 100
 								}"
 							>
 								<text>{{ stateTransfer(item.status) }}</text>
@@ -173,12 +173,8 @@
 								<text>退货原因:</text>
 								<text>{{ item.content }}</text>
 							</view>
-							<view class="commom-view score-box" v-if="item.status == 51">
-								<text>评分:</text>
-								<text>{{ item.content }}</text>
-							</view>
-							<view class="commom-view evaluate-box" v-if="item.status == 51">
-								<text>评价:</text>
+							<view class="commom-view score-box" v-if="item.status == 100">
+								<text></text>
 								<text>{{ item.content }}</text>
 							</view>
 						</view>
@@ -443,7 +439,7 @@
 						case 50:
 								return '已完成'
 								break;
-						case 51:
+						case 100:
 								return '已评价'
 								break;
 				} 
@@ -456,7 +452,7 @@
 				 return value.toFixed(2);
 			},
 			
-			// 进入退换货详情事件
+			// 进入送货单详情事件
 			enterChangingOrRefundingDetailsEvent (item,index) {
 				let transmitParams = encodeURIComponent(
 				 JSON.stringify({
@@ -466,7 +462,7 @@
 				 })
 				);
 				uni.navigateTo({
-					url: `/materialApplicationPackage/pages/changingOrRefundingDetails/changingOrRefundingDetails?transmitParams=${transmitParams}`
+					url: `/materialApplicationPackage/pages/deliveryNoteMessage/deliveryNoteMessage?transmitParams=${transmitParams}`
 				})
 			}
 		}

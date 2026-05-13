@@ -984,6 +984,7 @@ page {
   .content {
 		 width: 100%;
 		 flex: 1;
+		 height: 0;
 		 overflow: auto;
 		 padding: 0 0 10px 0;
 		 box-sizing: border-box;
