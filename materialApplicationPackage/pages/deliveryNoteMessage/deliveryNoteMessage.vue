@@ -9,7 +9,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
 		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="送货信息" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="送货单详情" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content">
@@ -28,6 +28,12 @@
 					<view class="deliver-number-cell">
 						<text>发货数</text>
 					</view>
+					<view class="sales-return-cell" v-if="saleReturnOrderMessage['status'] == 60">
+						<text>退货数</text>
+					</view>
+					<view class="barter-cell" v-if="saleReturnOrderMessage['status'] == 60">
+						<text>换货数</text>
+					</view>
 					<view class="unit-cell">
 						<text>单位</text>
 					</view>
@@ -42,6 +48,22 @@
 						</view>
 						<view class="deliver-number-content">
 							<text>{{ item.count }}</text>
+						</view>
+						<view class="sales-return-content" v-if="saleReturnOrderMessage['status'] == 60">
+							 <u--input
+									disabled
+							    border="none"
+									type="digit"
+							    v-model="item.returnCount"
+							  ></u--input>
+						</view>
+						<view class="barter-content" v-if="saleReturnOrderMessage['status'] == 60">
+							 <u--input
+									disabled
+							    border="none"
+									type="digit"
+							    v-model="item.exchangeCount"
+							  ></u--input>
 						</view>
 						<view class="unit-content">
 							<text>{{ item.productUnitName }}</text>
@@ -284,6 +306,30 @@
 						.product-content {
 							>text {
 								font-weight: bold;
+							}
+						};
+						.sales-return-content {
+							::v-deep .u-input {
+								width: 70%;
+								background: #fff !important;
+								flex: none !important;
+								.u-input__content__field-wrapper__field {
+									text-align: center !important;
+									font-size: 12px !important;
+									color: #101010 !important
+								}
+							}
+						};
+						.barter-content {
+							::v-deep .u-input {
+								width: 70%;
+								background: #fff !important;
+								flex: none !important;
+								.u-input__content__field-wrapper__field {
+									text-align: center !important;
+									font-size: 12px !important;
+									color: #101010 !important
+								}
 							}
 						}
 					}

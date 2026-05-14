@@ -170,7 +170,7 @@
 								<text>{{ item.content }}</text>
 							</view>
 							<view class="commom-view sales-return-reason" v-if="(item.status == 41 || item.status == 50) && item.content !== ''">
-								<text>退货原因:</text>
+								<text></text>
 								<text>{{ item.content }}</text>
 							</view>
 							<view class="commom-view score-box" v-if="item.status == 100">
@@ -247,7 +247,7 @@
 		onLoad (options) {
 			this.isExecute = false;
 			this.orderId = Number(options.id);
-			this.parallelFunction();
+			this.parallelFunction()
 		},
 		onShow () {
 			if (this.isExecute) {
@@ -260,6 +260,7 @@
 		methods: {
 			...mapMutations([
 			]),
+	
 			
 			// 顶部导航返回事件
 			backTo () {

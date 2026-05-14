@@ -10,9 +10,9 @@
 		<u-toast ref="uToast" />
 		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="审核" @backClick="backTo">
-				<view slot="right" @click="enterAuditHistoryOrderEvent">
+				<!-- <view slot="right" @click="enterAuditHistoryOrderEvent">
 					<text>历史</text>
-				</view>
+				</view> -->
 			</nav-bar> 
 		</view>
 		<view class="content">
