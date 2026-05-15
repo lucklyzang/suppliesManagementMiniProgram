@@ -428,6 +428,7 @@
 				flex: 1;
 				.user-name {
 					word-break: break-all;
+					font-weight: bold;
 					>text {
 						color: #fff;
 						font-size: 13px;
@@ -440,7 +441,8 @@
 					color: #fff;
 					word-break: break-all;
 					font-size: 12px;
-					margin-top: 4px;
+					font-weight: bold;
+					margin-top: 2px;
 					line-height: 20px
 				}
 			}
