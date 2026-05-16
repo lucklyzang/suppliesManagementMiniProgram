@@ -153,8 +153,16 @@
 				</view>
 			</u-modal>
 		</view>
-		<!-- 日历 -->
-		<u-calendar color="#11D183" :allowSameDay="true" monthNum="12" minDate="2026-01-01" maxDate="2028-01-01" :show="showCalendar" :defaultDate="defaultDateArr" mode="range" @confirm="calendarConfirm" @close="showCalendar = false"></u-calendar>
+		<!-- 日期选择框 -->
+		<dateRangePicker
+			:show="showCalendar"
+			:minYear="2020"
+			:maxYear="2050"
+			:defaultDate="defaultDateArr"
+			@close="showCalendar=false"
+			@confirm="calendarConfirm"
+		>
+		</dateRangePicker>
 	</view>
 </template>
 
@@ -175,10 +183,12 @@
 	import { getPlanOrderPage, createOrderEvaluate, getOrderEvaluate } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import LightHint from "@/components/light-hint/light-hint.vue"
+	import dateRangePicker from '@/components/date-range-picker/date-range-picker.vue'
 	export default {
 		components: {
 			navBar,
-			LightHint
+			LightHint,
+			dateRangePicker
 		},
 		data() {
 			return {
