@@ -308,6 +308,25 @@
 			// 全部收货成功后，删除该订单
 			allSureConfirmOrderEvent () {
 				this.fullOrderList.splice(this.currentOrderIndex,1);
+				if (this.fullOrderList.length == 0) {
+					this.isShowNoData = true
+				} else {
+					this.isShowNoData = false
+				}
+			},
+			
+			// 收货成功后(单个)，变更订单状态为送货中
+			confirmOrderEvent () {
+				if (this.currentStatusValue == 40) {
+					this.fullOrderList.splice(this.currentOrderIndex,1);
+					if (this.fullOrderList.length == 0) {
+						this.isShowNoData = true
+					} else {
+						this.isShowNoData = false
+					}
+				} else {
+					this.$set(this.fullOrderList[this.currentOrderIndex],'status',41)
+				}
 			},
 			
 			// 状态栏以外区域点击
@@ -362,6 +381,11 @@
 					if ( res && res.data.code == 0) {
 						if (res.data.data) {
 							this.fullOrderList.splice(this.currentOrderIndex,1);
+							if (this.fullOrderList.length == 0) {
+								this.isShowNoData = true
+							} else {
+								this.isShowNoData = false
+							};
 							this.$refs.uToast.show({
 								message: '删除成功!',
 								type: 'success',

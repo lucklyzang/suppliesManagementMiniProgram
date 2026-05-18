@@ -47,7 +47,6 @@
 </template>
 
 <script>
-	// ... (保持 script 部分完全不变)
 	export default {
 		name: 'dateRangePicker',
 		props: {
@@ -315,13 +314,13 @@
 			
 			padStart(val) {
 				return val.toString().padStart(2, '0');
-			},
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	/* --- 核心修改：为每个列的项目设置固定宽度，并调整固定单位标签的位置 --- */
+	/*为每个列的项目设置固定宽度，并调整固定单位标签的位置 --- */
 	::v-deep .column-left,
 	::v-deep .column-center,
 	::v-deep .column-right {
