@@ -118,7 +118,6 @@
 				noClick: true,
 				showLoadingHint: false,
 				infoText: '加载中···',
-				loadingShow: false,
 				isExceedStockQuantity: false,
 				exchangeReason: '',
 				saleReturnOrderDetailsList: {

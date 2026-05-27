@@ -668,7 +668,7 @@ export default {
 			 			 chooseMaterialList: this.chooseMaterialList
 			 		 }
 			 	 )
-			  };
+			  }
 			 } else {
 			  temporaryAddMaterialApplicationMessage.push(
 			 		 {

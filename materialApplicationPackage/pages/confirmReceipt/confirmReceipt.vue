@@ -79,7 +79,6 @@
 				isExecute: true,
 				isShowAllConfirmReceipt: false,
 				isShowNoData: false,
-				loadingShow: false,
 				isAllSure: false,
 				currentId: '',
 				saleReturnOrderList: []

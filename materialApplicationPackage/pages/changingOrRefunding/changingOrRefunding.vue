@@ -72,7 +72,6 @@
 				infoText: '加载中···',
 				isExecute: true,
 				isShowNoData: false,
-				loadingShow: false,
 				currentOrderNo: 0,
 				saleReturnOrderList: []
 			}

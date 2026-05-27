@@ -105,7 +105,6 @@
 				noClick: true,
 				showLoadingHint: false,
 				infoText: '加载中···',
-				loadingShow: false,
 				chooseMaterialList: [],
 				taskDescribe: '',
 				deliveryAddress: '',

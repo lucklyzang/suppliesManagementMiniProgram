@@ -290,7 +290,7 @@
 					this.status = 'nomore'
 				} else {
 					this.status = 'loadmore';
-					this.currentPageNum = this.currentPageNum + 1;
+					this.currentPageNum++;
 					this.getPlanOrderPageEvent({
 						pageNo: this.currentPageNum,
 						pageSize: this.pageSize,

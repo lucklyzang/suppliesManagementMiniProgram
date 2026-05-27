@@ -210,7 +210,6 @@
 			return {
 				showLoadingHint: false,
 				infoText: '加载中···',
-				loadingShow: false,
 				isExecute: true,
 				allChooseProductPrice: 0,
 				orderId: '',

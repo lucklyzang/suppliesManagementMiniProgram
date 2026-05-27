@@ -101,7 +101,6 @@
 				showLoadingHint: false,
 				isSure: false,
 				infoText: '加载中···',
-				loadingShow: false,
 				saleReturnOrderDetailsList: [],
 				saleReturnOrderMessage: {}
 			}
