@@ -164,9 +164,9 @@
 							url: '/pages/login/login'
 						});
 						this.changeOverDueWay(true);
+						if(store.getters.suppliesHomeGlobalTimer) {clearInterval(store.getters.suppliesHomeGlobalTimer)};
 						// 清空store和localStorage
 						removeAllLocalStorage();
-						if(store.getters.suppliesHomeGlobalTimer) {clearInterval(store.getters.suppliesHomeGlobalTimer)};
 						store.dispatch('resetOrderFormAuditState');
 						store.dispatch('resetMaterialApplicationOrderFormState');
 						store.dispatch('resetLoginState');

@@ -211,8 +211,8 @@
 									url: '/pages/login/login'
 								})
 							},2000);
-							// 清空store和localStorage
 							if(store.getters.suppliesHomeGlobalTimer) {clearInterval(store.getters.suppliesHomeGlobalTimer)};
+							// 清空store和localStorage
 							store.dispatch('resetOrderFormAuditState');
 							store.dispatch('resetMaterialApplicationOrderFormState');
 							store.dispatch('resetLoginState');
