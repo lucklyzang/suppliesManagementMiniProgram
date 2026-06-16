@@ -45,7 +45,7 @@
 							<view class="product-specification-right">
 								<text>￥</text>
 								<text>
-									{{ item.salePrice }}
+									{{ formatPrice(item.salePrice) }}
 								</text>
 								<text>
 									{{ `/${item.unit}` }}
@@ -59,7 +59,7 @@
 						</view>
 						<view class="product-total-price">
 							<text>￥</text>
-							<text>{{ item.showTotalPrice }}</text>
+							<text>{{ formatPrice(item.showTotalPrice) }}</text>
 						</view>
 					</view>
 				</view>
@@ -116,7 +116,7 @@
 										<view>
 											<text>￥</text>
 											<text>
-												{{ item.salePrice }}
+												{{ formatPrice(item.salePrice) }}
 											</text>
 											<text>
 												{{ `/${item.unit}` }}
@@ -425,19 +425,29 @@ export default {
 			 }, 0)
 		 },
 		 
-		 // 保留两位小数，返回数字类型，修复精度问题
+		 // 金额保留三位小数，返回数字类型，修复精度问题
 		 formatPrice(num) {
-		   if (typeof num !== 'number' || isNaN(num)) return "0.00";
-			 const value = Math.round(num * 100) / 100;
-			 return value.toFixed(2);
+			 const resultNum = Number(num);
+			 if (typeof resultNum !== 'number' || isNaN(resultNum)) return "0.000";
+				 const value = Math.round(resultNum * 1000) / 1000;
+				 return value.toFixed(3);
+		 },
+		 
+		 // 数量保留二位小数，返回数字类型，修复精度问题
+		 formatCount(num) {
+			 const resultNum = Number(num);
+			 if (typeof resultNum !== 'number' || isNaN(resultNum)) return "0.00";
+				 const value = Math.round(resultNum * 100) / 100;
+				 return value.toFixed(2);
 		 },
 		 
 		 // 产品步进器change事件
 		 productNumberBoxChange(item,index,val) {
+			 console.log('dasd1',item,val);
 			 if (val['value'] == 0) {
 				 this.chooseMaterialList.splice(index,1);
 			 };
-			 item['showTotalPrice'] = this.formatPrice(item['salePrice'] * val['value']);
+			 item['showTotalPrice'] = item['salePrice'] * val['value'];
 			 item['totalPrice'] = item['salePrice'] * val['value'];
 			 item['quantity'] = val['value'];
 			 this.reduceTotal();
@@ -538,12 +548,12 @@ export default {
 					minPrice: item['minPrice'], 	/*最低价格，单位：元 */
 					quantity: item['quantity'],
 					totalPrice: 0,
-					showTotalPrice: '0.00'
+					showTotalPrice: '0.000'
 				}) 
 			 };
 			 // 计算选中产品的对应价格
 			 for (let item of this.chooseMaterialList) {
-				 item['showTotalPrice'] = this.formatPrice(item['salePrice'] * item['quantity']);
+				 item['showTotalPrice'] = item['salePrice'] * item['quantity'];
 				 item['totalPrice'] = item['salePrice'] * item['quantity'];
 			 }; 
 			 this.reduceTotal();

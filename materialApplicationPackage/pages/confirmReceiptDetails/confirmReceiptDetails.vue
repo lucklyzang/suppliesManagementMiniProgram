@@ -47,7 +47,7 @@
 							<text>{{ item.productStandard ? item.productStandard : '' }}</text>
 						</view>
 						<view class="deliver-number-content">
-							<text>{{ item.count }}</text>
+							<text>{{ formatCount(item.count) }}</text>
 						</view>
 						<view class="sales-return-content">
 							 <u--input
@@ -156,6 +156,14 @@
 			// 取消事件
 			cancelEvent () {},
 			
+			// 数量保留二位小数，返回数字类型，修复精度问题
+			formatCount(num) {
+				 const resultNum = Number(num);
+				 if (typeof resultNum !== 'number' || isNaN(resultNum)) return "0.00";
+					 const value = Math.round(resultNum * 100) / 100;
+					 return value.toFixed(2);
+			},
+			
 			// 查询退换货详情
 			getSaleReturnEvent(data) {
 				this.showLoadingHint = true;
@@ -166,6 +174,10 @@
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 0) {
 						this.saleReturnOrderDetailsList = res.data.data;
+						this.saleReturnOrderDetailsList.items.forEach((item) => {
+							item['exchangeCount'] = this.formatCount(item['exchangeCount']);
+							item['returnCount'] = this.formatCount(item['returnCount'])
+						})
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,

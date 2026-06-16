@@ -47,7 +47,7 @@
 							<text>{{ item.productStandard ? item.productStandard : '' }}</text>
 						</view>
 						<view class="deliver-number-content">
-							<text>{{ item.count }}</text>
+							<text>{{ formatCount(item.count) }}</text>
 						</view>
 						<view class="sales-return-content">
 							 <u--input
@@ -200,6 +200,14 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.navigateBack()
+			},
+			
+			// 数量保留二位小数，返回数字类型，修复精度问题
+			formatCount(num) {
+				 const resultNum = Number(num);
+				 if (typeof resultNum !== 'number' || isNaN(resultNum)) return "0.00";
+					 const value = Math.round(resultNum * 100) / 100;
+					 return value.toFixed(2);
 			},
 			
 			extractNeedArr (notNeedKey,targetArray) {
