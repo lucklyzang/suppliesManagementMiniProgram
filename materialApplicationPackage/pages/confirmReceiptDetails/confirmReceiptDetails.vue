@@ -31,9 +31,9 @@
 					<view class="sales-return-cell">
 						<text>退货数</text>
 					</view>
-					<view class="barter-cell">
+					<!-- <view class="barter-cell">
 						<text>换货数</text>
-					</view>
+					</view> -->
 					<view class="unit-cell">
 						<text>单位</text>
 					</view>
@@ -57,14 +57,14 @@
 							    v-model="item.returnCount"
 							  ></u--input>
 						</view>
-						<view class="barter-content">
+						<!-- <view class="barter-content">
 							 <u--input
 									disabled
 							    border="none"
 									type="digit"
 							    v-model="item.exchangeCount"
 							  ></u--input>
-						</view>
+						</view> -->
 						<view class="unit-content">
 							<text>{{ item.productUnitName }}</text>
 						</view>

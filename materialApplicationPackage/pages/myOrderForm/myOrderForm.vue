@@ -93,7 +93,7 @@
 									<text>删除</text>
 								</view>
 								<view class="delete-left" v-if="item.status == 40 && hasIntersection(['erp:plan-order:return','erp:temporary-order:return'],userPermissionInfo['permissions'])" @click.stop="changingOrRefundingEvent(item,index)">
-									<text>退换货</text>
+									<text>退货</text>
 								</view>
 								<view class="edit-right" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && hasIntersection(['erp:plan-order:update','erp:temporary-order:update'],userPermissionInfo['permissions'])" @click.stop="editEvent(item,index)">
 									<text>编辑</text>

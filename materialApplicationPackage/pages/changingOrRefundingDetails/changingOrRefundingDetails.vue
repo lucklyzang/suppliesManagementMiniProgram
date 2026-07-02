@@ -9,7 +9,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
 		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="退换货" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="退货" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content">
@@ -31,9 +31,9 @@
 					<view class="sales-return-cell">
 						<text>退货数</text>
 					</view>
-					<view class="barter-cell">
+					<!-- <view class="barter-cell">
 						<text>换货数</text>
-					</view>
+					</view> -->
 					<view class="unit-cell">
 						<text>单位</text>
 					</view>
@@ -58,7 +58,7 @@
 							  v-model="item.returnCount"
 							  ></u--input>
 						</view>
-						<view class="barter-content">
+						<!-- <view class="barter-content">
 							 <u--input
 							 :disabled="saleReturnOrderMessage.status != 21"
 							  border="none"
@@ -66,7 +66,7 @@
 								@input="barterInput(item, index, $event)"
 							  v-model="item.exchangeCount"
 							  ></u--input>
-						</view>
+						</view> -->
 						<view class="unit-content">
 							<text>{{ item.productUnitName }}</text>
 						</view>
