@@ -76,7 +76,7 @@
 			<view class="exchange-reason" v-if="saleReturnOrderMessage.status == 21">
 				<view class="exchange-reason-left">
 					<text class="exchange-reason-text-one" v-if="isExceedStockQuantity">*</text>
-					<text class="exchange-reason-text-two">退换原因:</text>
+					<text class="exchange-reason-text-two">退货原因:</text>
 				</view>
 				<view class="exchange-reason-right">
 					<u--textarea v-model="exchangeReason" placeholder="请输入退换原因" border="none"></u--textarea>
@@ -343,14 +343,14 @@
 				isReturnCountNoValid = this.saleReturnOrderDetailsList['items'].some((item)=> {return regex.test(item.returnCount) === false });
 				if (is‌ExchangeCountNoValid || isReturnCountNoValid) {
 					this.$refs.uToast.show({
-						message: '请输入正确的退换货数量(正整数和0)',
+						message: '请输入正确的退货数量(正整数和0)',
 						position: 'center'
 					});
 					return;
 				};
 				if (isAllSaleReturnZero && isAllBarterOrderZero) {
 					this.$refs.uToast.show({
-						message: '退换货不能全部为0!',
+						message: '退货不能全部为0!',
 						type: 'error'
 					});
 					return
@@ -358,7 +358,7 @@
 				if (this.isExceedStockQuantity) {
 					if (this.exchangeReason === '') {
 						this.$refs.uToast.show({
-							message: '退换货理由不能为空',
+							message: '退货理由不能为空',
 							type: 'error'
 						});
 						return
