@@ -19,9 +19,7 @@
 				</view>
 			</view>
 			<view class="content-center">
-				<view class="empty-info" v-if="materialList.length == 0">
-					<u-empty text="暂无产品" mode="list"></u-empty>
-				</view>
+				<u-empty v-if="materialList.length == 0" text="暂无产品" mode="list"></u-empty>
 				<view class="product-list" v-for="(item,index) in materialList" :key="item.productName">
 					<view class="product-left">
 						<image :src="item['images'] && item['images'].length > 0 ? item['images'][0] : productDefaultImage"></image>
@@ -127,6 +125,58 @@
 					</view>
 				</view>
 			</view>
+			<view class="content-top" v-if="orderMessage['status'] == 50">
+				<view class="content-top-left">
+					<text>退货清单</text>
+				</view>
+			</view>
+			<view class="content-center" v-if="orderMessage['status'] == 50">
+				<u-empty v-if="returnOrderListMessage['list'].length == 0" text="暂无退货产品" mode="list"></u-empty>
+				<view class="product-list" v-for="(item,index) in returnOrderListMessage['list']" :key="item.productName">
+					<view class="product-left">
+						<image :src="item['images'] && item['images'].length > 0 ? item['images'][0] : productDefaultImage"></image>
+					</view>
+					<view class="product-center">
+						<view class="product-name">
+							<text>
+								{{ item.productName }}
+							</text>
+						</view>
+						<view class="product-specification">
+							<view class="product-specification-left">
+								<text>
+									{{ item.productStandard ? item.productStandard : '无' }}
+								</text>
+							</view>
+							<view class="product-specification-right">
+								<text>￥</text>
+								<text>
+									{{ formatPrice(item.productPrice) }}
+								</text>
+								<text>
+									{{ `/${item.productUnitName}` }}
+								</text>
+							</view>
+						</view>
+					</view>
+					<view class="product-right">
+						<view class="product-number-box">
+							<text>数量:</text>
+							<text>{{ formatCount(item.count) }}</text>
+						</view>
+						<view class="product-total-price">
+							<text>总额:</text>
+							<text>{{ `￥${formatPrice(item.totalPrice)}` }}</text>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="total-prices" v-if="orderMessage['status'] == 50 && returnOrderListMessage['list'].length > 0">
+				<view class="total-prices-right">
+					<text>合计:</text>
+					<text>{{ `￥${formatPrice(allReturnProductPrice)}` }}</text>
+				</view>
+			</view>
 			<view class="order-status-record">
 				<view class="order-status-record-text">
 					<text>订单状态记录:</text>
@@ -193,7 +243,7 @@
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js';
 	import { setCache,removeAllLocalStorage, getDate } from '@/common/js/utils'
-	import { getPlanOrder, queryorderOperationLog, getSaleReturnPage } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
+	import { getPlanOrder, queryorderOperationLog, getSaleReturnPage, getSaleReturnList } from '@/api/suppliesManagement/materialApplicationOrderForm.js'
 	import _ from 'lodash'
 	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
@@ -207,12 +257,16 @@
 				infoText: '加载中···',
 				isExecute: true,
 				allChooseProductPrice: 0,
+				allReturnProductPrice: 0,
 				orderId: '',
 				productDefaultImage: require('@/static/img/basic-message.png'),
 				saleReturnOrderList: [],
 				orderMessage: {},
 				materialList: [],
-				orderStatusRecordList: []
+				orderStatusRecordList: [],
+				returnOrderListMessage: {
+					list: []
+				}
 			}
 		},
 		computed: {
@@ -246,7 +300,7 @@
 		onLoad (options) {
 			this.isExecute = false;
 			this.orderId = Number(options.id);
-			this.parallelFunction()
+			this.parallelFunction();
 		},
 		onShow () {
 			if (this.isExecute) {
@@ -335,11 +389,34 @@
 				})
 			},
 			
-		// 并行查询订单详情、订单操作记录、出货单列表
+			// 查询退货单列表
+			getSaleReturnListEvent() {
+				return new Promise((resolve,reject) => {
+					getSaleReturnList(this.orderId).then((res) => {
+						this.loadingText = '';
+						this.showLoadingHint = false;
+						if ( res && res.data.code == 0) {
+							resolve(res.data.data)
+						} else {
+							reject(res.data.msg);
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+								position: 'bottom'
+							})
+						}
+					})
+					.catch((err) => {
+						reject(err)
+					})
+				})
+			},
+			
+		// 并行查询订单详情、订单操作记录、出货单列表、退货单列表
 		parallelFunction () {
 				this.showLoadingHint = true;
 				this.infoText = '加载中···';
-				Promise.all([this.getPlanOrderEvent(),this.queryorderOperationLogEvent(),this.getSaleReturnPageEvent()])
+				Promise.all([this.getPlanOrderEvent(),this.queryorderOperationLogEvent(),this.getSaleReturnPageEvent(),this.getSaleReturnListEvent()])
 				.then((res) => {
 					this.showLoadingHint = false;
 					this.infoText = '';
@@ -347,7 +424,7 @@
 						this.saleReturnOrderList = [];
 						this.orderStatusRecordList = [];
 						this.orderMessage = {};
-						let [item1,item2,item3] = res;
+						let [item1,item2,item3,item4] = res;
 						if (item1) {
 							this.orderMessage = item1;
 							this.materialList = this.orderMessage['items'];
@@ -372,6 +449,17 @@
 								});
 								this.isShowNoData = false
 							}
+						};
+						if (item4) {
+							// 合并每条退货单里的产品清单
+							this.returnOrderListMessage['list'] = [];
+							for (let item of item4) {
+								this.returnOrderListMessage['list'] = this.returnOrderListMessage['list'].concat(item['items']);
+							};
+							// 计算总退货价格
+							this.allReturnProductPrice = item4.reduce((accumulator, currentValue) => {
+								return accumulator + currentValue.totalPrice
+							}, 0)
 						}
 					}
 				})
@@ -560,17 +648,15 @@
 			 background: #F0F2FE;
 			 overflow: auto;
 			 position: relative;
-			 .empty-info {
-					width: 100px;
-					height: 120px;
-					position: absolute;
-					top: 0;
-					left: 0;
-					bottom: 0;
-					right: 0;
-					margin: auto;
-					z-index: 100;
-			 };
+			 min-height: 80px;
+			 ::v-deep .van-empty {
+					 width: 100%;
+					 height: 100%;
+					 position: absolute;
+					 top: 50%;
+					 left: 50%;
+					 transform: translate(-50%,-50%)
+				};
 			 .product-list {
 				 padding: 10px 0;
 				 box-sizing: border-box;
@@ -743,7 +829,6 @@
 			.delivery-information-list {
 				padding: 0 6px;
 				box-sizing: border-box;
-				margin-bottom: 10px;
 				max-height: 250px;
 				display: flex;
 				flex-direction: column;
@@ -876,6 +961,7 @@
 				padding: 0 6px;
 				box-sizing: border-box;
 				margin-bottom: 6px;
+				margin-top: 10px;
 				.order-status-record-text {
 					margin-bottom: 6px;
 					padding: 0 3px;

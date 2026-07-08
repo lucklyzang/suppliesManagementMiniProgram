@@ -124,6 +124,14 @@ export function getOrderEvaluate(data) {
 	  })
 }
 
+// 根据订单查询退货单
+export function getSaleReturnList(id) {
+	return request({
+	    url: `/spd/admin-api/erp/sale-return/list-by-order-id?orderId=${id}`,
+	    method: 'get'
+	  })
+}
+
 // 查询订单操作记录
 export function queryorderOperationLog(orderId) {
 	return request({
