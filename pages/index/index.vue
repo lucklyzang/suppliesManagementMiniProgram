@@ -107,7 +107,7 @@
 					},
 					{
 						text: '我的订单',
-						value: ['erp:plan-order:query','erp:temporary-order:query','erp:plan-history-order:query','erp:temporary-his-order:query'],
+						value: ['erp:plan-order:query','erp:temporary-order:query','erp:plan-history-order:query','erp:temporary-history-order:query'],
 						url: require('@/static/img/home-order-icon.png')
 					},
 					{
