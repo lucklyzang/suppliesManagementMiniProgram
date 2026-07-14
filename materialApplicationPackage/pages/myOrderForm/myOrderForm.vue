@@ -89,16 +89,28 @@
 						</view>
 						<view class="order-list-bottom">
 							<view class="order-list-btn">
-								<view class="delete-left" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && hasIntersection(['erp:plan-order:delete','erp:temporary-order:delete'],userPermissionInfo['permissions'])" @click.stop="deleteEvent(item,index)">
+								<view class="delete-left" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && item.orderTypeName == '计划订单' && hasIntersection(['erp:plan-order:delete'],userPermissionInfo['permissions'])" @click.stop="deleteEvent(item,index)">
 									<text>删除</text>
 								</view>
-								<view class="delete-left" v-if="item.status == 40 && hasIntersection(['erp:plan-order:return','erp:temporary-order:return'],userPermissionInfo['permissions'])" @click.stop="changingOrRefundingEvent(item,index)">
+								<view class="delete-left" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && item.orderTypeName == '临时订单' && hasIntersection(['erp:temporary-order:delete'],userPermissionInfo['permissions'])" @click.stop="deleteEvent(item,index)">
+									<text>删除</text>
+								</view>
+								<view class="delete-left" v-if="item.status == 40 && item.orderTypeName == '计划订单' && hasIntersection(['erp:plan-order:return'],userPermissionInfo['permissions'])" @click.stop="changingOrRefundingEvent(item,index)">
 									<text>退货</text>
 								</view>
-								<view class="edit-right" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && hasIntersection(['erp:plan-order:update','erp:temporary-order:update'],userPermissionInfo['permissions'])" @click.stop="editEvent(item,index)">
+								<view class="delete-left" v-if="item.status == 40 && item.orderTypeName == '临时订单' && hasIntersection(['erp:temporary-order:return'],userPermissionInfo['permissions'])" @click.stop="changingOrRefundingEvent(item,index)">
+									<text>退货</text>
+								</view>
+								<view class="edit-right" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && item.orderTypeName == '计划订单' && hasIntersection(['erp:plan-order:update'],userPermissionInfo['permissions'])" @click.stop="editEvent(item,index)">
 									<text>编辑</text>
 								</view>
-								<view class="edit-right" v-if="item.status == 40 && hasIntersection(['erp:plan-order:confirm','erp:temporary-order:confirm','erp:sale-out:confirm'],userPermissionInfo['permissions'])" @click.stop="sureReceivingEvent(item,index)">
+								<view class="edit-right" v-if="(item.status == 10 || item.status == 21 || item.status == 31) && item.orderTypeName == '临时订单' && hasIntersection(['erp:temporary-order:update'],userPermissionInfo['permissions'])" @click.stop="editEvent(item,index)">
+									<text>编辑</text>
+								</view>
+								<view class="edit-right" v-if="item.status == 40 && item.orderTypeName == '计划订单' && hasIntersection(['erp:plan-order:confirm','erp:sale-out:confirm'],userPermissionInfo['permissions'])" @click.stop="sureReceivingEvent(item,index)">
+									<text>确认收货</text>
+								</view>
+								<view class="edit-right" v-if="item.status == 40 && item.orderTypeName == '临时订单' && hasIntersection(['erp:temporary-order:confirm','erp:sale-out:confirm'],userPermissionInfo['permissions'])" @click.stop="sureReceivingEvent(item,index)">
 									<text>确认收货</text>
 								</view>
 							</view>
