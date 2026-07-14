@@ -97,12 +97,12 @@
 				serviceList: [
 					{
 						text: '临时申领',
-						value: ['erp:temporary-order:create','erp:plan-order:create'],
+						value: ['erp:temporary-order:create'],
 						url: require('@/static/img/home-apply-icon.png')
 					},
 					{
 						text: '计划申领',
-						value: ['erp:plan-order:create','erp:temporary-order:create'],
+						value: ['erp:plan-order:create'],
 						url: require('@/static/img/home-apply-icon.png')
 					},
 					{
