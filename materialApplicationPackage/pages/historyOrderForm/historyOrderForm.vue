@@ -478,6 +478,7 @@
 				this.currentOrderNo = item['no'];
 				if (!item.evaluate) {
 					this.scoreValue = '';
+					this.evaluateValue = '';
 					this.evaluateModalShow = true;
 				} else {
 					this.viewEvaluateEvent()
